@@ -265,20 +265,27 @@
     }
 
     /* ============================================================
-       3. BILINGUAL SWITCHER (Longhd style)
+       3. BILINGUAL SWITCHER & ARCHIVES STYLING
        ============================================================ */
     .lang-switch {
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
       margin: 10px 0 16px;
       user-select: none;
     }
 
     .lang-switch.topbar-lang-switch {
       margin: 0 16px 0 auto;
-      gap: 16px;
+      gap: 8px;
+    }
+
+    .sidebar-lang-switch {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      margin: 0 !important;
     }
 
     .lang-btn {
@@ -288,7 +295,7 @@
       background: transparent;
       padding: 2px 4px;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       letter-spacing: .5px;
       color: inherit;
@@ -299,8 +306,23 @@
       pointer-events: auto !important;
     }
 
+    .sidebar-lang-switch .lang-btn {
+      color: #f1f5f9 !important;
+      font-size: 12px !important;
+      padding: 1px 3px !important;
+    }
+
+    html[data-bs-theme="light"] .sidebar-lang-switch .lang-btn {
+      color: #334155 !important;
+    }
+
     .lang-btn.active {
       opacity: 1 !important;
+      color: #fbbf24 !important;
+    }
+
+    html[data-bs-theme="light"] .lang-btn.active {
+      color: #d97706 !important;
     }
 
     .lang-btn:hover {
@@ -308,37 +330,98 @@
     }
 
     .lang-btn:active {
-      transform: scale(.96);
+      transform: scale(.95);
     }
 
-    /* Primary CSS rules for language visibility */
+    /* Primary CSS rules for language visibility (Default: English) */
+    html:not([data-lang="vn"]) .lang-vn,
     html[data-lang="en"] .lang-vn {
       display: none !important;
     }
-    html[data-lang="en"] div.lang-en {
-      display: block !important;
+
+    html:not([data-lang="vn"]) .lang-en,
+    html[data-lang="en"] .lang-en {
+      display: revert !important;
     }
+
+    html:not([data-lang="vn"]) span.lang-en,
     html[data-lang="en"] span.lang-en {
       display: inline !important;
     }
 
-    html:not([data-lang="en"]) .lang-en,
+    html:not([data-lang="vn"]) div.lang-en,
+    html:not([data-lang="vn"]) p.lang-en,
+    html:not([data-lang="vn"]) section.lang-en,
+    html[data-lang="en"] div.lang-en,
+    html[data-lang="en"] p.lang-en,
+    html[data-lang="en"] section.lang-en {
+      display: block !important;
+    }
+
     html[data-lang="vn"] .lang-en {
       display: none !important;
     }
-    html:not([data-lang="en"]) div.lang-vn,
-    html[data-lang="vn"] div.lang-vn {
-      display: block !important;
+
+    html[data-lang="vn"] .lang-vn {
+      display: revert !important;
     }
-    html:not([data-lang="en"]) span.lang-vn,
+
     html[data-lang="vn"] span.lang-vn {
       display: inline !important;
     }
+
+    html[data-lang="vn"] div.lang-vn,
+    html[data-lang="vn"] p.lang-vn,
+    html[data-lang="vn"] section.lang-vn {
+      display: block !important;
+    }
+
+    /* Archives by tournament styling */
+    .archive-tournaments .tournament-post-item {
+      border-bottom: 1px solid rgba(125, 125, 125, 0.12);
+      transition: background-color 0.15s ease-in-out;
+    }
+
+    .archive-tournaments .tournament-post-item:hover {
+      background-color: rgba(125, 125, 125, 0.08);
+    }
+
+    .archive-tournaments .badge-category {
+      background-color: rgba(125, 125, 125, 0.18);
+      color: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.3rem 0.55rem;
+      border-radius: 4px;
+      min-width: 75px;
+      text-align: center;
+      display: inline-block;
+    }
+
+    .archive-tournaments .post-title-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .archive-tournaments .post-title-link:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
   </style>
 
-  <!-- Global Bilingual Switching Controller -->
+  <!-- Global Bilingual Switching Controller (Defaults to English) -->
   <script>
     (function() {
+      function getPreferredLang() {
+        try {
+          var saved = localStorage.getItem('blog_lang_pref');
+          if (saved === 'en' || saved === 'vn') {
+            return saved;
+          }
+        } catch (e) {}
+        return 'en'; // Standard Default: English
+      }
+
       window.setLanguage = function(lang) {
         var isVN = (lang === 'vn' || lang === 'vi');
         var targetLang = isVN ? 'vn' : 'en';
@@ -349,20 +432,21 @@
         }
 
         try {
-          localStorage.setItem('site_lang_choice', targetLang);
+          localStorage.setItem('blog_lang_pref', targetLang);
         } catch (e) {}
 
         // 1. Sync button states
         document.querySelectorAll('.lang-btn').forEach(function(btn) {
           var bLang = btn.getAttribute('data-lang');
-          var isActive = (isVN && bLang === 'vn') || (!isVN && bLang === 'en');
+          var isActive = (bLang === targetLang);
           btn.classList.toggle('active', isActive);
           btn.setAttribute('aria-selected', String(isActive));
         });
 
-        // 2. Direct DOM style modification (guarantees instant switch across all browsers)
+        // 2. Direct DOM style modification
         document.querySelectorAll('.lang-vn').forEach(function(el) {
-          if (el.tagName.toLowerCase() === 'span') {
+          var tag = el.tagName.toLowerCase();
+          if (tag === 'span' || tag === 'a') {
             el.style.setProperty('display', isVN ? 'inline' : 'none', 'important');
           } else {
             el.style.setProperty('display', isVN ? 'block' : 'none', 'important');
@@ -370,7 +454,8 @@
         });
 
         document.querySelectorAll('.lang-en').forEach(function(el) {
-          if (el.tagName.toLowerCase() === 'span') {
+          var tag = el.tagName.toLowerCase();
+          if (tag === 'span' || tag === 'a') {
             el.style.setProperty('display', isVN ? 'none' : 'inline', 'important');
           } else {
             el.style.setProperty('display', isVN ? 'none' : 'block', 'important');
@@ -378,14 +463,11 @@
         });
       };
 
-      // Immediate initialization to prevent any FOUC (flash of unstyled content)
-      var saved = 'vn';
-      try {
-        saved = localStorage.getItem('site_lang_choice') || 'vn';
-      } catch (e) {}
-      document.documentElement.setAttribute('data-lang', saved);
+      // Set immediately on head evaluation
+      var currentPref = getPreferredLang();
+      document.documentElement.setAttribute('data-lang', currentPref);
 
-      // Event delegation fallback for any dynamic buttons
+      // Event delegation fallback for any buttons
       document.addEventListener('click', function(e) {
         var btn = e.target.closest('.lang-btn');
         if (btn) {
@@ -398,7 +480,7 @@
       });
 
       function applyInitial() {
-        var cur = document.documentElement.getAttribute('data-lang') || 'vn';
+        var cur = document.documentElement.getAttribute('data-lang') || getPreferredLang();
         window.setLanguage(cur);
       }
 

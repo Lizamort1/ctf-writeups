@@ -5,6 +5,13 @@ layout: page
 
 {% include lang.html %}
 
+<!-- Long HD Style Language Switcher on Categories Page -->
+<div class="lang-switch d-flex justify-content-center align-items-center mb-4" role="tablist" aria-label="Language switch">
+  <button class="lang-btn active" role="tab" type="button" data-lang="en" aria-selected="true">EN</button>
+  <span class="text-muted opacity-50 px-2">•</span>
+  <button class="lang-btn" role="tab" type="button" data-lang="vn" aria-selected="false">VN</button>
+</div>
+
 {% assign HEAD_PREFIX = 'h_' %}
 {% assign LIST_PREFIX = 'l_' %}
 
@@ -47,15 +54,10 @@ layout: page
           <!-- content count -->
           {% assign top_posts_size = posts_of_category | size %}
           <span class="text-muted small font-weight-light">
-            {% if sub_categories_size > 0 %}
-              {{ sub_categories_size }}
-              <span class="lang-vn">chuyên mục</span>
-              <span class="lang-en">{% if sub_categories_size > 1 %}categories{% else %}category{% endif %}</span>,
-            {% endif %}
-
-            {{ top_posts_size }}
-            <span class="lang-vn">bài viết</span>
-            <span class="lang-en">{% if top_posts_size > 1 %}posts{% else %}post{% endif %}</span>
+            {%- if sub_categories_size > 0 -%}
+              {{ sub_categories_size }} <span class="lang-vn">chuyên mục</span><span class="lang-en">{% if sub_categories_size > 1 %}categories{% else %}category{% endif %}</span>, 
+            {%- endif -%}
+            {{ top_posts_size }} <span class="lang-vn">bài viết</span><span class="lang-en">{% if top_posts_size > 1 %}posts{% else %}post{% endif %}</span>
           </span>
         </span>
 
@@ -92,9 +94,7 @@ layout: page
                 {% assign sub_posts = posts_of_category | where_exp: "item", "item.categories[1] == sub_category" %}
                 {% assign posts_size = sub_posts | size %}
                 <span class="text-muted small font-weight-light">
-                  {{ posts_size }}
-                  <span class="lang-vn">bài viết</span>
-                  <span class="lang-en">{% if posts_size > 1 %}posts{% else %}post{% endif %}</span>
+                  {{ posts_size }} <span class="lang-vn">bài viết</span><span class="lang-en">{% if posts_size > 1 %}posts{% else %}post{% endif %}</span>
                 </span>
               </li>
             {% endfor %}

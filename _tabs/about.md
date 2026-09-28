@@ -5,8 +5,8 @@ title: About
 ---
 
 <div class="lang-switch" role="tablist" aria-label="Language switch">
-  <button class="lang-btn" role="tab" type="button" data-lang="en" aria-selected="false">EN</button>
-  <button class="lang-btn active" role="tab" type="button" data-lang="vn" aria-selected="true">VN</button>
+  <button class="lang-btn active" role="tab" type="button" data-lang="en" aria-selected="true">EN</button>
+  <button class="lang-btn" role="tab" type="button" data-lang="vn" aria-selected="false">VN</button>
 </div>
 
 <div class="content">

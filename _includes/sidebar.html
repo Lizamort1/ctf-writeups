@@ -69,6 +69,11 @@
   </nav>
 
   <div class="sidebar-bottom d-flex flex-wrap align-items-center w-100">
+    <div class="lang-switch sidebar-lang-switch me-auto ps-2" role="tablist" aria-label="Language switch">
+      <button class="lang-btn active" role="tab" type="button" data-lang="en" aria-selected="true">EN</button>
+      <span class="opacity-50 px-1" style="font-size: 0.8rem; color: inherit;">/</span>
+      <button class="lang-btn" role="tab" type="button" data-lang="vn" aria-selected="false">VN</button>
+    </div>
     {% unless site.theme_mode == 'light' or site.theme_mode == 'dark' %}
       {%- capture icon_system -%}
         <i class="fa-solid fa-display" data-theme-mode="system"></i>

@@ -55,10 +55,11 @@
       {% endif %}
     </div>
 
-    <!-- Longhd Style Dual-Language Toggle (EN  VN) with Direct Click Handlers -->
+    <!-- Longhd Style Dual-Language Toggle (EN / VN) with Direct Click Handlers -->
     <div class="lang-switch topbar-lang-switch ms-auto me-3" role="tablist" aria-label="Language switch">
-      <button class="lang-btn" role="tab" type="button" data-lang="en" aria-selected="false" onclick="window.setLanguage('en'); return false;">EN</button>
-      <button class="lang-btn active" role="tab" type="button" data-lang="vn" aria-selected="true" onclick="window.setLanguage('vn'); return false;">VN</button>
+      <button class="lang-btn active" role="tab" type="button" data-lang="en" aria-selected="true" onclick="window.setLanguage('en'); return false;">EN</button>
+      <span class="opacity-50 px-1" style="font-size: 0.8rem; color: inherit;">/</span>
+      <button class="lang-btn" role="tab" type="button" data-lang="vn" aria-selected="false" onclick="window.setLanguage('vn'); return false;">VN</button>
     </div>
 
     <button type="button" id="search-trigger" class="btn btn-link" aria-label="Search">

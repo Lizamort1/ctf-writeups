@@ -1,0 +1,62 @@
+---
+layout: page
+# The Archives of posts organized by competition (theo kì thi)
+---
+
+{% include lang.html %}
+
+<!-- Long HD Style Language Switcher on Archives Page -->
+<div class="lang-switch d-flex justify-content-center align-items-center mb-4" role="tablist" aria-label="Language switch">
+  <button class="lang-btn active" role="tab" type="button" data-lang="en" aria-selected="true">EN</button>
+  <span class="text-muted opacity-50 px-2">•</span>
+  <button class="lang-btn" role="tab" type="button" data-lang="vn" aria-selected="false">VN</button>
+</div>
+
+<div id="archives" class="archive-tournaments">
+  <div class="archive-overview mb-4 pb-2 border-bottom d-flex align-items-center justify-content-between">
+    <div class="text-muted small">
+      <span class="lang-en"><i class="fas fa-flag-checkered me-1 text-primary"></i> 3 Competitions · 40 Writeups</span>
+      <span class="lang-vn"><i class="fas fa-flag-checkered me-1 text-primary"></i> 3 Kỳ thi · 40 Bài viết</span>
+    </div>
+  </div>
+
+  {% assign tournament_list = "H7CTF 2026,SunshineCTF 2026,PTITCTF 2026" | split: "," %}
+
+  {% for t_name in tournament_list %}
+    {% assign t_posts = site.posts | where_exp: "item", "item.categories[0] == t_name" %}
+    {% assign t_size = t_posts | size %}
+
+    <div class="tournament-group mb-5">
+      <div class="tournament-header d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
+        <h2 class="h4 mb-0 fw-bold d-flex align-items-center">
+          <i class="fas fa-trophy text-warning me-2"></i>
+          <span>{{ t_name }}</span>
+        </h2>
+        <span class="badge bg-secondary rounded-pill px-3 py-2 fw-normal">
+          {{ t_size }}
+          <span class="lang-en">{% if t_size > 1 %}writeups{% else %}writeup{% endif %}</span>
+          <span class="lang-vn">bài viết</span>
+        </span>
+      </div>
+
+      <ul class="list-unstyled tournament-posts-list mb-0">
+        {% for post in t_posts %}
+          <li class="d-flex align-items-center justify-content-between py-2 px-2 rounded tournament-post-item">
+            <div class="d-flex align-items-center text-truncate me-3">
+              {% assign sub_cat = post.categories[1] %}
+              {% if sub_cat %}
+                <span class="badge badge-category me-2">{{ sub_cat }}</span>
+              {% endif %}
+              <a href="{{ post.url | relative_url }}" class="fw-semibold text-truncate post-title-link">
+                {{ post.title }}
+              </a>
+            </div>
+            <time class="text-muted small text-nowrap">
+              {{ post.date | date: "%b %d" }}
+            </time>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+</div>
