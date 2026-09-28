@@ -1,0 +1,6 @@
+{%- if post.description -%}
+  <span class="lang-vn">{{ post.description }}</span>
+  <span class="lang-en">{{ post.description | replace: 'Bài giải chi tiết thử thách', 'Detailed write-up for challenge' }}</span>
+{%- else -%}
+  <span class="lang-vn">{{ content }}</span>
+{%- endif -%}

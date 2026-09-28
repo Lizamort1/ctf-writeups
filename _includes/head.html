@@ -133,11 +133,36 @@
     {% endfor %}
   {% endif %}
 
-  <!-- Van Gogh Taskbar & Bilingual Switcher Styles -->
+  <!-- Dynamic Van Gogh Art Themes (Dark: Starry Night | Light: Almond Blossom) -->
   <style>
-    /* Topbar Van Gogh Background */
+    /* ============================================================
+       1. DARK MODE: The Starry Night (Vincent van Gogh, 1889)
+       ============================================================ */
+    #sidebar {
+      background-image: linear-gradient(rgba(17, 24, 39, 0.85), rgba(17, 24, 39, 0.90)), url('{{ "/assets/img/vangogh.jpg" | relative_url }}') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    #sidebar .site-title,
+    #sidebar .site-subtitle,
+    #sidebar .nav-item .nav-link,
+    #sidebar .sidebar-bottom,
+    #sidebar .sidebar-bottom a,
+    #sidebar .sidebar-bottom button {
+      color: #f1f5f9 !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+    }
+
+    #sidebar .nav-item .nav-link:hover,
+    #sidebar .nav-item.active .nav-link {
+      color: #fbbf24 !important;
+    }
+
     #topbar-wrapper {
-      background-image: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.65)), url('{{ "/assets/img/vangogh.jpg" | relative_url }}') !important;
+      background-image: linear-gradient(rgba(17, 24, 39, 0.68), rgba(17, 24, 39, 0.72)), url('{{ "/assets/img/vangogh.jpg" | relative_url }}') !important;
       background-position: center 38% !important;
       background-size: cover !important;
       background-repeat: no-repeat !important;
@@ -164,7 +189,84 @@
       color: #fbbf24 !important;
     }
 
-    /* EN - VN Language Switcher (Longhd style) */
+    #topbar-wrapper .lang-btn.active {
+      color: #fbbf24 !important;
+      opacity: 1 !important;
+    }
+
+    /* ============================================================
+       2. LIGHT MODE: Almond Blossom (Vincent van Gogh, 1890)
+       ============================================================ */
+    html[data-bs-theme="light"] #sidebar {
+      background-image: linear-gradient(rgba(248, 250, 252, 0.84), rgba(241, 245, 249, 0.88)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+    }
+
+    html[data-bs-theme="light"] #sidebar .site-title {
+      color: #0f172a !important;
+      text-shadow: none !important;
+    }
+
+    html[data-bs-theme="light"] #sidebar .site-subtitle {
+      color: #475569 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-bs-theme="light"] #sidebar .nav-item .nav-link {
+      color: #334155 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-bs-theme="light"] #sidebar .nav-item .nav-link:hover,
+    html[data-bs-theme="light"] #sidebar .nav-item.active .nav-link {
+      color: #d97706 !important;
+      background: rgba(255, 255, 255, 0.65) !important;
+      border-radius: 8px;
+    }
+
+    html[data-bs-theme="light"] #sidebar .sidebar-bottom,
+    html[data-bs-theme="light"] #sidebar .sidebar-bottom a,
+    html[data-bs-theme="light"] #sidebar .sidebar-bottom button {
+      color: #475569 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-bs-theme="light"] #topbar-wrapper {
+      background-image: linear-gradient(rgba(248, 250, 252, 0.82), rgba(241, 245, 249, 0.86)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
+      background-position: center 35% !important;
+      background-size: cover !important;
+      background-repeat: no-repeat !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    html[data-bs-theme="light"] #topbar-wrapper #breadcrumb,
+    html[data-bs-theme="light"] #topbar-wrapper #breadcrumb a,
+    html[data-bs-theme="light"] #topbar-wrapper #topbar-title,
+    html[data-bs-theme="light"] #topbar-wrapper #sidebar-trigger,
+    html[data-bs-theme="light"] #topbar-wrapper #search-trigger,
+    html[data-bs-theme="light"] #topbar-wrapper .lang-btn {
+      color: #0f172a !important;
+      text-shadow: none !important;
+    }
+
+    html[data-bs-theme="light"] #topbar-wrapper .lang-btn.active {
+      color: #d97706 !important;
+      opacity: 1 !important;
+      font-weight: 800 !important;
+    }
+
+    html[data-bs-theme="light"] #topbar-wrapper #search-trigger:hover,
+    html[data-bs-theme="light"] #topbar-wrapper #sidebar-trigger:hover {
+      color: #d97706 !important;
+    }
+
+    /* ============================================================
+       3. BILINGUAL SWITCHER (Longhd style)
+       ============================================================ */
     .lang-switch {
       display: inline-flex;
       justify-content: center;
@@ -189,7 +291,7 @@
       font-size: 14px;
       font-weight: 700;
       letter-spacing: .5px;
-      color: var(--text-color, #e0e0e0);
+      color: inherit;
       opacity: .4;
       cursor: pointer;
       transition: opacity .18s ease, transform .12s ease;
@@ -198,7 +300,6 @@
 
     .lang-btn.active {
       opacity: 1 !important;
-      color: #fbbf24 !important;
     }
 
     .lang-btn:hover {
@@ -209,78 +310,100 @@
       transform: scale(.96);
     }
 
-    /* Instant Multilingual Content Visibility */
+    /* CSS Visibility Rules (Primary & Fallback) */
     html[data-lang="en"] .lang-vn {
       display: none !important;
     }
-    html[data-lang="en"] .lang-en {
+    html[data-lang="en"] div.lang-en {
       display: block !important;
+    }
+    html[data-lang="en"] span.lang-en {
+      display: inline !important;
     }
 
     html:not([data-lang="en"]) .lang-en,
     html[data-lang="vn"] .lang-en {
       display: none !important;
     }
-
-    html:not([data-lang="en"]) .lang-vn,
-    html[data-lang="vn"] .lang-vn {
+    html:not([data-lang="en"]) div.lang-vn,
+    html[data-lang="vn"] div.lang-vn {
       display: block !important;
+    }
+    html:not([data-lang="en"]) span.lang-vn,
+    html[data-lang="vn"] span.lang-vn {
+      display: inline !important;
     }
   </style>
 
   <!-- Bilingual Instant Init & Interactive Handler -->
   <script>
     (function() {
-      // 1. Instant language check before DOM renders to prevent flash
-      var currentLang = 'vn';
-      try {
-        currentLang = localStorage.getItem('site_lang_choice') || 'vn';
-      } catch (e) {}
-      document.documentElement.setAttribute('data-lang', currentLang);
+      function applyLanguage(lang) {
+        var isVN = (lang === 'vn' || lang === 'vi');
+        var targetLang = isVN ? 'vn' : 'en';
 
-      // 2. Global language switch function
-      window.setLanguage = function(lang) {
-        var targetLang = (lang === 'en') ? 'en' : 'vn';
         document.documentElement.setAttribute('data-lang', targetLang);
         try {
           localStorage.setItem('site_lang_choice', targetLang);
         } catch (e) {}
 
+        // Update button states
         document.querySelectorAll('.lang-btn').forEach(function(btn) {
           var bLang = btn.getAttribute('data-lang');
-          var isActive = (bLang === targetLang);
+          var isActive = (isVN && bLang === 'vn') || (!isVN && bLang === 'en');
           btn.classList.toggle('active', isActive);
           btn.setAttribute('aria-selected', String(isActive));
         });
-      };
 
-      // 3. Global click delegation for all .lang-btn elements
+        // Direct DOM enforcement (Longhd technique)
+        document.querySelectorAll('.lang-vn').forEach(function(el) {
+          if (el.tagName.toLowerCase() === 'span') {
+            el.style.setProperty('display', isVN ? 'inline' : 'none', 'important');
+          } else {
+            el.style.setProperty('display', isVN ? 'block' : 'none', 'important');
+          }
+        });
+
+        document.querySelectorAll('.lang-en').forEach(function(el) {
+          if (el.tagName.toLowerCase() === 'span') {
+            el.style.setProperty('display', isVN ? 'none' : 'inline', 'important');
+          } else {
+            el.style.setProperty('display', isVN ? 'none' : 'block', 'important');
+          }
+        });
+      }
+
+      window.setLanguage = applyLanguage;
+
+      // 1. Check preference on initial parse
+      var initialLang = 'vn';
+      try {
+        initialLang = localStorage.getItem('site_lang_choice') || 'vn';
+      } catch (e) {}
+      document.documentElement.setAttribute('data-lang', initialLang);
+
+      // 2. Global click delegation
       document.addEventListener('click', function(e) {
         var btn = e.target.closest('.lang-btn');
         if (btn) {
           e.preventDefault();
           var lang = btn.getAttribute('data-lang');
           if (lang) {
-            window.setLanguage(lang);
+            applyLanguage(lang);
           }
         }
       });
 
-      // 4. Sync button active states on DOM load
-      function syncButtons() {
-        var activeLang = document.documentElement.getAttribute('data-lang') || 'vn';
-        document.querySelectorAll('.lang-btn').forEach(function(btn) {
-          var bLang = btn.getAttribute('data-lang');
-          var isActive = (bLang === activeLang);
-          btn.classList.toggle('active', isActive);
-          btn.setAttribute('aria-selected', String(isActive));
-        });
+      // 3. Apply on DOM ready
+      function onReady() {
+        var active = document.documentElement.getAttribute('data-lang') || 'vn';
+        applyLanguage(active);
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', syncButtons);
+        document.addEventListener('DOMContentLoaded', onReady);
       } else {
-        syncButtons();
+        onReady();
       }
     })();
   </script>
