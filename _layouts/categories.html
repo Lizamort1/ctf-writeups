@@ -54,9 +54,9 @@ layout: page
           <!-- content count -->
           {% assign top_posts_size = posts_of_category | size %}
           <span class="text-muted small font-weight-light">
-            {%- if sub_categories_size > 0 -%}
-              {{ sub_categories_size }} <span class="lang-vn">chuyên mục</span><span class="lang-en">{% if sub_categories_size > 1 %}categories{% else %}category{% endif %}</span>, 
-            {%- endif -%}
+            {% if sub_categories_size > 0 %}
+              {{ sub_categories_size }} <span class="lang-vn">chuyên mục,</span><span class="lang-en">{% if sub_categories_size > 1 %}categories,{% else %}category,{% endif %}</span>
+            {% endif %}
             {{ top_posts_size }} <span class="lang-vn">bài viết</span><span class="lang-en">{% if top_posts_size > 1 %}posts{% else %}post{% endif %}</span>
           </span>
         </span>
