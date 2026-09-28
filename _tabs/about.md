@@ -13,9 +13,9 @@ title: About
 
 <div class="lang-vn" markdown="1">
 
-# Ngô Quý Trường Giang
+# Lizamort1
 
-Xin chào, mình là **Ngô Quý Trường Giang** (sinh viên khóa D23, ngành An toàn thông tin tại Học viện Công nghệ Bưu chính Viễn thông - PTIT Hà Nội).
+Xin chào, mình là Lizamort1 (Ngô Quý Trường Giang), sinh viên khóa D23 ngành An toàn thông tin tại Học viện Công nghệ Bưu chính Viễn thông - PTIT Hà Nội.
 
 Đây là blog cá nhân của mình, được lập ra nhằm lưu trữ và chia sẻ các bài writeup giải đề, phân tích kỹ thuật và kinh nghiệm thực chiến từ các giải đấu CTF (Capture The Flag) trong nước và quốc tế.
 
@@ -43,9 +43,9 @@ Mình theo học chuyên ngành An toàn thông tin tại PTIT và tập trung n
 
 <div class="lang-en" markdown="1">
 
-# Ngo Quy Truong Giang
+# Lizamort1
 
-Hi there, I am **Ngo Quy Truong Giang** (D23 cohort, Information Security major at the Posts and Telecommunications Institute of Technology - PTIT Hanoi).
+Hi there, I am Lizamort1 (Ngo Quy Truong Giang), a D23 Information Security student at the Posts and Telecommunications Institute of Technology - PTIT Hanoi.
 
 This is my personal technical blog, built to archive write-ups, vulnerability analyses, exploit PoCs, and lessons learned from domestic and international CTF (Capture The Flag) competitions.
 

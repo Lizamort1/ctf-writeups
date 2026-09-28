@@ -18,8 +18,9 @@ mermaid: true
 > **Flag:** `H7CTF{4fb846630ae38a205b}`
 
 
-Bài này với description:
-`Some operators still think their domains are private. Infrastructure has a longer memory than they do.`
+Bài này có mô tả thử thách:
+
+> Some operators still think their domains are private. Infrastructure has a longer memory than they do.
 
 Đọc description, có 2 cái key ở đây:
 * **"operators"**: trong ban tổ chức/infra giải này có Abu, domain cá nhân quen thuộc là `abu.rocks`

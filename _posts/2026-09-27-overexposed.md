@@ -18,8 +18,9 @@ mermaid: true
 > **Flag:** `H7CTF{06da61b5c60e087c87c9}`
 
 
-Bài này thuộc category **Misc / Forensics** với description:
-`The comms team blacked out the sensitive photo before it went public. Nothing left in the pixels, they swore. For a redaction, it reveals an awful lot.`
+Bài này thuộc category Misc / Forensics. Mô tả thử thách:
+
+> The comms team blacked out the sensitive photo before it went public. Nothing left in the pixels, they swore. For a redaction, it reveals an awful lot.
 
 Đọc description, có các tín hiệu rất thú vị:
 * **"Nothing left in the pixels, they swore"**: Tác giả đã bôi đen toàn bộ pixel bức ảnh và khẳng định dữ liệu không nằm trong pixel raster. Điều này loại bỏ hoàn toàn các kỹ thuật LSB hay chỉnh contrast/curve thông thường.

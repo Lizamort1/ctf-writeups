@@ -18,8 +18,9 @@ mermaid: true
 > **Flag:** `H7CTF{0ddc42ef683b6bd1be9f}`
 
 
-Bài này thuộc category **AI / Hard** với description:
-`You mirrored a community model hub: one base model and eight community adapters stacked on top. Each one sails through review alone, yet the scanner keeps flagging the collection and won't say why. No member ever looks guilty by itself; it's the syndicate that bites.`
+Bài này thuộc category AI / Hard. Mô tả thử thách:
+
+> You mirrored a community model hub: one base model and eight community adapters stacked on top. Each one sails through review alone, yet the scanner keeps flagging the collection and won't say why. No member ever looks guilty by itself; it's the syndicate that bites.
 
 Đọc description, có các tín hiệu rất rõ ràng:
 * **"eight community adapters stacked on top"**: Đề bài cung cấp 8 LoRA adapters (`vendor-01` đến `vendor-08`).

@@ -27,7 +27,7 @@ layout: page
   {% for competition in competitions %}
     {% assign t_name = competition.name %}
     {% assign t_posts = competition.items %}
-    {% assign t_size = competition.size %}
+    {% assign t_size = t_posts | size %}
 
     <div class="tournament-group mb-5">
       <div class="tournament-header d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">

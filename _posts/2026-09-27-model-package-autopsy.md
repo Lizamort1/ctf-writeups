@@ -18,8 +18,9 @@ mermaid: true
 > **Flag:** `H7CTF{64080f42b43c8e48033c}`
 
 
-Bài này thuộc category **AI / Forensics** với description:
-`Meridian's ML team pulled a fine-tuned model off an internal build agent and queued it straight for production. The operator who packaged it left something off the changelog. Consider this the postmortem.`
+Bài này thuộc category AI / Forensics. Mô tả thử thách:
+
+> Meridian's ML team pulled a fine-tuned model off an internal build agent and queued it straight for production. The operator who packaged it left something off the changelog. Consider this the postmortem.
 
 Đọc description, có các điểm mấu chốt:
 * **"pulled a fine-tuned model off an internal build agent"**: Đề bài cung cấp file package mô hình `sentiment-distilbert-meridian.zip`.

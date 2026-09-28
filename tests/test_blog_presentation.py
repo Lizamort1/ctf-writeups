@@ -50,6 +50,7 @@ class BlogPresentationTests(unittest.TestCase):
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
 
         self.assertRegex(config, r"(?m)^title:\s*Lizamort1\s*(?:#.*)?$")
+        self.assertRegex(config, r"(?m)^  name:\s*Lizamort1\s*$")
         avatar_rule = re.search(r"#sidebar #avatar img\s*\{(?P<body>.*?)\}", head, re.S)
         self.assertIsNotNone(avatar_rule)
         self.assertIn("object-fit: contain", avatar_rule.group("body"))
@@ -67,13 +68,22 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertIn("rgba(241, 245, 249, 0.68)", head)
 
     def test_writeup_typography_avoids_accidental_heavy_text(self):
-        """Long quoted prose and emphasis should read as prose, not heavy code labels."""
+        """Quoted challenge descriptions should not use monospace code formatting."""
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
 
         self.assertIn(".content strong", head)
         self.assertIn("font-weight: 600", head)
-        self.assertIn(".content p > code:only-child", head)
-        self.assertIn("font-family: inherit", head)
+        self.assertNotIn(".content p > code:only-child", head)
+        for post in (ROOT / "_posts").glob("*.md"):
+            content = post.read_text(encoding="utf-8")
+            lines = content.splitlines()
+            for index, line in enumerate(lines):
+                if "Mô tả thử thách:" in line:
+                    next_content = next((item for item in lines[index + 1:] if item.strip()), "")
+                    self.assertTrue(
+                        next_content.startswith("> "),
+                        f"Challenge description should be a quotation in {post.name}",
+                    )
 
     def test_archives_are_derived_from_posts_instead_of_hard_coded(self):
         """New competitions and write-ups must appear without editing the archives layout."""
@@ -81,6 +91,7 @@ class BlogPresentationTests(unittest.TestCase):
 
         self.assertIn('group_by_exp: "post", "post.categories[0]"', archives)
         self.assertIn("site.posts | size", archives)
+        self.assertIn("assign t_size = t_posts | size", archives)
         self.assertNotIn("3 Competitions", archives)
         self.assertNotIn("40 Writeups", archives)
         self.assertNotIn('assign tournament_list = "', archives)

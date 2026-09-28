@@ -18,8 +18,9 @@ mermaid: true
 > **Flag:** `H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}`
 
 
-Bài này thuộc category **Mobile / Web API / Docker** với description:
-`Meridian Pay is a neobank that shipped in a hurry and trusts everyone: the client trusts the server, the server trusts the client, and both trust the phone underneath. Four separate cracks are hiding in that arrangement, some in the app and some in the API behind it, one flag each. Move fast, break banks.`
+Bài này thuộc category Mobile / Web API / Docker. Mô tả thử thách:
+
+> Meridian Pay is a neobank that shipped in a hurry and trusts everyone: the client trusts the server, the server trusts the client, and both trust the phone underneath. Four separate cracks are hiding in that arrangement, some in the app and some in the API behind it, one flag each. Move fast, break banks.
 
 Đọc description, tác giả chỉ rõ kiến trúc 3 thành phần có lỗ hổng:
 * **"the client trusts the server, the server trusts the client"**: Client giả định server an toàn, nhưng server lại tin tưởng tuyệt đối các header và dữ liệu do client gửi lên mà không xác thực cryptographically.

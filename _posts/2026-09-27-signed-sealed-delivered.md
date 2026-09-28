@@ -18,8 +18,9 @@ mermaid: true
 > **Flag:** `H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}`
 
 
-Bài này thuộc category **Mobile / Web API** với description:
-`Get the dispatcher-only fleet manifest the driver app never asks for. Sign for it yourself.`
+Bài này thuộc category Mobile / Web API. Mô tả thử thách:
+
+> Get the dispatcher-only fleet manifest the driver app never asks for. Sign for it yourself.
 
 Đọc description, có các tín hiệu mấu chốt:
 * **"dispatcher-only fleet manifest the driver app never asks for"**: Ứng dụng di động của tài xế (`FleetLink`) chỉ truy vấn các chuyến đi của riêng mình (`/api/v1/trips`), nhưng API backend có một endpoint ẩn chứa danh sách toàn bộ đội xe (`/api/v1/fleet/manifest`).

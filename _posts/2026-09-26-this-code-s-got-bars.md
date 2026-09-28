@@ -18,8 +18,9 @@ mermaid: true
 > **Flag:** `sun{ctf_r_4_h00m4n5}`
 
 
-Bài này thuộc category **Misc / OSINT / Hardware Badge**, do tác giả `@solarbonite` ra đề, với description:
-`1-Dimensional and Patented!`
+Bài này thuộc category Misc / OSINT / Hardware Badge, do tác giả `@solarbonite` ra đề. Mô tả thử thách:
+
+> 1-Dimensional and Patented!
 
 Đọc description, có các keyword cốt lõi:
 * **"1-Dimensional"**: Mã 1 chiều (1D Barcode - mã vạch tuyến tính).
