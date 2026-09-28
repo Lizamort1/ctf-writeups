@@ -296,6 +296,7 @@
       cursor: pointer;
       transition: opacity .18s ease, transform .12s ease;
       outline: none;
+      pointer-events: auto !important;
     }
 
     .lang-btn.active {
@@ -310,7 +311,7 @@
       transform: scale(.96);
     }
 
-    /* CSS Visibility Rules (Primary & Fallback) */
+    /* Primary CSS rules for language visibility */
     html[data-lang="en"] .lang-vn {
       display: none !important;
     }
@@ -335,19 +336,23 @@
     }
   </style>
 
-  <!-- Bilingual Instant Init & Interactive Handler -->
+  <!-- Global Bilingual Switching Controller -->
   <script>
     (function() {
-      function applyLanguage(lang) {
+      window.setLanguage = function(lang) {
         var isVN = (lang === 'vn' || lang === 'vi');
         var targetLang = isVN ? 'vn' : 'en';
 
         document.documentElement.setAttribute('data-lang', targetLang);
+        if (document.body) {
+          document.body.setAttribute('data-lang', targetLang);
+        }
+
         try {
           localStorage.setItem('site_lang_choice', targetLang);
         } catch (e) {}
 
-        // Update button states
+        // 1. Sync button states
         document.querySelectorAll('.lang-btn').forEach(function(btn) {
           var bLang = btn.getAttribute('data-lang');
           var isActive = (isVN && bLang === 'vn') || (!isVN && bLang === 'en');
@@ -355,7 +360,7 @@
           btn.setAttribute('aria-selected', String(isActive));
         });
 
-        // Direct DOM enforcement (Longhd technique)
+        // 2. Direct DOM style modification (guarantees instant switch across all browsers)
         document.querySelectorAll('.lang-vn').forEach(function(el) {
           if (el.tagName.toLowerCase() === 'span') {
             el.style.setProperty('display', isVN ? 'inline' : 'none', 'important');
@@ -371,40 +376,38 @@
             el.style.setProperty('display', isVN ? 'none' : 'block', 'important');
           }
         });
-      }
+      };
 
-      window.setLanguage = applyLanguage;
-
-      // 1. Check preference on initial parse
-      var initialLang = 'vn';
+      // Immediate initialization to prevent any FOUC (flash of unstyled content)
+      var saved = 'vn';
       try {
-        initialLang = localStorage.getItem('site_lang_choice') || 'vn';
+        saved = localStorage.getItem('site_lang_choice') || 'vn';
       } catch (e) {}
-      document.documentElement.setAttribute('data-lang', initialLang);
+      document.documentElement.setAttribute('data-lang', saved);
 
-      // 2. Global click delegation
+      // Event delegation fallback for any dynamic buttons
       document.addEventListener('click', function(e) {
         var btn = e.target.closest('.lang-btn');
         if (btn) {
           e.preventDefault();
           var lang = btn.getAttribute('data-lang');
           if (lang) {
-            applyLanguage(lang);
+            window.setLanguage(lang);
           }
         }
       });
 
-      // 3. Apply on DOM ready
-      function onReady() {
-        var active = document.documentElement.getAttribute('data-lang') || 'vn';
-        applyLanguage(active);
+      function applyInitial() {
+        var cur = document.documentElement.getAttribute('data-lang') || 'vn';
+        window.setLanguage(cur);
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', onReady);
+        document.addEventListener('DOMContentLoaded', applyInitial);
       } else {
-        onReady();
+        applyInitial();
       }
+      window.addEventListener('pageshow', applyInitial);
     })();
   </script>
 </head>
