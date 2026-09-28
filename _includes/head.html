@@ -445,7 +445,7 @@
             return saved;
           }
         } catch (e) {}
-        return 'en'; // Standard Default: English
+        return 'en';
       }
 
       function normalizeLanguage(lang) {
@@ -480,6 +480,28 @@
         });
       }
 
+      var observedTocContainers = [];
+
+      function observeToc() {
+        if (!window.MutationObserver) {
+          return;
+        }
+
+        document.querySelectorAll('#toc-wrapper, #toc-popup-content').forEach(function(container) {
+          if (observedTocContainers.indexOf(container) !== -1) {
+            return;
+          }
+
+          var observer = new MutationObserver(function() {
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+            filterTocForLanguage(current);
+          });
+
+          observer.observe(container, { childList: true, subtree: true });
+          observedTocContainers.push(container);
+        });
+      }
+
       window.setLanguage = function(lang) {
         var targetLang = normalizeLanguage(lang);
 
@@ -495,7 +517,6 @@
 
       document.documentElement.setAttribute('data-lang', getPreferredLang());
 
-      // Event delegation fallback for any buttons
       document.addEventListener('click', function(e) {
         var btn = e.target.closest('.lang-btn');
         if (btn) {
@@ -510,6 +531,7 @@
       function applyInitialLanguage() {
         var current = document.documentElement.getAttribute('data-lang') || getPreferredLang();
         window.setLanguage(current);
+        observeToc();
       }
 
       if (document.readyState === 'loading') {
