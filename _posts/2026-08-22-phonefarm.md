@@ -79,7 +79,7 @@ import hashlib
 
 key = "hello"
 flag_hash = hashlib.md5(key.encode()).hexdigest()
-print(f"PTITCTF{{{flag_hash}}}")
+print("PTITCTF{" + flag_hash + "}")
 # Output: PTITCTF{5d41402abc4b2a76b9719d911017c592}
 ```
 
@@ -149,7 +149,7 @@ salt = b"ptit_farm_device_master_2026"
 xor_transformed = bytes([b ^ 0x5A for b in salt])
 target_hash = hashlib.md5(xor_transformed).hexdigest()
 
-print("Target flag:", f"PTITCTF{{{target_hash}}}")
+print("Target flag:", "PTITCTF{" + target_hash + "}")
 ```
 
 ⇒ **Flag:** `PTITCTF{5d41402abc4b2a76b9719d911017c592}`

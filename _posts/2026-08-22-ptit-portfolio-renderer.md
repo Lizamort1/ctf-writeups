@@ -8,6 +8,8 @@ math: true
 mermaid: true
 ---
 
+{% raw %}
+
 <div class="lang-switch" role="tablist" aria-label="Language switch">
   <button class="lang-btn" role="tab" type="button" data-lang="en" aria-selected="false">EN</button>
   <button class="lang-btn active" role="tab" type="button" data-lang="vn" aria-selected="true">VN</button>
@@ -173,3 +175,5 @@ The response returns the flag: `PTITCTF{sst1_j1nj42_bl4ckl1st_byp4ss_rce_succ3ss
 * Pass user data strictly as context variables into pre-compiled template files (`render_template('index.html', user_data=data)`).
 
 </div>
+
+{% endraw %}

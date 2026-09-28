@@ -8,6 +8,8 @@ math: true
 mermaid: true
 ---
 
+{% raw %}
+
 <div class="lang-switch" role="tablist" aria-label="Language switch">
   <button class="lang-btn" role="tab" type="button" data-lang="en" aria-selected="false">EN</button>
   <button class="lang-btn active" role="tab" type="button" data-lang="vn" aria-selected="true">VN</button>
@@ -171,3 +173,5 @@ Submitting the payload via GET/POST parameters executes the command and yields t
 ⇒ **Flag:** `PTITCTF{p4lw0rld_m0d_j1nj42_s4ndb0x_3sc4p3_rce}`
 
 </div>
+
+{% endraw %}
