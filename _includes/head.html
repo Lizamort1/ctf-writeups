@@ -198,7 +198,7 @@
        2. LIGHT MODE: Irises (Vincent van Gogh, 1889)
        ============================================================ */
     html[data-bs-theme="light"] #sidebar {
-      background-image: linear-gradient(rgba(248, 250, 252, 0.84), rgba(241, 245, 249, 0.88)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
+      background-image: linear-gradient(rgba(248, 250, 252, 0.56), rgba(241, 245, 249, 0.68)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
       background-size: cover !important;
       background-position: center !important;
       background-repeat: no-repeat !important;
@@ -235,7 +235,7 @@
     }
 
     html[data-bs-theme="light"] #topbar-wrapper {
-      background-image: linear-gradient(rgba(248, 250, 252, 0.82), rgba(241, 245, 249, 0.86)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
+      background-image: linear-gradient(rgba(248, 250, 252, 0.70), rgba(241, 245, 249, 0.78)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
       background-position: center 35% !important;
       background-size: cover !important;
       background-repeat: no-repeat !important;
@@ -256,7 +256,7 @@
     html[data-bs-theme="light"] #topbar-wrapper .lang-btn.active {
       color: #d97706 !important;
       opacity: 1 !important;
-      font-weight: 800 !important;
+      font-weight: 600 !important;
     }
 
     html[data-bs-theme="light"] #topbar-wrapper #search-trigger:hover,
@@ -296,7 +296,7 @@
       padding: 2px 4px;
       font-family: inherit;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 600;
       letter-spacing: .5px;
       color: inherit;
       opacity: .4;
@@ -359,6 +359,75 @@
       text-transform: none !important;
     }
 
+    #sidebar #avatar {
+      width: 8.25rem;
+      height: 8.25rem;
+      padding: 0.3rem;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.78);
+      border: 2px solid rgba(255, 255, 255, 0.92);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+    }
+
+    #sidebar #avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      background: transparent;
+    }
+
+    #sidebar .site-title {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    article > header h1 {
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.18;
+    }
+
+    .post-desc {
+      font-weight: 400 !important;
+      line-height: 1.55;
+    }
+
+    .post-meta,
+    .post-meta a,
+    .post-meta em {
+      font-weight: 400;
+    }
+
+    .content {
+      font-weight: 400;
+      line-height: 1.75;
+    }
+
+    .content strong,
+    .content b {
+      font-weight: 600;
+    }
+
+    .content code {
+      font-weight: 400;
+      overflow-wrap: anywhere;
+    }
+
+    .content p > code:only-child {
+      display: block;
+      padding: 0.8rem 1rem;
+      font-family: inherit;
+      font-size: 0.95em;
+      font-weight: 400;
+      line-height: 1.65;
+      white-space: normal;
+      color: inherit;
+      background: rgba(125, 125, 125, 0.08);
+      border-left: 3px solid rgba(37, 99, 235, 0.45);
+      border-radius: 0 0.45rem 0.45rem 0;
+    }
+
     /* Primary CSS rules for language visibility (Default: English) */
     html:not([data-lang="vn"]) .lang-vn,
     html[data-lang="en"] .lang-vn {
@@ -405,18 +474,31 @@
     /* Archives by tournament styling */
     .archive-tournaments .tournament-post-item {
       border-bottom: 1px solid rgba(125, 125, 125, 0.12);
-      transition: background-color 0.15s ease-in-out;
+      transition: background-color 0.15s ease-in-out, transform 0.15s ease-in-out;
     }
 
     .archive-tournaments .tournament-post-item:hover {
       background-color: rgba(125, 125, 125, 0.08);
+      transform: translateX(2px);
+    }
+
+    .archive-tournaments .tournament-group {
+      padding: 1rem 1.1rem 0.35rem;
+      border: 1px solid rgba(125, 125, 125, 0.14);
+      border-radius: 0.85rem;
+      background: rgba(125, 125, 125, 0.035);
+    }
+
+    .archive-tournaments .tournament-header h2 {
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }
 
     .archive-tournaments .badge-category {
       background-color: rgba(125, 125, 125, 0.18);
       color: inherit;
       font-size: 0.72rem;
-      font-weight: 600;
+      font-weight: 500;
       padding: 0.3rem 0.55rem;
       border-radius: 4px;
       min-width: 75px;
@@ -426,12 +508,33 @@
 
     .archive-tournaments .post-title-link {
       color: inherit;
+      font-weight: 500;
       text-decoration: none;
     }
 
     .archive-tournaments .post-title-link:hover {
       color: #2563eb;
       text-decoration: underline;
+    }
+
+    @media (max-width: 575.98px) {
+      #sidebar #avatar {
+        width: 7.25rem;
+        height: 7.25rem;
+      }
+
+      .archive-tournaments .tournament-group {
+        padding: 0.85rem 0.75rem 0.25rem;
+      }
+
+      .archive-tournaments .tournament-post-item {
+        align-items: flex-start !important;
+        gap: 0.65rem;
+      }
+
+      .archive-tournaments .badge-category {
+        min-width: 4.5rem;
+      }
     }
   </style>
 
