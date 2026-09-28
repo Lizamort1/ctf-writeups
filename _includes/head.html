@@ -133,7 +133,7 @@
     {% endfor %}
   {% endif %}
 
-  <!-- Dynamic Van Gogh Art Themes (Dark: Starry Night | Light: Almond Blossom) -->
+  <!-- Dynamic Van Gogh Art Themes (Dark: Starry Night | Light: Irises) -->
   <style>
     /* ============================================================
        1. DARK MODE: The Starry Night (Vincent van Gogh, 1889)
@@ -195,7 +195,7 @@
     }
 
     /* ============================================================
-       2. LIGHT MODE: Almond Blossom (Vincent van Gogh, 1890)
+       2. LIGHT MODE: Irises (Vincent van Gogh, 1889)
        ============================================================ */
     html[data-bs-theme="light"] #sidebar {
       background-image: linear-gradient(rgba(248, 250, 252, 0.84), rgba(241, 245, 249, 0.88)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
@@ -333,6 +333,32 @@
       transform: scale(.95);
     }
 
+    /* Keep Vietnamese prose readable without changing technical code samples. */
+    body,
+    button,
+    input,
+    select,
+    textarea,
+    .content,
+    .post-desc {
+      font-family: "Source Sans Pro", "Segoe UI", sans-serif;
+    }
+
+    pre,
+    code,
+    kbd,
+    samp,
+    .highlight {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      text-transform: none;
+    }
+
+    #sidebar .nav-link,
+    #sidebar .nav-link span {
+      letter-spacing: normal;
+      text-transform: none !important;
+    }
+
     /* Primary CSS rules for language visibility (Default: English) */
     html:not([data-lang="vn"]) .lang-vn,
     html[data-lang="en"] .lang-vn {
@@ -409,7 +435,7 @@
     }
   </style>
 
-  <!-- Global Bilingual Switching Controller (Defaults to English) -->
+  <!-- Global bilingual switching controller (defaults to English). -->
   <script>
     (function() {
       function getPreferredLang() {
@@ -422,50 +448,52 @@
         return 'en'; // Standard Default: English
       }
 
+      function normalizeLanguage(lang) {
+        return (lang === 'vn' || lang === 'vi') ? 'vn' : 'en';
+      }
+
+      function syncLanguageUi(targetLang) {
+        document.querySelectorAll('.lang-btn').forEach(function(btn) {
+          var isActive = btn.getAttribute('data-lang') === targetLang;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', String(isActive));
+        });
+      }
+
+      function filterTocForLanguage(targetLang) {
+        var tocLinks = document.querySelectorAll(
+          '#toc-wrapper a[href^="#"], #toc-popup-content a[href^="#"]'
+        );
+
+        tocLinks.forEach(function(link) {
+          var fragment = link.getAttribute('href');
+          var target = fragment ? document.getElementById(fragment.slice(1)) : null;
+
+          if (!target) {
+            return;
+          }
+
+          var languageBlock = target.closest('.lang-vn, .lang-en');
+          var isVisible = !languageBlock || languageBlock.classList.contains('lang-' + targetLang);
+          link.hidden = !isVisible;
+          link.setAttribute('aria-hidden', String(!isVisible));
+        });
+      }
+
       window.setLanguage = function(lang) {
-        var isVN = (lang === 'vn' || lang === 'vi');
-        var targetLang = isVN ? 'vn' : 'en';
+        var targetLang = normalizeLanguage(lang);
 
         document.documentElement.setAttribute('data-lang', targetLang);
-        if (document.body) {
-          document.body.setAttribute('data-lang', targetLang);
-        }
 
         try {
           localStorage.setItem('blog_lang_pref', targetLang);
         } catch (e) {}
 
-        // 1. Sync button states
-        document.querySelectorAll('.lang-btn').forEach(function(btn) {
-          var bLang = btn.getAttribute('data-lang');
-          var isActive = (bLang === targetLang);
-          btn.classList.toggle('active', isActive);
-          btn.setAttribute('aria-selected', String(isActive));
-        });
-
-        // 2. Direct DOM style modification
-        document.querySelectorAll('.lang-vn').forEach(function(el) {
-          var tag = el.tagName.toLowerCase();
-          if (tag === 'span' || tag === 'a') {
-            el.style.setProperty('display', isVN ? 'inline' : 'none', 'important');
-          } else {
-            el.style.setProperty('display', isVN ? 'block' : 'none', 'important');
-          }
-        });
-
-        document.querySelectorAll('.lang-en').forEach(function(el) {
-          var tag = el.tagName.toLowerCase();
-          if (tag === 'span' || tag === 'a') {
-            el.style.setProperty('display', isVN ? 'none' : 'inline', 'important');
-          } else {
-            el.style.setProperty('display', isVN ? 'none' : 'block', 'important');
-          }
-        });
+        syncLanguageUi(targetLang);
+        filterTocForLanguage(targetLang);
       };
 
-      // Set immediately on head evaluation
-      var currentPref = getPreferredLang();
-      document.documentElement.setAttribute('data-lang', currentPref);
+      document.documentElement.setAttribute('data-lang', getPreferredLang());
 
       // Event delegation fallback for any buttons
       document.addEventListener('click', function(e) {
@@ -479,17 +507,17 @@
         }
       });
 
-      function applyInitial() {
-        var cur = document.documentElement.getAttribute('data-lang') || getPreferredLang();
-        window.setLanguage(cur);
+      function applyInitialLanguage() {
+        var current = document.documentElement.getAttribute('data-lang') || getPreferredLang();
+        window.setLanguage(current);
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', applyInitial);
+        document.addEventListener('DOMContentLoaded', applyInitialLanguage);
       } else {
-        applyInitial();
+        applyInitialLanguage();
       }
-      window.addEventListener('pageshow', applyInitial);
+      window.addEventListener('pageshow', applyInitialLanguage);
     })();
   </script>
 </head>

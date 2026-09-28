@@ -26,8 +26,8 @@
         <a href="{{ '/' | relative_url }}" class="nav-link">
           <i class="fa-fw fas fa-home"></i>
           <span>
-            <span class="lang-vn">TRANG CHỦ</span>
-            <span class="lang-en">HOME</span>
+            <span class="lang-vn">Trang chủ</span>
+            <span class="lang-en">Home</span>
           </span>
         </a>
       </li>
@@ -40,23 +40,23 @@
 
             {% if tab.title == 'Categories' %}
               <span>
-                <span class="lang-vn">CHUYÊN MỤC</span>
-                <span class="lang-en">CATEGORIES</span>
+                <span class="lang-vn">Chuyên mục</span>
+                <span class="lang-en">Categories</span>
               </span>
             {% elsif tab.title == 'Tags' %}
               <span>
-                <span class="lang-vn">THẺ TAGS</span>
-                <span class="lang-en">TAGS</span>
+                <span class="lang-vn">Thẻ</span>
+                <span class="lang-en">Tags</span>
               </span>
             {% elsif tab.title == 'Archives' %}
               <span>
-                <span class="lang-vn">LƯU TRỮ</span>
-                <span class="lang-en">ARCHIVES</span>
+                <span class="lang-vn">Lưu trữ</span>
+                <span class="lang-en">Archives</span>
               </span>
             {% elsif tab.title == 'About' %}
               <span>
-                <span class="lang-vn">GIỚI THIỆU</span>
-                <span class="lang-en">ABOUT</span>
+                <span class="lang-vn">Giới thiệu</span>
+                <span class="lang-en">About</span>
               </span>
             {% else %}
               <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>
