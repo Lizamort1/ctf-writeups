@@ -2,7 +2,7 @@
 title: "PhoneFarm"
 date: 2026-08-22 12:00:00 +0700
 categories: ["PTITCTF 2026", "Reverse Engineering"]
-tags: ["reverse", "android", "apk", "native-lib", "md5"]
+tags: ["reverse"]
 description: "Bài giải chi tiết thử thách PhoneFarm (PTITCTF 2026 - Reverse Engineering)."
 math: true
 mermaid: true
@@ -87,7 +87,7 @@ print("PTITCTF{" + flag_hash + "}")
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{5d41402abc4b2a76b9719d911017c592}`
 

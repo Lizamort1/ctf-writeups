@@ -2,7 +2,7 @@
 title: "PTIT Portfolio Renderer"
 date: 2026-08-22 12:00:00 +0700
 categories: ["PTITCTF 2026", "Web"]
-tags: ["web", "ssti", "jinja2", "blacklist-bypass", "rce"]
+tags: ["web"]
 description: "Bài giải chi tiết thử thách PTIT Portfolio Renderer (PTITCTF 2026 - Web)."
 math: true
 mermaid: true
@@ -86,18 +86,11 @@ Tối giản payload thành một dòng duy nhất để gửi qua HTTP POST:
 
 Khi gửi payload lên server, backend xử lý biểu thức, thực thi lệnh hệ thống `cat /flag*` và in trực tiếp nội dung cờ ra trang web phản hồi.
 
----
-
-## Biện pháp khắc phục (Defensive Remediation)
-
-1. **Không render trực tiếp chuỗi do người dùng cung cấp:** Thay thế `render_template_string` bằng việc nạp các tệp template tĩnh cố định qua `render_template("portfolio.html", data=safe_data)`.
-2. **Sử dụng Môi trường Hộp cát (SandboxedEnvironment):** Nếu bắt buộc phải cho phép người dùng tùy biến template, sử dụng `jinja2.sandbox.SandboxedEnvironment` để chặn đứng toàn bộ việc truy cập vào các thuộc tính nhạy cảm như `__globals__` hay `__subclasses__`.
-
 ⇒ **Flag:** `PTITCTF{sst1_j1nj42_bl4ckl1st_byp4ss_rce_succ3ss}`
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{sst1_j1nj42_bl4ckl1st_byp4ss_rce_succ3ss}`
 
@@ -166,13 +159,6 @@ template={{(lipsum|attr(['\x5f\x5f','globals','\x5f\x5f']|join))[['o','s']|join]
 ```
 
 The response returns the flag: `PTITCTF{sst1_j1nj42_bl4ckl1st_byp4ss_rce_succ3ss}`.
-
----
-
-## Defensive Remediation
-
-* Never pass unsanitized user input into `render_template_string()`.
-* Pass user data strictly as context variables into pre-compiled template files (`render_template('index.html', user_data=data)`).
 
 </div>
 

@@ -1,8 +1,8 @@
 ---
 title: "Model Package Autopsy"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "AI"]
-tags: ["ai", "forensics", "pickle", "pytorch", "deserialization"]
+categories: ["H7CTF 2026", "AI"]
+tags: ["ai"]
 description: "Bài giải chi tiết thử thách Model Package Autopsy (H7CTF'26 - AI / Forensics)."
 math: true
 mermaid: true
@@ -170,7 +170,7 @@ Kẻ đứng sau gói mô hình đã cắm một post-load hook để beacon v�
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{m0d3l_p4ck4g3_p1ckl3_0pc0d3_4ut0psy}`
 

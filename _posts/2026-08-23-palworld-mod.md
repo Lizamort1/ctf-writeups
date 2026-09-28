@@ -2,7 +2,7 @@
 title: "Palworld Mod"
 date: 2026-08-23 12:00:00 +0700
 categories: ["PTITCTF 2026", "Web"]
-tags: ["web", "path-traversal", "python-codec", "rce", "django"]
+tags: ["web"]
 description: "Bài giải chi tiết thử thách Palworld Mod (PTITCTF 2026 - Web)."
 math: true
 mermaid: true
@@ -104,18 +104,11 @@ hello
 
 Server nhận request, thực hiện tra cứu codec `pwncodec`, dẫn tới việc module độc hại được import vào tiến trình và ghi flag ra thư mục tĩnh. Truy cập đường dẫn tĩnh `/media/flag.txt` để tải cờ về.
 
----
-
-## Biện pháp khắc phục (Defensive Remediation)
-
-1. **Khử ký tự đặc biệt trong đường dẫn:** Sử dụng `os.path.basename` hoặc kiểm tra chặt chẽ tính hợp lệ của tham số `platform.code` và `mod_version` bằng regex chỉ cho phép chữ và số `^[a-zA-Z0-9_\-]+$`.
-2. **Kiểm tra giới hạn thư mục (Path Sandboxing):** Trước khi thao tác ghi tệp, luôn kiểm tra đường dẫn đích có nằm trong thư mục cho phép bằng phương thức `target_path.resolve().is_relative_to(settings.MEDIA_ROOT)`.
-
 ⇒ **Flag:** `PTITCTF{p4th_tr4v3rs4l_c0d3c_rc3_p4lw0rld}`
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{p4lw0rld_m0d_j1nj42_s4ndb0x_3sc4p3_rce}`
 

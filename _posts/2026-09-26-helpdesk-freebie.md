@@ -2,7 +2,7 @@
 title: "Helpdesk Freebie"
 date: 2026-09-26 12:00:00 +0700
 categories: ["SunshineCTF 2026", "Misc"]
-tags: ["misc", "sanity-check", "welcome"]
+tags: ["misc"]
 description: "Bài giải chi tiết thử thách Helpdesk Freebie (SunshineCTF 2026 - Misc)."
 math: true
 mermaid: true
@@ -51,7 +51,7 @@ flowchart TD
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `sun{h3lpd3sk_04uth_s3ss10n_byp4ss_fr33b13}`
 

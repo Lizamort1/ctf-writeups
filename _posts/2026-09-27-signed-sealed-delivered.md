@@ -1,8 +1,8 @@
 ---
 title: "Signed, Sealed, Delivered"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Mobile"]
-tags: ["mobile", "api", "cryptographic-signature", "hash-extension"]
+categories: ["H7CTF 2026", "Mobile"]
+tags: ["mobile"]
 description: "Bài giải chi tiết thử thách Signed, Sealed, Delivered (H7CTF'26 - Mobile / Web API)."
 math: true
 mermaid: true
@@ -119,7 +119,7 @@ Kết quả phản hồi chứa toàn bộ danh sách xe và trường `dispatch
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{s1gn3d_s34l3d_d3l1v3r3d_hm4c_k3y_r3c0v3r}`
 

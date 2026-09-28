@@ -1,8 +1,8 @@
 ---
 title: "Adapter Cartel"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "AI"]
-tags: ["ai", "lora", "safetensors", "moe", "backdoor"]
+categories: ["H7CTF 2026", "AI"]
+tags: ["ai"]
 description: "Bài giải chi tiết thử thách Adapter Cartel (H7CTF'26 - AI / ML)."
 math: true
 mermaid: true
@@ -196,7 +196,7 @@ Tất cả các dòng dưới đều triệt tiêu về 0 hoàn hảo, chỉ cò
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{l0r4_4d4pt3r_p01s0n1n9_w31ght_tr0j4n}`
 

@@ -2,7 +2,7 @@
 title: "baby-heap-V2-revenge"
 date: 2026-08-23 12:00:00 +0700
 categories: ["PTITCTF 2026", "Pwn"]
-tags: ["pwn", "heap", "glibc-2.35", "large-bin-attack", "fsop", "house-of-apple", "wfile-jumps"]
+tags: ["pwn"]
 description: "Bài giải chi tiết thử thách baby-heap-V2-revenge (PTITCTF 2026 - Pwn)."
 math: true
 mermaid: true
@@ -157,17 +157,6 @@ edit(2, bytes(z))
 
 ---
 
-## Biện pháp khắc phục (Defensive Remediation)
-
-1. **Triệt tiêu lỗ hổng Use-After-Free**:
-   Xóa toàn bộ con trỏ và kích thước trong bảng quản lý sau khi gọi `free()`.
-2. **Bảo vệ tính toàn vẹn của danh sách liên kết kép (Pointer Integrity Checking)**:
-   Các phiên bản glibc mới hơn (từ 2.36+) đã bổ sung các điều kiện assert kiểm tra tính toàn vẹn của con trỏ `fd_nextsize` và `bk_nextsize` trong Large Bin tương tự như Safe Linking, nhằm ngăn chặn việc chèn các con trỏ giả mạo vào cấu trúc dữ liệu của allocator.
-3. **Bảo vệ toàn diện cấu trúc FSOP**:
-   Đặt thuộc tính `__read_only` cho các con trỏ danh sách luồng xuất nhập sau giai đoạn khởi tạo nếu không có nhu cầu đăng ký luồng động.
-
----
-
 ## Flag
 
 ```text
@@ -176,7 +165,7 @@ PTITCTF{l4rg3_b1n_4tt4ck_fs0p_w1d3_d4t4_2.35}
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{h0us3_0f_b0tc4k3_tc4ch3_p01s0n1n9_r3v3ng3_pwn}`
 

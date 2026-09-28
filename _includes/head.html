@@ -1,0 +1,287 @@
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1e">
+  <meta
+    name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
+  >
+
+  {%- capture seo_tags -%}
+    {% seo title=false %}
+  {%- endcapture -%}
+
+  <!-- Setup Open Graph image -->
+
+  {% if page.image %}
+    {% assign src = page.image.path | default: page.image %}
+
+    {% unless src contains '://' %}
+      {%- capture img_url -%}
+        {% include media-url.html src=src subpath=page.media_subpath absolute=true %}
+      {%- endcapture -%}
+
+      {%- capture old_url -%}{{ src | absolute_url }}{%- endcapture -%}
+      {%- capture new_url -%}{{ img_url }}{%- endcapture -%}
+
+      {% assign seo_tags = seo_tags | replace: old_url, new_url %}
+    {% endunless %}
+
+  {% elsif site.social_preview_image %}
+    {%- capture img_url -%}
+      {% include media-url.html src=site.social_preview_image absolute=true %}
+    {%- endcapture -%}
+
+    {%- capture og_image -%}
+      <meta property="og:image" content="{{ img_url }}" />
+    {%- endcapture -%}
+
+    {%- capture twitter_image -%}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta property="twitter:image" content="{{ img_url }}" />
+    {%- endcapture -%}
+
+    {% assign old_meta_clip = '<meta name="twitter:card" content="summary" />' %}
+    {% assign new_meta_clip = og_image | append: twitter_image %}
+    {% assign seo_tags = seo_tags | replace: old_meta_clip, new_meta_clip %}
+  {% endif %}
+
+  {{ seo_tags }}
+
+  {%- if site.social.fediverse_handle %}
+    <!-- Fediverse handle/creator -->
+    <meta name="fediverse:creator" content="{{ site.social.fediverse_handle }}">
+  {% endif %}
+
+  <title>
+    {%- unless page.layout == 'home' -%}
+      {%- capture title -%}
+        {%- if page.collection == 'tabs' -%}
+          {%- assign tab_key = page.title | downcase -%}
+          {{- site.data.locales[include.lang].tabs[tab_key] -}}
+        {%- else -%}
+          {{- page.title -}}
+        {%- endif -%}
+      {%- endcapture -%}
+      {{- title | append: ' | ' -}}
+    {%- endunless -%}
+    {{- site.title -}}
+  </title>
+
+  {% include_cached favicons.html %}
+
+  <!-- Resource Hints -->
+  {% unless site.assets.self_host.enabled %}
+    {% for hint in site.data.origin.cors.resource_hints %}
+      {% for link in hint.links %}
+        <link rel="{{ link.rel }}" href="{{ hint.url }}" {{ link.opts | join: ' ' }}>
+      {% endfor %}
+    {% endfor %}
+  {% endunless %}
+
+  <!-- Bootstrap -->
+  {% unless jekyll.environment == 'production' %}
+    <link rel="stylesheet" href="{{ site.data.origin.cors.bootstrap.css }}">
+  {% endunless %}
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ '/assets/css/:THEME.css' | replace: ':THEME', site.theme | relative_url }}">
+
+  <!-- Web Font -->
+  <link rel="stylesheet" href="{{ site.data.origin[type].webfonts | relative_url }}">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="{{ site.data.origin[type].fontawesome.css | relative_url }}">
+
+  <!-- 3rd-party Dependencies -->
+
+  {% if site.toc and page.toc %}
+    <link rel="stylesheet" href="{{ site.data.origin[type].toc.css | relative_url }}">
+  {% endif %}
+
+  {% if page.layout == 'post' or page.layout == 'page' or page.layout == 'home' %}
+    <link rel="stylesheet" href="{{ site.data.origin[type]['lazy-polyfill'].css | relative_url }}">
+  {% endif %}
+
+  {% if page.layout == 'page' or page.layout == 'post' %}
+    <!-- Image Popup -->
+    <link rel="stylesheet" href="{{ site.data.origin[type].glightbox.css | relative_url }}">
+  {% endif %}
+
+  <!-- Scripts -->
+
+  <script src="{{ '/assets/js/dist/theme.min.js' | relative_url }}"></script>
+
+  {% include js-selector.html lang=lang %}
+
+  {% if jekyll.environment == 'production' %}
+    <!-- PWA -->
+    {% if site.pwa.enabled %}
+      <script
+        defer
+        src="{{ '/app.min.js' | relative_url }}?baseurl={{ site.baseurl | default: '' }}&register={{ site.pwa.cache.enabled }}"
+      ></script>
+    {% endif %}
+
+    <!-- Web Analytics -->
+    {% for analytics in site.analytics %}
+      {% capture str %}{{ analytics }}{% endcapture %}
+      {% assign platform = str | split: '{' | first %}
+      {% if site.analytics[platform].id and site.analytics[platform].id != empty %}
+        {% include analytics/{{ platform }}.html %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  <!-- Van Gogh Taskbar & Bilingual Switcher Styles -->
+  <style>
+    /* Topbar Van Gogh Background */
+    #topbar-wrapper {
+      background-image: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.65)), url('{{ "/assets/img/vangogh.jpg" | relative_url }}') !important;
+      background-position: center 38% !important;
+      background-size: cover !important;
+      background-repeat: no-repeat !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    #topbar {
+      background: transparent !important;
+    }
+
+    #topbar-wrapper #breadcrumb,
+    #topbar-wrapper #breadcrumb a,
+    #topbar-wrapper #topbar-title,
+    #topbar-wrapper #sidebar-trigger,
+    #topbar-wrapper #search-trigger,
+    #topbar-wrapper .lang-btn {
+      color: #ffffff !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    }
+
+    #topbar-wrapper #search-trigger:hover,
+    #topbar-wrapper #sidebar-trigger:hover {
+      color: #fbbf24 !important;
+    }
+
+    /* EN - VN Language Switcher (Longhd style) */
+    .lang-switch {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin: 10px 0 16px;
+      user-select: none;
+    }
+
+    .lang-switch.topbar-lang-switch {
+      margin: 0 16px 0 auto;
+      gap: 16px;
+    }
+
+    .lang-btn {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 2px 4px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: var(--text-color, #e0e0e0);
+      opacity: .4;
+      cursor: pointer;
+      transition: opacity .18s ease, transform .12s ease;
+      outline: none;
+    }
+
+    .lang-btn.active {
+      opacity: 1 !important;
+      color: #fbbf24 !important;
+    }
+
+    .lang-btn:hover {
+      opacity: .9;
+    }
+
+    .lang-btn:active {
+      transform: scale(.96);
+    }
+
+    /* Instant Multilingual Content Visibility */
+    html[data-lang="en"] .lang-vn {
+      display: none !important;
+    }
+    html[data-lang="en"] .lang-en {
+      display: block !important;
+    }
+
+    html:not([data-lang="en"]) .lang-en,
+    html[data-lang="vn"] .lang-en {
+      display: none !important;
+    }
+
+    html:not([data-lang="en"]) .lang-vn,
+    html[data-lang="vn"] .lang-vn {
+      display: block !important;
+    }
+  </style>
+
+  <!-- Bilingual Instant Init & Interactive Handler -->
+  <script>
+    (function() {
+      // 1. Instant language check before DOM renders to prevent flash
+      var currentLang = 'vn';
+      try {
+        currentLang = localStorage.getItem('site_lang_choice') || 'vn';
+      } catch (e) {}
+      document.documentElement.setAttribute('data-lang', currentLang);
+
+      // 2. Global language switch function
+      window.setLanguage = function(lang) {
+        var targetLang = (lang === 'en') ? 'en' : 'vn';
+        document.documentElement.setAttribute('data-lang', targetLang);
+        try {
+          localStorage.setItem('site_lang_choice', targetLang);
+        } catch (e) {}
+
+        document.querySelectorAll('.lang-btn').forEach(function(btn) {
+          var bLang = btn.getAttribute('data-lang');
+          var isActive = (bLang === targetLang);
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', String(isActive));
+        });
+      };
+
+      // 3. Global click delegation for all .lang-btn elements
+      document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.lang-btn');
+        if (btn) {
+          e.preventDefault();
+          var lang = btn.getAttribute('data-lang');
+          if (lang) {
+            window.setLanguage(lang);
+          }
+        }
+      });
+
+      // 4. Sync button active states on DOM load
+      function syncButtons() {
+        var activeLang = document.documentElement.getAttribute('data-lang') || 'vn';
+        document.querySelectorAll('.lang-btn').forEach(function(btn) {
+          var bLang = btn.getAttribute('data-lang');
+          var isActive = (bLang === activeLang);
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', String(isActive));
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncButtons);
+      } else {
+        syncButtons();
+      }
+    })();
+  </script>
+</head>

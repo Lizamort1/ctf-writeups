@@ -1,8 +1,8 @@
 ---
 title: "Public Domain"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "OSINT"]
-tags: ["osint", "ct-logs", "wkd", "openpgp", "certspotter"]
+categories: ["H7CTF 2026", "OSINT"]
+tags: ["osint"]
 description: "Bài giải chi tiết thử thách Public Domain (H7CTF'26 - OSINT / Web)."
 math: true
 mermaid: true
@@ -205,7 +205,7 @@ User ID packet (Tag 13) có format `Name (Comment) <Email>`, tác giả nhét lu
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{publ1c_d0m41n_dns_s0ck3t_pwn_rce}`
 

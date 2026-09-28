@@ -32,20 +32,6 @@ Mình theo học chuyên ngành An toàn thông tin tại PTIT và tập trung n
 
 ---
 
-### Các giải đấu lưu trữ trên Blog
-
-Hiện tại, kho writeup trên blog đang lưu trữ đầy đủ 40 bài giải chi tiết kèm mã nguồn PoC và sơ đồ luồng khai thác:
-
-* **PTITCTF 2026 (14 bài):**
-  * *Vòng loại:* Machine Love, PTIT Portfolio Renderer, Palworld Mod, Operation Midnight Drop, baby-heap-V2, baby-heap-V2-revenge, MMO, Winux, GhostVM, Phonefarm, That Should Be NHH.
-  * *Chung kết:* Racing Monster, Endgame01, Megalovania.
-* **SunshineCTF 2026 (6 bài):**
-  * Vecnet (AI / ML Embeddings), IntMod (Reverse / Custom VM), RoboCall (Forensics / Audio DTMF), FlameOn (Reverse), Helpdesk Freebie (Web), This Code's Got Bars! (Misc).
-* **H7CTF'26 / WebVerse (20 bài):**
-  * Bartbrack, Broken Telephone, Constraint Yourself, Countersign, Fee Swap, FleetLink, Frame of Reference, Hothouse, Lockstep, Meridian Pay, Model Package Autopsy, Modem Operandi, Overexposed, Public Domain, Rust in Peace, Signed Sealed Delivered, The Ledger Never Sleeps, Toll Story, WorldOutter, Adapter Cartel.
-
----
-
 ### Thông tin liên hệ
 
 * **Email:** [ngoquytruonggiang@gmail.com](mailto:ngoquytruonggiang@gmail.com)
@@ -55,7 +41,7 @@ Hiện tại, kho writeup trên blog đang lưu trữ đầy đủ 40 bài giả
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 # Ngo Quy Truong Giang
 
@@ -73,20 +59,6 @@ As an Information Security student at PTIT, my technical research primarily cent
 * **Binary Exploitation (Pwn):** Linux userland heap exploitation (glibc heap internals, UAF, Tcache poisoning), Buffer Overflows, ROP.
 * **Applied Cryptography:** Modular arithmetic, Elliptic Curve Cryptography, PRNG state recovery.
 * **Reverse Engineering & Forensics:** Custom VM bytecode disassemblers, anti-analysis deobfuscation, memory & network analysis.
-
----
-
-### Archived CTF Competitions
-
-The blog currently hosts 40 comprehensive write-ups with full PoC scripts and analysis diagrams:
-
-* **PTITCTF 2026 (14 challenges):**
-  * *Qualifiers:* Machine Love, PTIT Portfolio Renderer, Palworld Mod, Operation Midnight Drop, baby-heap-V2, baby-heap-V2-revenge, MMO, Winux, GhostVM, Phonefarm, That Should Be NHH.
-  * *Finals:* Racing Monster, Endgame01, Megalovania.
-* **SunshineCTF 2026 (6 challenges):**
-  * Vecnet (AI / ML Embeddings), IntMod (Reverse / Custom VM), RoboCall (Forensics / Audio DTMF), FlameOn (Reverse), Helpdesk Freebie (Web), This Code's Got Bars! (Misc).
-* **H7CTF'26 / WebVerse (20 challenges):**
-  * Bartbrack, Broken Telephone, Constraint Yourself, Countersign, Fee Swap, FleetLink, Frame of Reference, Hothouse, Lockstep, Meridian Pay, Model Package Autopsy, Modem Operandi, Overexposed, Public Domain, Rust in Peace, Signed Sealed Delivered, The Ledger Never Sleeps, Toll Story, WorldOutter, Adapter Cartel.
 
 ---
 

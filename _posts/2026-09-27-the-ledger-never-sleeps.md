@@ -1,8 +1,8 @@
 ---
 title: "The Ledger Never Sleeps"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Crypto"]
-tags: ["crypto", "ecdsa", "nonce-reuse", "signature-forgery"]
+categories: ["H7CTF 2026", "Crypto"]
+tags: ["crypto"]
 description: "Bài giải chi tiết thử thách The Ledger Never Sleeps (H7CTF'26 - Crypto)."
 math: true
 mermaid: true
@@ -95,7 +95,7 @@ Server verify bằng pubkey của nó và thả cờ:
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{th3_l3dg3r_n3v3r_sl33ps_p0ll4rd_rh0}`
 

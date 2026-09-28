@@ -1,8 +1,8 @@
 ---
 title: "Toll Story"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Reverse Engineering"]
-tags: ["reverse", "protocol", "binary-patching", "traffic-analysis"]
+categories: ["H7CTF 2026", "Reverse Engineering"]
+tags: ["reverse"]
 description: "Bài giải chi tiết thử thách Toll Story (H7CTF'26 - Reverse Engineering)."
 math: true
 mermaid: true
@@ -111,7 +111,7 @@ print(flag.decode())
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{t0ll_st0ry_d3lph1_r3v_k3y_d3r1v4t10n}`
 

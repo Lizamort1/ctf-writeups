@@ -1,8 +1,8 @@
 ---
 title: "Modem Operandi"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Reverse Engineering"]
-tags: ["reverse", "firmware", "modem", "at-commands"]
+categories: ["H7CTF 2026", "Reverse Engineering"]
+tags: ["reverse"]
 description: "Bài giải chi tiết thử thách Modem Operandi (H7CTF'26 - Reverse Engineering)."
 math: true
 mermaid: true
@@ -99,7 +99,7 @@ Tính `MD5("H7X-9F2A-COREKEY")`, dùng làm khóa AES-128-CBC với IV = 16 byte
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{m0d3m_0p3r4nd1_4t_c0mm4nd_1nj3ct10n}`
 

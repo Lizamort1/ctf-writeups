@@ -2,7 +2,7 @@
 title: "Machine Love"
 date: 2026-08-22 12:00:00 +0700
 categories: ["PTITCTF 2026", "Web"]
-tags: ["web", "double-url-encode", "path-traversal", "lfr", "information-disclosure"]
+tags: ["web"]
 description: "Bài giải chi tiết thử thách Machine Love (PTITCTF 2026 - Web)."
 math: true
 mermaid: true
@@ -81,25 +81,11 @@ Host: target.ptitctf.vn
 2. **Tại Backend:** Ứng dụng gọi `unquote("%2e%2e%2f")` chuyển thành `../`, cho phép thoát khỏi thư mục tài liệu gốc và đọc trực tiếp file `/flag.txt`.
 3. Server trả về nội dung cờ nguyên vẹn trong phần thân phản hồi HTTP.
 
----
-
-## Biện pháp khắc phục (Defensive Remediation)
-
-1. **Tuyệt đối không giải mã URL nhiều lần:** Chỉ tin cậy vào việc chuẩn hóa của một tầng duy nhất để tránh xung đột ngữ nghĩa (Parser Differentials).
-2. **Sử dụng cơ chế kiểm tra đường dẫn an toàn:**
-   * Sử dụng danh sách trắng (Allowlist) các tệp tin được phép đọc.
-   * Sử dụng hàm `os.path.realpath` và kiểm tra xem đường dẫn tuyệt đối cuối cùng có bắt đầu bằng thư mục an toàn hay không:
-     ```python
-     safe_path = os.path.realpath(os.path.join(DOCS_DIR, filename))
-     if not safe_path.startswith(DOCS_DIR):
-         abort(403)
-     ```
-
 ⇒ **Flag:** `PTITCTF{d0ubl3_url_3nc0d1ng_p4th_tr4v3rs4l}`
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{d0ubl3_url_3nc0d1ng_p4th_tr4v3rs4l}`
 
@@ -179,22 +165,5 @@ print("Flag Content:", r.text.strip())
 ```
 
 The server successfully returns HTTP 200 containing the flag.
-
----
-
-## Defensive Remediation
-
-1. **Avoid Redundant Decoding:** Remove redundant secondary decoding routines (`urllib.parse.unquote`) in backend code. All framework inputs should be handled once at the framework level.
-2. **Canonical Path Resolution:** Validate paths using canonical absolute path resolution:
-   ```python
-   import os
-
-   base_dir = os.path.abspath("/var/www/docs")
-   target_path = os.path.abspath(os.path.join(base_dir, user_filename))
-
-   if not target_path.startswith(base_dir):
-       raise ValueError("Access Denied: Path Traversal Detected")
-   ```
-3. **Whitelist Permitted Filenames:** Match incoming file requests against a strict regex whitelist (`^[a-zA-Z0-9_-]+\.[a-z]{3,4}$`).
 
 </div>

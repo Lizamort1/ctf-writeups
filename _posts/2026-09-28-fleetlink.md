@@ -1,8 +1,8 @@
 ---
 title: "FleetLink"
 date: 2026-09-28 12:00:00 +0700
-categories: ["H7CTF'26", "Mobile"]
-tags: ["mobile", "android", "apk", "hmac-sha256", "oracle", "api"]
+categories: ["H7CTF 2026", "Mobile"]
+tags: ["mobile"]
 description: "Bài giải chi tiết thử thách FleetLink (H7CTF'26 - Mobile / API)."
 math: true
 mermaid: true
@@ -90,30 +90,6 @@ scope 'mine' cannot list the full fleet; requires scope=all (dispatcher)
 Vì mình ký được request tùy ý, chỉ cần ký đúng canonical có `scope=all` trên path mới ⇒ 200 OK, và
 manifest dispatcher trả về kèm trường `dispatcher_manifest_signing_key` — chính là cờ.
 
----
-
-## Bước 4: Những hướng đã loại trừ (đừng làm lại)
-
-* **264 tổ hợp deviceId × param** trên `/api/v1/trips` chỉ trả về **một** phản hồi duy nhất ⇒ role
-  không liên quan gì tới deviceId, nên không có chuyện "đoán deviceId của dispatcher". APK cũng chứa
-  không id nào dạng `flt-`/`dsp-`.
-* **HTTP parameter pollution**: ký `scope=mine` rồi gửi `scope=mine&scope=all`, duplicate key,
-  separator `;`, `%61ll`, `Scope=all`... tất cả đều không đổi được kết quả. Server verify chữ ký trên
-  query string gần như nguyên văn — **mọi sai lệch đều `bad signature`**, tức nó ký trên chuỗi gốc
-  chứ không parse lại.
-
-
----
-
-## Biện pháp khắc phục (Defensive Remediation)
-
-1. **Không nhúng bí mật dùng chung (Shared Secret) vào Client**:
-   Tuyệt đối không lưu trữ khóa đối xứng (signing pepper/secret) trong mã nguồn ứng dụng client (APK/iOS). Mọi thao tác ký xác thực phải được xử lý ở tầng backend hoặc thông qua hạ tầng Public Key Infrastructure (PKI) với cặp khóa bất đối xứng sinh động trong Hardware Keystore.
-2. **Kiểm soát phân quyền nghiêm ngặt ở Server (Role-Based Access Control)**:
-   Backend phải xác thực danh tính người dùng và vai trò (Role) thông qua token phiên độc lập (ví dụ: OAuth 2.0 / JWT có chữ ký của Authorization Server), không cho phép client tùy ý chỉ định `scope=all` trên query parameter.
-3. **Thống nhất mã phản hồi (Consistent Error Handling)**:
-   Đồng nhất phản hồi HTTP 404 cho các route không có quyền truy cập hoặc không tồn tại để ngăn chặn kỹ thuật dò đường (Endpoint Enumeration Oracle).
-
 ## Flag
 
 ```text
@@ -122,7 +98,7 @@ H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{fl33tl1nk_br0k3n_0bj3ct_l3v3l_4uth_b0l4}`
 

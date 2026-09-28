@@ -1,8 +1,8 @@
 ---
 title: "BartBrack"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Web"]
-tags: ["web", "prototype-pollution", "ssti", "webverse"]
+categories: ["H7CTF 2026", "Web"]
+tags: ["web"]
 description: "Bài giải chi tiết thử thách BartBrack (H7CTF'26 - Web)."
 math: true
 mermaid: true
@@ -122,7 +122,7 @@ JSON phản hồi trả về trường `release_code` chứa flag:
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{gr4phql_b4tch_0tp_brut3_rce}`
 

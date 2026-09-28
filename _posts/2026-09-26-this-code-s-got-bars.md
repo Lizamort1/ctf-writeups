@@ -2,7 +2,7 @@
 title: "This Code's Got Bars!"
 date: 2026-09-26 12:00:00 +0700
 categories: ["SunshineCTF 2026", "Misc"]
-tags: ["misc", "osint", "barcode", "code39", "badge"]
+tags: ["misc"]
 description: "Bài giải chi tiết thử thách This Code's Got Bars! (SunshineCTF 2026 - Misc / OSINT)."
 math: true
 mermaid: true
@@ -208,7 +208,7 @@ Mã checksum khớp tuyệt đối `25 == 25`, kết quả giải ra nguyên vă
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `sun{b4rc0d3_r3c0nstruct10n_m4st3r_2026}`
 

@@ -1,8 +1,8 @@
 ---
 title: "Frame of Reference"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Pwn"]
-tags: ["pwn", "cpp-coroutine", "uaf", "slab-allocator"]
+categories: ["H7CTF 2026", "Pwn"]
+tags: ["pwn"]
 description: "Bài giải chi tiết thử thách Frame of Reference (H7CTF'26 - Pwn)."
 math: true
 mermaid: true
@@ -92,7 +92,7 @@ $$\text{Output} = \text{flag} \oplus 0 = \text{flag}$$
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{fr4m3_0f_r3f3r3nc3_l1n34r_cr4ck}`
 

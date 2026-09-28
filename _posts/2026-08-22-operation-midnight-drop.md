@@ -2,7 +2,7 @@
 title: "Operation Midnight Drop"
 date: 2026-08-22 12:00:00 +0700
 categories: ["PTITCTF 2026", "Pwn"]
-tags: ["pwn", "heap", "heap-overflow", "function-pointer-overwrite", "custom-protocol", "glibc"]
+tags: ["pwn"]
 description: "Bài giải chi tiết thử thách Operation Midnight Drop (PTITCTF 2026 - Pwn)."
 math: true
 mermaid: true
@@ -121,23 +121,6 @@ Một shell tương tác được mở ra trên máy chủ mục tiêu. Thực h
 
 ---
 
-## Biện pháp khắc phục (Defensive Remediation)
-
-1. **Khắc phục lỗi kiểm tra độ dài đầu vào**:
-   Kiểm tra kích thước biên nghiêm ngặt dựa trên kích thước thực tế của vùng nhớ được cấp phát, không phụ thuộc vào giá trị header người dùng cung cấp:
-   ```c
-   if (declared_len > ALLOCATED_RULE_SIZE) {
-       return ERROR_INVALID_LENGTH;
-   }
-   memcpy(rule_buf, input_data, declared_len);
-   ```
-2. **Tách biệt vùng dữ liệu và con trỏ điều khiển (Data/Control Separation)**:
-   Không đặt con trỏ hàm (`function pointer`) trên vùng nhớ heap chung với dữ liệu do người dùng kiểm soát. Con trỏ hàm nên được cố định trong các bảng tra cứu chỉ đọc (jump table trong `.rodata`).
-3. **Bật cơ chế bảo vệ Safe Linking và Pointer Authentication**:
-   Mã hóa các con trỏ hàm nội bộ trước khi lưu trữ hoặc sử dụng kiến trúc thiết kế hướng đối tượng an toàn với các hàm getter/dispatcher tĩnh.
-
----
-
 ## Flag
 
 ```text
@@ -146,7 +129,7 @@ PTITCTF{0p3r4t10n_m1dn1ght_dr0p_h34p_0v3rfl0w}
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{h34p_0v3rfl0w_fn_ptr_0v3rwr1t3_gl1bc}`
 

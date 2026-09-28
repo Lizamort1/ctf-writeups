@@ -1,8 +1,8 @@
 ---
 title: "WorldOutter"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Web"]
-tags: ["web", "jwt", "git-leak", "webverse", "auth-bypass"]
+categories: ["H7CTF 2026", "Web"]
+tags: ["web"]
 description: "Bài giải chi tiết thử thách WorldOutter (H7CTF'26 - Web)."
 math: true
 mermaid: true
@@ -115,7 +115,7 @@ Phản hồi trả về trang quản trị chứa League API Key mang định d�
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `WEBVERSE{cae45c5951bcb5565e70eb9ff37569a9}`
 

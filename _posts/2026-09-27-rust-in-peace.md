@@ -1,8 +1,8 @@
 ---
 title: "Rust in Peace"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Reverse Engineering"]
-tags: ["reverse", "rust", "decompilation", "ghidra"]
+categories: ["H7CTF 2026", "Reverse Engineering"]
+tags: ["reverse"]
 description: "Bài giải chi tiết thử thách Rust in Peace (H7CTF'26 - Reverse Engineering)."
 math: true
 mermaid: true
@@ -116,7 +116,7 @@ Flag: H7CTF{3f7b3f564a5524ce863d}
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{rust_1n_p34c3_uns4f3_tr4nsmut3_uaf}`
 

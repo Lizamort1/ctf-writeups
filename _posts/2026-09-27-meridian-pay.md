@@ -1,8 +1,8 @@
 ---
 title: "Meridian Pay"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Mobile"]
-tags: ["mobile", "android", "api", "jwt", "auth-bypass"]
+categories: ["H7CTF 2026", "Mobile"]
+tags: ["mobile"]
 description: "Bài giải chi tiết thử thách Meridian Pay (H7CTF'26 - Mobile / Web API)."
 math: true
 mermaid: true
@@ -237,7 +237,7 @@ Nội dung phản hồi trả về ghi chú phiên làm việc của tài khoả
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{m3r1d14n_p4y_m4ss_4ss1gnm3nt_c0nt3nt_pr0v1d3r}`
 

@@ -1,8 +1,8 @@
 ---
 title: "Constraint Yourself"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Reverse Engineering"]
-tags: ["reverse", "z3", "smt-solver", "symbolic-execution"]
+categories: ["H7CTF 2026", "Reverse Engineering"]
+tags: ["reverse"]
 description: "Bài giải chi tiết thử thách Constraint Yourself (H7CTF'26 - Reverse Engineering)."
 math: true
 mermaid: true
@@ -95,7 +95,7 @@ Kết quả:
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{c0nstr41nt_z3_s0lv3r_l1n34r_s1mult4n30us}`
 

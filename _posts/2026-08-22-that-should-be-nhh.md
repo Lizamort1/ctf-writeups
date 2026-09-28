@@ -2,7 +2,7 @@
 title: "That Should Be nhh"
 date: 2026-08-22 12:00:00 +0700
 categories: ["PTITCTF 2026", "Crypto"]
-tags: ["crypto", "rsa", "wiener-attack", "continued-fractions", "ecm", "coppersmith"]
+tags: ["crypto"]
 description: "Bài giải chi tiết thử thách That Should Be nhh (PTITCTF 2026 - Crypto)."
 math: true
 mermaid: true
@@ -84,7 +84,7 @@ Khi đã có $s$:
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{7h47_5h0uld_b3_nhh,_h0ld1n9_y0ur_h4nd}`
 

@@ -1,8 +1,8 @@
 ---
 title: "Racing Monster"
 date: 2026-09-13 12:00:00 +0700
-categories: ["PTITCTF 2026 (Final)", "Reverse Engineering"]
-tags: ["reverse", "scheduled-rounds", "carry-rotation", "custom-vm", "constraint-solving"]
+categories: ["PTITCTF 2026", "Reverse Engineering"]
+tags: ["reverse"]
 description: "Bài giải chi tiết thử thách Racing Monster (PTITCTF 2026 (Final) - Reverse Engineering)."
 math: true
 mermaid: true
@@ -104,7 +104,7 @@ Kiểm tra lại toàn bộ chuỗi thu được thỏa mãn tất cả 49 đi�
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{t0ct0u_r4c1ng_m0nst3r_c0ncurr3ncy_pr0f1t}`
 

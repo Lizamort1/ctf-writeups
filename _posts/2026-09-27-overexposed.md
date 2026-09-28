@@ -1,8 +1,8 @@
 ---
 title: "Overexposed"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Forensics"]
-tags: ["forensics", "steganography", "image-analysis", "exif"]
+categories: ["H7CTF 2026", "Forensics"]
+tags: ["forensics"]
 description: "Bài giải chi tiết thử thách Overexposed (H7CTF'26 - Forensics / Misc)."
 math: true
 mermaid: true
@@ -208,7 +208,7 @@ $$\text{Flag} = \text{part1} + \text{part2} + \text{part3} = \texttt{06da61b} + 
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{0v3r3xp0s3d_k3y_l34k_v14_f0rm4t_str1ng}`
 

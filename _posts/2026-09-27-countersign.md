@@ -1,8 +1,8 @@
 ---
 title: "Countersign"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Reverse Engineering"]
-tags: ["reverse", "vm", "mac-oracle", "custom-arch"]
+categories: ["H7CTF 2026", "Reverse Engineering"]
+tags: ["reverse"]
 description: "Bài giải chi tiết thử thách Countersign (H7CTF'26 - Reverse Engineering)."
 math: true
 mermaid: true
@@ -80,7 +80,7 @@ Chương trình duyệt qua toàn bộ các node hợp lệ và in ra flag:
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{c0unt3rs1gn_d1g1t4l_s1gn4tur3_n0nc3_r3us3}`
 

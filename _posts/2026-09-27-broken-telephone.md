@@ -1,8 +1,8 @@
 ---
 title: "Broken Telephone"
 date: 2026-09-27 12:00:00 +0700
-categories: ["H7CTF'26", "Crypto"]
-tags: ["crypto", "noise-protocol", "poly1305", "nonce-reuse"]
+categories: ["H7CTF 2026", "Crypto"]
+tags: ["crypto"]
 description: "Bài giải chi tiết thử thách Broken Telephone (H7CTF'26 - Crypto)."
 math: true
 mermaid: true
@@ -203,7 +203,7 @@ một cờ**.
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `h7ctf{bl4k32s_k3y_m1x1n9_m1sund3rst4nd1n9}`
 

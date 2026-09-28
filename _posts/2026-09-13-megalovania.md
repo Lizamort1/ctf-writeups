@@ -1,8 +1,8 @@
 ---
 title: "MEGALOVANIA"
 date: 2026-09-13 12:00:00 +0700
-categories: ["PTITCTF 2026 Final", "Web"]
-tags: ["web", "sqli", "blind-sqli", "postgresql", "waf-bypass", "unicode-escape"]
+categories: ["PTITCTF 2026", "Web"]
+tags: ["web"]
 description: "Bài giải chi tiết thử thách MEGALOVANIA (PTITCTF 2026 Final - Web)."
 math: true
 mermaid: true
@@ -173,27 +173,6 @@ Chạy kịch bản hoàn tất, chuỗi ký tự flag được tái tạo nguy�
 
 ---
 
-## Biện pháp khắc phục (Defensive Remediation)
-
-1. **Sử dụng Tham số hóa câu truy vấn (Parameterized Queries / Prepared Statements)**:
-   Tuyệt đối không ghép chuỗi đầu vào của người dùng trực tiếp vào câu lệnh SQL:
-   ```python
-   # An toàn với psycopg2 / asyncpg
-   cursor.execute("SELECT lines FROM dialogs WHERE death_count = %s", (deaths,))
-   ```
-2. **Ép kiểu dữ liệu nghiêm ngặt ở tầng Controller**:
-   Tham số `deaths` phải được xác thực là số nguyên hợp lệ trước khi đưa vào cơ sở dữ liệu:
-   ```python
-   try:
-       deaths = int(request.data.get('deaths', 0))
-   except (ValueError, TypeError):
-       return Response({"error": "Invalid death count"}, status=400)
-   ```
-3. **Phân quyền tối thiểu cho tài khoản Database (Least Privilege)**:
-   Tài khoản database của ứng dụng web không được cấp quyền siêu người dùng (`superuser`) hoặc quyền thực thi các hàm đọc hệ thống tệp nguy hiểm như `pg_read_file()`, `pg_ls_dir()`.
-
----
-
 ## Flag
 
 ```text
@@ -202,7 +181,7 @@ PTITCTF{uN1c0d3_35c4p3_p0stgr3s_b4d_t1m3_5ql1}
 
 </div>
 
-<div class="lang-en" markdown="1" style="display: none;">
+<div class="lang-en" markdown="1">
 
 > **Flag:** `PTITCTF{m3g4l0v4n14_z3_s0lv3r_vm_byt3c0d3_r3v}`
 
