@@ -159,9 +159,11 @@ class BlogPresentationTests(unittest.TestCase):
     def test_home_has_one_authentic_image_card_per_competition(self):
 
         home = (ROOT / "_layouts" / "home.html").read_text(encoding="utf-8")
+        head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
         self.assertIn("site.data.competitions", home)
         self.assertIn('post.categories[0] == competition.name', home)
         self.assertIn('class="competition-card ', home)
+        self.assertIn('.competition-card-image .preview-img::before {', head)
 
         for slug, extension in (
             ("poctf-2026", "png"),
