@@ -602,20 +602,6 @@
       margin: .25rem 0 .4rem;
     }
 
-    .competition-home-intro > p:last-child,
-    .competition-section-lead {
-      color: #9fa3ab;
-      font-size: .96rem;
-    }
-
-    .competition-eyebrow {
-      color: #8db7f2;
-      font-size: .76rem;
-      font-weight: 600;
-      letter-spacing: .13em;
-      text-transform: uppercase;
-    }
-
     .competition-card-list {
       display: grid;
       gap: 1.45rem;
@@ -929,12 +915,6 @@
       white-space: nowrap;
     }
 
-    .competition-see-all {
-      display: inline-block;
-      margin: .25rem 1.25rem .9rem 3rem;
-      font-size: .83rem;
-    }
-
     .competition-detail-hero {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 36%;
@@ -1033,14 +1013,11 @@
       color: #242a32;
     }
 
-    html:not([data-bs-theme="dark"]) .competition-home-intro > p:last-child,
-    html:not([data-bs-theme="dark"]) .competition-section-lead,
     html:not([data-bs-theme="dark"]) .competition-timeline-year,
     html:not([data-bs-theme="dark"]) .competition-timeline-entry time {
       color: #68717e;
     }
 
-    html:not([data-bs-theme="dark"]) .competition-eyebrow,
     html:not([data-bs-theme="dark"]) .competition-card-kicker {
       color: #376ca9;
     }
@@ -1064,6 +1041,34 @@
     html:not([data-bs-theme="dark"]) .competition-card-copy > p,
     html:not([data-bs-theme="dark"]) .competition-card-meta {
       color: #66717f;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-detail-hero {
+      background: #fff;
+      border: 1px solid #dfe3e8;
+      color: #303741;
+      box-shadow: 0 12px 30px rgba(40, 54, 73, .07);
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-detail-hero h2 {
+      color: #263341;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-detail-hero p {
+      color: #66717f;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-detail-count {
+      color: #376ca9;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-detail-hero.competition-card--h7ctf-2026 {
+      background: #fff;
+    }
+
+    .competition-detail-hero.competition-card--h7ctf-2026 img {
+      background: radial-gradient(circle at 60% 42%, #183d43, #081a24 65%, #090e16);
+      padding: .75rem;
     }
 
     html:not([data-bs-theme="dark"]) .competition-timeline-entry {

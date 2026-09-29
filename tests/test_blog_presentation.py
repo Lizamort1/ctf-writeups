@@ -98,7 +98,6 @@ class BlogPresentationTests(unittest.TestCase):
         archives = (ROOT / "_layouts" / "archives.html").read_text(encoding="utf-8")
 
         self.assertIn('group_by_exp: "post", "post.categories[0]"', archives)
-        self.assertIn("site.posts | size", archives)
         self.assertIn("assign t_size = t_posts | size", archives)
         self.assertIn("competition-timeline-entry", archives)
         self.assertIn("/competitions/{{ info.slug }}/", archives)
@@ -106,6 +105,20 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertNotIn("3 Competitions", archives)
         self.assertNotIn("40 Writeups", archives)
         self.assertNotIn('assign tournament_list = "', archives)
+
+    def test_light_competition_details_and_clean_section_headings(self):
+        head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
+        home = (ROOT / "_layouts" / "home.html").read_text(encoding="utf-8")
+        categories = (ROOT / "_layouts" / "categories.html").read_text(encoding="utf-8")
+        archives = (ROOT / "_layouts" / "archives.html").read_text(encoding="utf-8")
+
+        self.assertIn('html:not([data-bs-theme="dark"]) .competition-detail-hero {', head)
+        self.assertIn("background: #fff", head)
+        self.assertNotIn("competition-eyebrow", home)
+        self.assertNotIn("Khám phá bài giải", home)
+        self.assertNotIn("Chọn cuộc thi", categories)
+        self.assertNotIn("competition-see-all", categories)
+        self.assertNotIn("competition-section-lead", archives)
 
     def test_competition_navigation_keeps_subjects_scoped(self):
 

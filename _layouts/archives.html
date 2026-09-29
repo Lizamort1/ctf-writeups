@@ -5,11 +5,8 @@ layout: page
 {% include lang.html %}
 
 {% assign competitions = site.posts | group_by_exp: "post", "post.categories[0]" %}
-{% assign competition_count = competitions | size %}
-{% assign post_count = site.posts | size %}
 
 <div id="competition-timeline" class="competition-timeline">
-  <p class="competition-section-lead"><span class="lang-vn">{{ competition_count }} cuộc thi · {{ post_count }} bài giải</span><span class="lang-en">{{ competition_count }} competitions · {{ post_count }} writeups</span></p>
   {% assign last_year = '' %}
   {% for competition in competitions %}
     {% assign t_name = competition.name %}

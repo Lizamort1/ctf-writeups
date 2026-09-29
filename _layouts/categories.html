@@ -5,14 +5,12 @@ layout: page
 {% include lang.html %}
 
 <div class="competition-categories">
-  <p class="competition-section-lead"><span class="lang-vn">Chọn cuộc thi, sau đó mở chuyên mục để xem đúng các bài giải của cuộc thi đó.</span><span class="lang-en">Choose a competition, then open a subject to see only its writeups.</span></p>
   {% for competition in site.data.competitions %}
     {% assign posts = site.posts | where_exp: "post", "post.categories[0] == competition.name" %}
     {% assign post_count = posts | size %}
     {% if post_count > 0 %}
       {% assign subjects = posts | group_by_exp: "post", "post.categories[1]" | sort: "name" %}
       {% assign subject_count = subjects | size %}
-      {% capture competition_url %}/competitions/{{ competition.slug }}/{% endcapture %}
       <details class="competition-category">
         <summary>
           <span class="competition-category-name"><i class="far fa-folder-open" aria-hidden="true"></i> {{ competition.name }}</span>
@@ -29,7 +27,6 @@ layout: page
                   <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %b" }}</time></li>
                 {% endfor %}
               </ul>
-              <a class="competition-see-all" href="{{ competition_url | relative_url }}#{{ subject.name | slugify }}"><span class="lang-vn">Xem chuyên mục trong {{ competition.name }}</span><span class="lang-en">View {{ subject.name }} in {{ competition.name }}</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </details>
           {% endfor %}
         </div>
