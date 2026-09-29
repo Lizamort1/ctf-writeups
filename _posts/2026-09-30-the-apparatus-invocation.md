@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{3.623.I3JTGLWW552JLNFT.JUZWTTEKKPRQN55TUPVPE3L6N7}`
-
 Thử thách Misc 100 điểm với đề bài:
 > *"I see something... It's... Some kind of machine. A séance apparatus. Forty-nine candles arranged in a seven-by-seven grid. I remember this, somehow. To invoke, the operator must snuff them all.*
 > *Press, to quiet. Each press stirs the four cardinal neighbors equally. When every candle is dark, the apparatus will speak its name.*
@@ -103,15 +101,11 @@ Mở Developer Tools (F12) trên Chrome tại trang thử thách `/challenges/th
 
 Ngay sau khi click đủ 13 vị trí, toàn bộ 49 ngọn nến chuyển sang màu tối, giao diện tự động gửi request nộp danh sách clicks lên server và hiển thị Flag:
 
-```text
-POCTF{3.623.I3JTGLWW552JLNFT.JUZWTTEKKPRQN55TUPVPE3L6N7}
-```
+⇒ **Flag:** `POCTF{3.623.I3JTGLWW552JLNFT.JUZWTTEKKPRQN55TUPVPE3L6N7}`
 
 </div>
 
 <div class="lang-en" markdown="1">
-
-> **Flag:** `POCTF{3.623.I3JTGLWW552JLNFT.JUZWTTEKKPRQN55TUPVPE3L6N7}`
 
 This 100-point Misc challenge presents a **Lights Out** puzzle for team ID `623` with 49 candles in a $7 \times 7$ grid. Pressing a cell toggles that candle and its four cardinal neighbors. We must darken every candle to obtain the team-623 flag. The order of presses does not matter; resetting restores the team's starting pattern.
 
@@ -177,8 +171,6 @@ On `/challenges/the-apparatus-invocation/`, paste this into the browser DevTools
 
 After the thirteenth click, the page submits the press history and shows:
 
-```text
-POCTF{3.623.I3JTGLWW552JLNFT.JUZWTTEKKPRQN55TUPVPE3L6N7}
-```
+⇒ **Flag:** `POCTF{3.623.I3JTGLWW552JLNFT.JUZWTTEKKPRQN55TUPVPE3L6N7}`
 
 </div>

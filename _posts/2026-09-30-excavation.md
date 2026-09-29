@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{VRRXRNWIHNEKI2OY}`
-
 Thử thách Reverse Engineering 100 điểm với đề bài:
 > *"Here are some remnants of the fictional dark-fantasy RPG 'Sepulchure of the Undying'. A 16-bit occult horror game. Save format lost. Reverse it from what's left. Four save files recovered from an unlabelled hard drive. Three come from surviving playthroughs... The fourth was written for your team specifically. It carries a 16-character token."*
 
@@ -112,8 +110,6 @@ $$\text{Token} = \mathbf{\texttt{VRRXRNWIHNEKI2OY}}$$
 </div>
 
 <div class="lang-en" markdown="1">
-
-> **Flag:** `POCTF{VRRXRNWIHNEKI2OY}`
 
 This 100-point Reverse Engineering challenge asks us to reconstruct the save format of the fictional 16-bit occult RPG Sepulchure of the Undying. We receive three reference saves (`sample1.sav`, `sample2.sav`, `sample3.sav`) and one team-specific file (`team_623.sav`) containing a 16-character token.
 

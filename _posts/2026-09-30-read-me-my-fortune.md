@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}`
-
 Thử thách Exploitation 200 điểm với đề bài:
 > *"Welcome to Madam Elara's Personalized Fortune Reading Service. Take a seat and allow me to gaze into your future...*
 > *Oh... The veil is parting... My format call is working! I see it! A flag is in your future!*
@@ -101,19 +99,11 @@ POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}
 ─────────────────────────────────────────────────────────────
 ```
 
----
-
-## Flag
-
-```text
-POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}
-```
+⇒ **Flag:** `POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}`
 
 </div>
 
 <div class="lang-en" markdown="1">
-
-> **Flag:** `POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}`
 
 This 200-point Exploitation challenge runs Madame Elara's fortune-reading service via `nc read-my-fortune.pointeroverflowctf.com 9000`. The server asks for a team session token, then a name and zodiac sign. The supplied `service.py` and Dockerfile reveal that user-controlled text reaches Python's `str.format()`.
 
@@ -187,12 +177,6 @@ POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}
 ─────────────────────────────────────────────────────────────
 ```
 
----
-
-## Flag
-
-```text
-POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}
-```
+⇒ **Flag:** `POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}`
 
 </div>

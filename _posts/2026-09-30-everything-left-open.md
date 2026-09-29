@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{109.623.2ZRCPWUK2GOO3DBQ.WLDCO36NVBGG2DH4VY2KXE3MOT}`
-
 Thử thách Forensics 100 điểm với đề bài:
 > *"A guest left their laptop behind in the hotel room. The machine was unlocked, and the browser was sitting open mid-form. An external IT firm packaged up the profile into a zip.*
 > *Find the flag in that session, and pay attention to the details."*
@@ -116,19 +114,11 @@ Trường `artifact-flag` mang định dạng chuẩn của Pointer Overflow CTF
 * Nonce: `2ZRCPWUK2GOO3DBQ` (16 ký tự Base32)
 * HMAC Signature: `WLDCO36NVBGG2DH4VY2KXE3MOT` (26 ký tự Base32)
 
----
-
-## Flag
-
-```text
-POCTF{109.623.2ZRCPWUK2GOO3DBQ.WLDCO36NVBGG2DH4VY2KXE3MOT}
-```
+⇒ **Flag:** `POCTF{109.623.2ZRCPWUK2GOO3DBQ.WLDCO36NVBGG2DH4VY2KXE3MOT}`
 
 </div>
 
 <div class="lang-en" markdown="1">
-
-> **Flag:** `POCTF{109.623.2ZRCPWUK2GOO3DBQ.WLDCO36NVBGG2DH4VY2KXE3MOT}`
 
 This 100-point Forensics challenge provides `left-open-profile-team-623.zip`, a Firefox profile named `k-vance-profile` packaged for team 623. The prompt says a guest left an unlocked browser **open mid-form** and asks us to recover what was about to be submitted.
 
@@ -207,12 +197,6 @@ The restored tab points to `https://catalog.spr.org.uk/apparatus/provenance/lssf
 
 The flag fields encode challenge ID `109`, team ID `623`, a 16-character nonce `2ZRCPWUK2GOO3DBQ`, and a 26-character signature `WLDCO36NVBGG2DH4VY2KXE3MOT`.
 
----
-
-## Flag
-
-```text
-POCTF{109.623.2ZRCPWUK2GOO3DBQ.WLDCO36NVBGG2DH4VY2KXE3MOT}
-```
+⇒ **Flag:** `POCTF{109.623.2ZRCPWUK2GOO3DBQ.WLDCO36NVBGG2DH4VY2KXE3MOT}`
 
 </div>

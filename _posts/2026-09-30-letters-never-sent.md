@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{2.623.QWL2PQDDL4O65HCM.FTWGRFCLINJFDPRI3WZJJD45UQ}`
-
 Thử thách Cryptography 100 điểm với đề bài:
 > *"Here we have a letter that was recovered from the estate of Dr. H. Aldous Whitmore. It was never posted. Along with the letter, a strange message was discovered. We have no doubt that Dr. Whitmore meant to keep it secret, given his... Association with occult societies that was discovered after his death. Despite this, the relationship to the letter remains unclear, but a connection cannot be discounted.*
 > *Find the key the letter hides, and read what Whitmore could not bring himself to send."*
@@ -129,11 +127,11 @@ Cấu trúc flag hoàn toàn hợp lệ:
 * Nonce: `QWL2PQDDL4O65HCM` (16 ký tự Base32)
 * Signature: `FTWGRFCLINJFDPRI3WZJJD45UQ` (26 ký tự Base32 HMAC-SHA256)
 
+⇒ **Flag:** `POCTF{2.623.QWL2PQDDL4O65HCM.FTWGRFCLINJFDPRI3WZJJD45UQ}`
+
 </div>
 
 <div class="lang-en" markdown="1">
-
-> **Flag:** `POCTF{2.623.QWL2PQDDL4O65HCM.FTWGRFCLINJFDPRI3WZJJD45UQ}`
 
 This 100-point Cryptography challenge provides an unposted letter recovered from Dr. H. Aldous Whitmore's estate. We must find the key hidden in the letter and decrypt the team-specific message:
 
@@ -221,5 +219,7 @@ POCTF{2.623.QWL2PQDDL4O65HCM.FTWGRFCLINJFDPRI3WZJJD45UQ}
 ```
 
 The fields contain challenge ID `2`, team ID `623`, nonce `QWL2PQDDL4O65HCM`, and signature `FTWGRFCLINJFDPRI3WZJJD45UQ`.
+
+⇒ **Flag:** `POCTF{2.623.QWL2PQDDL4O65HCM.FTWGRFCLINJFDPRI3WZJJD45UQ}`
 
 </div>

@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{81.623.AH6ZSOTDT27RXRNZ.CLNMRCZIBOWCUYD5GG4NG2YILO}`
-
 Thử thách Web 300 điểm tại cổng nghiên cứu hợp tác **Collaborative Research Portal** (`https://shape-of-query.pointeroverflowctf.com`).
 Đề bài cảnh báo về việc "researchers meddling with each others' stuff", yêu cầu nộp token phiên của đội (thời hạn 15 phút) để bắt đầu.
 
@@ -40,7 +38,7 @@ flowchart TD
 
 Sau khi lấy token từ giao diện thử thách (`SHAPE1.623.81.AH6ZSOTDT27RXRNZ...`), gửi request tới endpoint trao đổi token:
 
-```http
+```text
 POST /session/exchange
 Content-Type: application/json
 
@@ -139,8 +137,6 @@ print(json.dumps(res, indent=2))
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `POCTF{81.623.AH6ZSOTDT27RXRNZ.CLNMRCZIBOWCUYD5GG4NG2YILO}`
-
 This 300-point Web challenge runs the **Collaborative Research Portal** at `https://shape-of-query.pointeroverflowctf.com`. The prompt warns about researchers meddling with one another's work. A team token, valid for 15 minutes, starts the session.
 
 ---
@@ -163,7 +159,7 @@ flowchart TD
 
 After receiving a token such as `SHAPE1.623.81.AH6ZSOTDT27RXRNZ...` from the challenge, exchange it for a session:
 
-```http
+```text
 POST /session/exchange
 Content-Type: application/json
 

@@ -159,7 +159,15 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertEqual(8, len(poctf_posts))
         self.assertIn("permalink: /competitions/poctf-2026/", competition)
         self.assertIn("https://pointeroverflowctf.com/img/logo-mini.png", catalog)
-        self.assertEqual(6, post.count("POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}"))
+        for item in poctf_posts:
+            content = item.read_text(encoding="utf-8")
+            vn = content.split('<div class="lang-vn" markdown="1">', 1)[1].split("</div>", 1)[0]
+            en = content.split('<div class="lang-en" markdown="1">', 1)[1].split("</div>", 1)[0]
+            for body in (vn, en):
+                self.assertRegex(body.strip().splitlines()[-1], r"^⇒ \*\*Flag:\*\* `POCTF\{[^`]+\}`$")
+                self.assertEqual(1, body.count("⇒ **Flag:**"))
+                self.assertNotIn("> **Flag:**", body)
+                self.assertNotIn("## Flag", body)
 
     def test_home_has_one_authentic_image_card_per_competition(self):
 

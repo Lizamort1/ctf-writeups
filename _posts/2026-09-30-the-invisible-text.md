@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{UMXMTBTBIUVGECNT}`
-
 Thử thách Steganography 200 điểm tại Pointer Overflow CTF 2026.
 Đề bài cung cấp tệp mã nguồn Python duy nhất mang tên `invisible_text_623.py` (sinh riêng cho đội `623`). Gợi ý: thông điệp bí mật được cất giấu ngay bên trong tệp nguồn và chỉ cần *"look closely"* tại vị trí thích hợp.
 
@@ -113,11 +111,11 @@ Quá trình giải mã từng dòng:
 
 Chuỗi kết quả thu được: `POCTF{UMXMTBTBIUVGECNT}` gồm đúng 23 ký tự chuẩn cấu trúc giải đấu.
 
+⇒ **Flag:** `POCTF{UMXMTBTBIUVGECNT}`
+
 </div>
 
 <div class="lang-en" markdown="1">
-
-> **Flag:** `POCTF{UMXMTBTBIUVGECNT}`
 
 This 200-point Steganography challenge provides one Python source file, `invisible_text_623.py`, generated for team `623`. The prompt says the secret is inside the source itself and asks us to *look closely*.
 
@@ -199,5 +197,7 @@ print("Flag:", res)
 ```
 
 The first data lines decode as `TSTSSSS` → `'P'`, `TSSTTTT` → `'O'`, `TSSSSTT` → `'C'`, `TSTSTSS` → `'T'`, `TSSSTTS` → `'F'`, and `TTTTSTT` → `'{'` (the opening brace `{`). The final data line `TTTTTST` yields `'}'` (the closing brace `}`). Together the 23 decoded characters form **`POCTF{UMXMTBTBIUVGECNT}`**.
+
+⇒ **Flag:** `POCTF{UMXMTBTBIUVGECNT}`
 
 </div>

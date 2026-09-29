@@ -15,8 +15,6 @@ mermaid: true
 
 <div class="lang-vn" markdown="1">
 
-> **Flag:** `POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}`
-
 Thử thách **Where the Light Fails to Fall** thuộc mảng OSINT của [Pointer Overflow CTF 2026](https://pointeroverflowctf.com/) (400 điểm, Wave 1). Ta cần tìm thành phố từ ảnh một chú chim bồ câu trên nền đá lát, hướng **Bắc thực** được đánh dấu màu đỏ, các bóng đổ và thời điểm quan sát **28/07/2026, 17:35 UTC+03:00**.
 
 ---
@@ -103,17 +101,11 @@ Các thành phố châu Âu trong bảng có Mặt Trời cao hơn đáng kể. 
 
 Sau đó nộp flag vào ô **SUBMIT FLAG** để ghi nhận bài giải. Phản hồi của máy chủ là bước xác nhận đáp án; phân tích bóng và phép tính thiên văn giúp tìm ứng viên hợp lý trước khi thử.
 
-## Flag
-
-```text
-POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}
-```
+⇒ **Flag:** `POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}`
 
 </div>
 
 <div class="lang-en" markdown="1">
-
-> **Flag:** `POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}`
 
 **Where the Light Fails to Fall** is a 400-point, Wave 1 OSINT challenge from [Pointer Overflow CTF 2026](https://pointeroverflowctf.com/). The task is to identify a city from a photograph of a pigeon on paving stones, a red **true-north** marker, the shadows, and an observation time of **July 28, 2026, 17:35 UTC+03:00**.
 
@@ -201,10 +193,6 @@ Enter `Addis Ababa` in **YOUR ANSWER (CITY NAME)**. According to the response re
 
 Submit that value in **SUBMIT FLAG** to record the solve. The server response establishes the correct answer; shadow analysis and the solar model narrow the search to a reasonable candidate first.
 
-## Flag
-
-```text
-POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}
-```
+⇒ **Flag:** `POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}`
 
 </div>
