@@ -12,7 +12,7 @@ class BlogPresentationTests(unittest.TestCase):
 
         posts = sorted((ROOT / "_posts").glob("*.md"))
 
-        self.assertEqual(39, len(posts))
+        self.assertEqual(40, len(posts))
         for post in posts:
             content = post.read_text(encoding="utf-8")
             self.assertEqual(
@@ -145,6 +145,16 @@ class BlogPresentationTests(unittest.TestCase):
             self.assertIn(f'categories: ["SunshineCTF 2026", "{subject}"]', content)
         self.assertFalse((ROOT / "_posts" / "2026-09-26-helpdesk-freebie.md").exists())
 
+    def test_pointer_overflow_writeup_has_its_own_osint_competition(self):
+        post = (ROOT / "_posts" / "2026-09-29-where-the-light-fails-to-fall.md").read_text(encoding="utf-8")
+        competition = (ROOT / "competitions" / "poctf-2026.md").read_text(encoding="utf-8")
+        catalog = (ROOT / "_data" / "competitions.yml").read_text(encoding="utf-8")
+
+        self.assertIn('categories: ["Pointer Overflow CTF 2026", "OSINT"]', post)
+        self.assertIn("permalink: /competitions/poctf-2026/", competition)
+        self.assertIn("https://pointeroverflowctf.com/img/logo-mini.png", catalog)
+        self.assertEqual(6, post.count("POCTF{99.623.3YOADRV22RFD27OD.DSGJUSWQHG734ELY3KPFEDNF4F}"))
+
     def test_home_has_one_authentic_image_card_per_competition(self):
 
         home = (ROOT / "_layouts" / "home.html").read_text(encoding="utf-8")
@@ -153,6 +163,7 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertIn('class="competition-card ', home)
 
         for slug, extension in (
+            ("poctf-2026", "png"),
             ("h7ctf-2026", "png"),
             ("sunshinectf-2026", "png"),
             ("ptitctf-2026", "jpg"),

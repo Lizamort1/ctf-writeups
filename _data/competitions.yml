@@ -1,3 +1,9 @@
+- name: Pointer Overflow CTF 2026
+  slug: poctf-2026
+  image: /assets/img/competitions/poctf-2026.png
+  image_source: https://pointeroverflowctf.com/img/logo-mini.png
+  description_vn: Bài giải OSINT của Pointer Overflow CTF 2026.
+  description_en: OSINT writeups from Pointer Overflow CTF 2026.
 - name: H7CTF 2026
   slug: h7ctf-2026
   image: /assets/img/competitions/h7ctf-2026.png
