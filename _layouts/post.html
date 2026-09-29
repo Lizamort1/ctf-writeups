@@ -133,7 +133,13 @@ script_includes:
         <div class="post-meta">
           <i class="far fa-folder-open fa-fw me-1"></i>
           {% for category in page.categories %}
-            <a href="{{ site.baseurl }}/categories/{{ category | slugify | url_encode }}/">{{ category }}</a>
+            {% assign competition_slug = page.categories[0] | slugify %}
+            {% if forloop.first %}
+              <a href="{{ '/competitions/' | append: competition_slug | append: '/' | relative_url }}">{{ category }}</a>
+            {% else %}
+              {% assign subject_slug = category | slugify %}
+              <a href="{{ '/competitions/' | append: competition_slug | append: '/' | relative_url }}#{{ subject_slug }}">{{ category }}</a>
+            {% endif %}
             {%- unless forloop.last -%},{%- endunless -%}
           {% endfor %}
         </div>

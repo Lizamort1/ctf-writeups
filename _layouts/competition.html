@@ -1,0 +1,38 @@
+---
+layout: page
+---
+
+{% include lang.html %}
+
+{% assign competition = site.data.competitions | where: "name", page.competition | first %}
+{% assign posts = site.posts | where_exp: "post", "post.categories[0] == page.competition" %}
+{% assign post_count = posts | size %}
+{% assign subjects = posts | group_by_exp: "post", "post.categories[1]" | sort: "name" %}
+
+<div class="competition-detail">
+  <div class="competition-detail-hero competition-card--{{ competition.slug }}">
+    <div>
+      <span class="competition-card-kicker"><i class="fas fa-trophy" aria-hidden="true"></i> CTF 2026</span>
+      <h2>{{ competition.name }}</h2>
+      <p class="lang-vn">{{ competition.description_vn }}</p>
+      <p class="lang-en">{{ competition.description_en }}</p>
+      <span class="competition-detail-count">{{ post_count }} <span class="lang-vn">bài viết</span><span class="lang-en">writeups</span></span>
+    </div>
+    <img src="{{ competition.image | relative_url }}" alt="{{ competition.name }}">
+  </div>
+
+  {% for subject in subjects %}
+    {% assign subject_count = subject.items | size %}
+    <section class="competition-subject" id="{{ subject.name | slugify }}">
+      <h3>{{ subject.name }} <span>{{ subject_count }}</span></h3>
+      <ul class="competition-post-list">
+        {% for post in subject.items %}
+          <li>
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %b %Y" }}</time>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+</div>

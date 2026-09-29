@@ -1,102 +1,39 @@
 ---
 layout: page
-# All the Categories of posts
 ---
 
 {% include lang.html %}
 
-{% assign HEAD_PREFIX = 'h_' %}
-{% assign LIST_PREFIX = 'l_' %}
-
-{% assign group_index = 0 %}
-
-{% assign sort_categories = site.categories | sort %}
-
-{% for category in sort_categories %}
-  {% assign category_name = category | first %}
-  {% assign posts_of_category = category | last %}
-  {% assign first_post = posts_of_category | first %}
-
-  {% if category_name == first_post.categories[0] %}
-    {% assign sub_categories = '' | split: '' %}
-
-    {% for post in posts_of_category %}
-      {% assign second_category = post.categories[1] %}
-      {% if second_category %}
-        {% unless sub_categories contains second_category %}
-          {% assign sub_categories = sub_categories | push: second_category %}
-        {% endunless %}
-      {% endif %}
-    {% endfor %}
-
-    {% assign sub_categories = sub_categories | sort %}
-    {% assign sub_categories_size = sub_categories | size %}
-
-    <div class="card categories">
-      <!-- top-category -->
-      <div
-        id="{{ HEAD_PREFIX }}{{ group_index }}"
-        class="card-header d-flex justify-content-between hide-border-bottom"
-      >
-        <span class="ms-2">
-          <i class="far fa-folder{% if sub_categories_size > 0 %}-open{% endif %} fa-fw"></i>
-
-          {% capture _category_url %}/categories/{{ category_name | slugify | url_encode }}/{% endcapture %}
-          <a href="{{ _category_url | relative_url }}" class="mx-2">{{ category_name }}</a>
-
-          <!-- content count -->
-          {% assign top_posts_size = posts_of_category | size %}
-          <span class="text-muted small font-weight-light">
-            {% if sub_categories_size > 0 %}
-              {{ sub_categories_size }} <span class="lang-vn">chuyên mục,</span><span class="lang-en">{% if sub_categories_size > 1 %}categories,{% else %}category,{% endif %}</span>
-            {% endif %}
-            {{ top_posts_size }} <span class="lang-vn">bài viết</span><span class="lang-en">{% if top_posts_size > 1 %}posts{% else %}post{% endif %}</span>
-          </span>
-        </span>
-
-        <!-- arrow -->
-        {% if sub_categories_size > 0 %}
-          <a
-            href="#{{ LIST_PREFIX }}{{ group_index }}"
-            data-bs-toggle="collapse"
-            aria-expanded="true"
-            aria-label="{{ HEAD_PREFIX }}{{ group_index }}-trigger"
-            class="category-trigger hide-border-bottom"
-          >
-            <i class="fas fa-fw fa-angle-down"></i>
-          </a>
-        {% else %}
-          <span data-bs-toggle="collapse" class="category-trigger hide-border-bottom disabled">
-            <i class="fas fa-fw fa-angle-right"></i>
-          </span>
-        {% endif %}
-      </div>
-      <!-- .card-header -->
-
-      <!-- Sub-categories -->
-      {% if sub_categories_size > 0 %}
-        <div id="{{ LIST_PREFIX }}{{ group_index }}" class="collapse show" aria-expanded="true">
-          <ul class="list-group">
-            {% for sub_category in sub_categories %}
-              <li class="list-group-item">
-                <i class="far fa-folder fa-fw"></i>
-
-                {% capture _sub_ctg_url %}/categories/{{ sub_category | slugify | url_encode }}/{% endcapture %}
-                <a href="{{ _sub_ctg_url | relative_url }}" class="mx-2">{{ sub_category }}</a>
-
-                {% assign sub_posts = posts_of_category | where_exp: "item", "item.categories[1] == sub_category" %}
-                {% assign posts_size = sub_posts | size %}
-                <span class="text-muted small font-weight-light">
-                  {{ posts_size }} <span class="lang-vn">bài viết</span><span class="lang-en">{% if posts_size > 1 %}posts{% else %}post{% endif %}</span>
-                </span>
-              </li>
-            {% endfor %}
-          </ul>
+<div class="competition-categories">
+  <p class="competition-section-lead"><span class="lang-vn">Chọn cuộc thi, sau đó mở chuyên mục để xem đúng các bài giải của cuộc thi đó.</span><span class="lang-en">Choose a competition, then open a subject to see only its writeups.</span></p>
+  {% for competition in site.data.competitions %}
+    {% assign posts = site.posts | where_exp: "post", "post.categories[0] == competition.name" %}
+    {% assign post_count = posts | size %}
+    {% if post_count > 0 %}
+      {% assign subjects = posts | group_by_exp: "post", "post.categories[1]" | sort: "name" %}
+      {% assign subject_count = subjects | size %}
+      {% capture competition_url %}/competitions/{{ competition.slug }}/{% endcapture %}
+      <details class="competition-category" open>
+        <summary>
+          <span class="competition-category-name"><i class="far fa-folder-open" aria-hidden="true"></i> {{ competition.name }}</span>
+          <span class="competition-category-count">{{ subject_count }} <span class="lang-vn">chuyên mục</span><span class="lang-en">subjects</span> · {{ post_count }} <span class="lang-vn">bài viết</span><span class="lang-en">writeups</span></span>
+        </summary>
+        <div class="competition-category-body">
+          {% for subject in subjects %}
+            {% assign subject_posts = subject.items %}
+            {% assign subject_post_count = subject_posts | size %}
+            <details class="competition-category-subject">
+              <summary><i class="far fa-folder" aria-hidden="true"></i> <span>{{ subject.name }}</span> <small>{{ subject_post_count }}</small></summary>
+              <ul class="competition-post-list">
+                {% for post in subject_posts %}
+                  <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %b" }}</time></li>
+                {% endfor %}
+              </ul>
+              <a class="competition-see-all" href="{{ competition_url | relative_url }}#{{ subject.name | slugify }}"><span class="lang-vn">Xem chuyên mục trong {{ competition.name }}</span><span class="lang-en">View {{ subject.name }} in {{ competition.name }}</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </details>
+          {% endfor %}
         </div>
-      {% endif %}
-    </div>
-    <!-- .card -->
-
-    {% assign group_index = group_index | plus: 1 %}
-  {% endif %}
-{% endfor %}
+      </details>
+    {% endif %}
+  {% endfor %}
+</div>

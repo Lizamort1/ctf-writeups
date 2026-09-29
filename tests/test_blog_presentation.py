@@ -45,7 +45,7 @@ class BlogPresentationTests(unittest.TestCase):
             self.assertIn(label, sidebar)
 
     def test_site_identity_and_avatar_are_presented_completely(self):
-        """Keeps the public brand name and prevents the rectangular avatar being cropped."""
+        """Keeps the public brand name and fills the round avatar without a white ring."""
         config = (ROOT / "_config.yml").read_text(encoding="utf-8")
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
 
@@ -53,10 +53,12 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertRegex(config, r"(?m)^  name:\s*Lizamort1\s*$")
         avatar_rule = re.search(r"#sidebar #avatar img\s*\{(?P<body>.*?)\}", head, re.S)
         self.assertIsNotNone(avatar_rule)
-        self.assertIn("object-fit: contain", avatar_rule.group("body"))
+        self.assertIn("object-fit: cover", avatar_rule.group("body"))
         frame_rule = re.search(r"#sidebar #avatar\s*\{(?P<body>.*?)\}", head, re.S)
         self.assertIsNotNone(frame_rule)
         self.assertIn("border-radius: 50%", frame_rule.group("body"))
+        self.assertIn("border: 0", frame_rule.group("body"))
+        self.assertIn("background: transparent", frame_rule.group("body"))
         sidebar = (ROOT / "_includes" / "sidebar.html").read_text(encoding="utf-8")
         self.assertIn('loading="eager"', sidebar)
         self.assertNotIn("sidebar-lang-switch", sidebar)
@@ -92,15 +94,46 @@ class BlogPresentationTests(unittest.TestCase):
                     )
 
     def test_archives_are_derived_from_posts_instead_of_hard_coded(self):
-        """New competitions and write-ups must appear without editing the archives layout."""
+        """The timeline contains one linked row per competition, never one per writeup."""
         archives = (ROOT / "_layouts" / "archives.html").read_text(encoding="utf-8")
 
         self.assertIn('group_by_exp: "post", "post.categories[0]"', archives)
         self.assertIn("site.posts | size", archives)
         self.assertIn("assign t_size = t_posts | size", archives)
+        self.assertIn("competition-timeline-entry", archives)
+        self.assertIn("/competitions/{{ info.slug }}/", archives)
+        self.assertNotIn("{% for post in t_posts %}", archives)
         self.assertNotIn("3 Competitions", archives)
         self.assertNotIn("40 Writeups", archives)
         self.assertNotIn('assign tournament_list = "', archives)
+
+    def test_competition_navigation_keeps_subjects_scoped(self):
+        """Shared subject names must not link back to global category archives."""
+        categories = (ROOT / "_layouts" / "categories.html").read_text(encoding="utf-8")
+        post = (ROOT / "_layouts" / "post.html").read_text(encoding="utf-8")
+        detail = (ROOT / "_layouts" / "competition.html").read_text(encoding="utf-8")
+
+        self.assertIn('post.categories[0] == competition.name', categories)
+        self.assertIn('group_by_exp: "post", "post.categories[1]"', categories)
+        self.assertNotIn('/categories/{{ sub_category', categories)
+        self.assertIn('/competitions/', post)
+        self.assertIn('#{{ subject_slug }}', post)
+        self.assertIn('post.categories[0] == page.competition', detail)
+
+    def test_home_has_one_authentic_image_card_per_competition(self):
+        """Checks each competition landing page and its local event image are present."""
+        home = (ROOT / "_layouts" / "home.html").read_text(encoding="utf-8")
+        self.assertIn("site.data.competitions", home)
+        self.assertIn('post.categories[0] == competition.name', home)
+        self.assertIn('class="competition-card ', home)
+
+        for slug, extension in (
+            ("h7ctf-2026", "png"),
+            ("sunshinectf-2026", "png"),
+            ("ptitctf-2026", "jpg"),
+        ):
+            self.assertTrue((ROOT / "competitions" / f"{slug}.md").is_file())
+            self.assertTrue((ROOT / "assets" / "img" / "competitions" / f"{slug}.{extension}").is_file())
 
     def test_shared_template_has_language_controller(self):
         """Catches loss of the shared language switch and TOC synchronization."""

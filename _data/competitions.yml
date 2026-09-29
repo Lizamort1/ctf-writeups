@@ -1,0 +1,18 @@
+- name: H7CTF 2026
+  slug: h7ctf-2026
+  image: /assets/img/competitions/h7ctf-2026.png
+  image_source: https://2026.h7tex.com/assets/logo.png
+  description_vn: Bài giải vòng loại H7CTF 2026, từ AI và Web đến Pwn, Reverse Engineering và Web3.
+  description_en: Qualifier writeups for H7CTF 2026, from AI and Web to Pwn, Reverse Engineering, and Web3.
+- name: SunshineCTF 2026
+  slug: sunshinectf-2026
+  image: /assets/img/competitions/sunshinectf-2026.png
+  image_source: https://2026.sunshinectf.org/themes/sunshine-retro/static/img/sunshinectf-2026-home.png
+  description_vn: Các bài giải SunshineCTF 2026 thuộc AI, Misc và Reverse Engineering.
+  description_en: SunshineCTF 2026 writeups in AI, Misc, and Reverse Engineering.
+- name: PTITCTF 2026
+  slug: ptitctf-2026
+  image: /assets/img/competitions/ptitctf-2026.jpg
+  image_source: https://ptit.edu.vn/wp-content/uploads/2026/09/16-2.jpg
+  description_vn: Bài giải PTITCTF 2026 theo các mảng Crypto, Pwn, Reverse Engineering và Web.
+  description_en: PTITCTF 2026 writeups across Crypto, Pwn, Reverse Engineering, and Web.

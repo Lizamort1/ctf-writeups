@@ -1,0 +1,39 @@
+---
+layout: default
+---
+
+{% include lang.html %}
+
+<section id="competition-home" class="competition-home px-1" aria-label="Competitions">
+  <header class="competition-home-intro">
+    <p class="competition-eyebrow">Lizamort1 / CTF writeups</p>
+    <h1><span class="lang-vn">Các cuộc thi</span><span class="lang-en">Competitions</span></h1>
+    <p><span class="lang-vn">Khám phá bài giải theo từng cuộc thi.</span><span class="lang-en">Explore writeups by competition.</span></p>
+  </header>
+
+  <div class="competition-card-list">
+    {% for competition in site.data.competitions %}
+      {% assign posts = site.posts | where_exp: "post", "post.categories[0] == competition.name" %}
+      {% assign post_count = posts | size %}
+      {% if post_count > 0 %}
+        {% assign latest_post = posts | first %}
+        {% capture competition_url %}/competitions/{{ competition.slug }}/{% endcapture %}
+        <a class="competition-card competition-card--{{ competition.slug }}" href="{{ competition_url | relative_url }}">
+          <div class="competition-card-copy">
+            <span class="competition-card-kicker"><i class="fas fa-trophy" aria-hidden="true"></i> CTF 2026</span>
+            <h2>{{ competition.name }}</h2>
+            <p class="lang-vn">{{ competition.description_vn }}</p>
+            <p class="lang-en">{{ competition.description_en }}</p>
+            <div class="competition-card-meta">
+              <span><i class="far fa-calendar" aria-hidden="true"></i> {{ latest_post.date | date: "%d %b %Y" }}</span>
+              <span><i class="far fa-folder-open" aria-hidden="true"></i> {{ post_count }} <span class="lang-vn">bài viết</span><span class="lang-en">writeups</span></span>
+            </div>
+          </div>
+          <div class="competition-card-image">
+            <img src="{{ competition.image | relative_url }}" alt="{{ competition.name }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+          </div>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
