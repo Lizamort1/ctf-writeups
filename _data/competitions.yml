@@ -2,8 +2,8 @@
   slug: poctf-2026
   image: /assets/img/competitions/poctf-2026.png
   image_source: https://pointeroverflowctf.com/img/logo-mini.png
-  description_vn: Bài giải OSINT của Pointer Overflow CTF 2026.
-  description_en: OSINT writeups from Pointer Overflow CTF 2026.
+  description_vn: Bài giải POCTF 2026 theo các mảng OSINT, Web, Crypto, Forensics, Exploitation, Reverse Engineering, Steganography và Misc.
+  description_en: POCTF 2026 writeups across OSINT, Web, Crypto, Forensics, Exploitation, Reverse Engineering, Steganography, and Misc.
 - name: H7CTF 2026
   slug: h7ctf-2026
   image: /assets/img/competitions/h7ctf-2026.png
