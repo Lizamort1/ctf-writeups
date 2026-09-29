@@ -281,13 +281,6 @@
       gap: 8px;
     }
 
-    .sidebar-lang-switch {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 4px !important;
-      margin: 0 !important;
-    }
-
     .lang-btn {
       appearance: none;
       -webkit-appearance: none;
@@ -304,16 +297,6 @@
       transition: opacity .18s ease, transform .12s ease;
       outline: none;
       pointer-events: auto !important;
-    }
-
-    .sidebar-lang-switch .lang-btn {
-      color: #f1f5f9 !important;
-      font-size: 12px !important;
-      padding: 1px 3px !important;
-    }
-
-    html[data-bs-theme="light"] .sidebar-lang-switch .lang-btn {
-      color: #334155 !important;
     }
 
     .lang-btn.active {
@@ -384,12 +367,12 @@
     #sidebar #avatar {
       width: 8.25rem;
       height: 8.25rem;
-      padding: 0.3rem;
+      padding: 0;
       overflow: hidden;
       background: rgba(255, 255, 255, 0.78);
       border: 2px solid rgba(255, 255, 255, 0.92);
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
-      border-radius: 1rem !important;
+      border-radius: 50% !important;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -401,7 +384,7 @@
       object-fit: contain;
       object-position: center;
       background: transparent;
-      border-radius: 0.7rem;
+      border-radius: 50%;
     }
 
     #sidebar .site-title {
@@ -655,6 +638,7 @@
 
       window.setLanguage = function(lang) {
         var targetLang = normalizeLanguage(lang);
+        var previousLang = document.documentElement.getAttribute('data-lang');
 
         document.documentElement.setAttribute('data-lang', targetLang);
 
@@ -664,6 +648,9 @@
 
         syncLanguageUi(targetLang);
         filterTocForLanguage(targetLang);
+        if (previousLang && previousLang !== targetLang && document.querySelector('.mermaid')) {
+          window.postMessage({ id: 'theme-updated' }, '*');
+        }
       };
 
       document.documentElement.setAttribute('data-lang', getPreferredLang());

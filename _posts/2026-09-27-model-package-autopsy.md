@@ -173,46 +173,157 @@ Kẻ đứng sau gói mô hình đã cắm một post-load hook để beacon v�
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{m0d3l_p4ck4g3_p1ckl3_0pc0d3_4ut0psy}`
+> **Flag:** `H7CTF{64080f42b43c8e48033c}`
 
-This challenge is an **AI / Forensic Analysis** challenge from H7CTF'26 involving a suspect machine learning model bundle (`model.pkl.tar.gz`).
 
-The goal is to perform a security autopsy on the serialized Pickle opcode stream and recover a hidden command payload.
+This article belongs to the category AI / Forensics. Challenge description:
+
+> Meridian's ML team pulled a fine-tuned model off an internal build agent and queued it straight for production. The operator who packaged it left something off the changelog. Consider this the postmortem.
+
+Read the description, there are key points:
+* **"pulled a fine-tuned model off an internal build agent"**: The topic provides the model package file `sentiment-distilbert-meridian.zip`.
+* **"left something off the changelog" / "postmortem"**: Suggests there is a payload or backdoor installed underground in the storage structure of the weights / metadata file that the normal review process misses.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["File: model.pkl.tar.gz"] --> B["Extract archive: model.pkl + metadata.json"]
-    B --> C["Disassemble Pickle Bytecode using Python pickletools.dis()"]
-    C --> D["Identify malicious REDUCE opcode (R) paired with os.system"]
-    D --> E["Inspect serialized constructor arguments"]
-    E --> F["Find base64-encoded reverse shell payload embedded in object state"]
-    F --> G["Decode payload string"]
-    G --> H["Flag: h7ctf{m0d3l_p4ck4g3_p1ckl3_0pc0d3_4ut0psy}"]
+    A["Attached file: sentiment-distilbert-meridian.zip"] --> B["Unzip the zip and see pytorch_model.bin capacity ~774 KB"]
+    B --> C["Check magic bytes of pytorch_model.bin and detect header PK 0x03 0x04 (ZIP format)"]
+    C --> D["Open pytorch_model.bin as a ZIP archive"]
+    D --> E["Extract data.pkl and .format_version files"]
+    E --> F["Use pickletools to disassemble the Pickle bytecode"]
+    F --> G["Detect opcode GLOBAL builtins.exec executes base64 + zlib string"]
+    G --> H["Decompress zlib and decode base64 payload"]
+    H --> I["Obtain a Python post-load hook script containing OPERATOR"]
+    I --> J["Flag: H7CTF{64080f42b43c8e48033c}"]
 ```
 
 ---
 
-## Step 1: Pickle Opcode Disassembly
+## Step 1: Check the model file structure
 
-Using `pickletools`:
+Extracting the problem file `sentiment-distilbert-meridian.zip`, we get:
+- `config.json`
+- `special_tokens_map.json`
+- `tokenizer_config.json`
+- `vocab.txt`
+- `pytorch_model.bin`
 
+The file `pytorch_model.bin` is 792,665 bytes in size. In the modern PyTorch ecosystem, when saving with `torch.save()`, the format is essentially a ZIP archive containing the `Pickle` serialization code.
+
+Check the magic bytes of `pytorch_model.bin`:
 ```python
-import pickletools
-
-with open("model.pkl", "rb") as f:
-    pickletools.dis(f.read())
+with open('pytorch_model.bin', 'rb') as f:
+    print(f.read(16))
 ```
 
-At offset `0x14F0`, we observe:
-`GLOBAL 'posix' 'system'`
-followed by a `SHORT_BINBYTES` argument and `REDUCE`.
+Output:
+```text
+b'PK\x03\x04\x00\x00\x08\x08\x00\x00\x00\x00\x00\x00\x00\x00'
+```
 
-Decoding the argument string yields the flag.
+As expected, this is a valid ZIP file.
 
-⇒ **Flag:** `h7ctf{m0d3l_p4ck4g3_p1ckl3_0pc0d3_4ut0psy}`
+---
 
+## Step 2: Look inside `pytorch_model.bin`
+
+Open the file as ZIP and browse the list of subfiles:
+```python
+import zipfile
+
+with zipfile.ZipFile('pytorch_model.bin', 'r') as z:
+    for info in z.infolist():
+        print(f"File: {info.filename}, Size: {info.file_size} bytes")
+```
+
+Output:
+```text
+File: pytorch_model/data.pkl, Size: 1101 bytes
+File: pytorch_model/.format_version, Size: 1 bytes
+```
+
+The file `pytorch_model/data.pkl` weighs a mere 1,101 bytes. While a transformer model like DistilBERT has a capacity of hundreds of MB of tensor weights, here there is only a very small pickle file. This confirms that this is a pickle file that was manually built or injected with malicious code (pickle deserialization attack).
+
+---
+
+## Step 3: Disassemble the Pickle code using `pickletools`
+
+Absolutely do not use `pickle.loads()` directly to avoid activating unintended reverse shells or malicious code. I use `pickletools.dis` of the Python standard library to decompile each opcode:
+
+```python
+import zipfile, io, pickletools
+
+with zipfile.ZipFile('sentiment-distilbert-meridian.zip', 'r') as outer:
+    inner_data = outer.read('pytorch_model.bin')
+
+with zipfile.ZipFile(io.BytesIO(inner_data)) as inner:
+    pkl_data = inner.read('pytorch_model/data.pkl')
+
+pickletools.dis(io.BytesIO(pkl_data))
+```
+
+Extract a notable portion of bytecode:
+```text
+    0: \x80 PROTO      2
+    2: }    EMPTY_DICT
+    3: q    BINPUT     0
+    5: (    MARK
+    6: X        BINUNICODE 'model_name'
+   21: q        BINPUT     1
+   23: X        BINUNICODE 'distilbert-base-uncased + linear sentiment head'
+  ...
+  726: X        BINUNICODE "exec(__import__('zlib').decompress(__import__('base64').b64decode('eJw9j01Lw0AQhu/7K17ooS3aUkzQEPEgo...')))"
+  ...
+  750: c    GLOBAL     'builtins exec'
+  765: R    REDUCE
+```
+
+At opcode location `GLOBAL 'builtins' 'exec'`, pickle calls the Python `exec()` function to execute a Python string compressed with `zlib` and `base64` encoded.
+
+---
+
+## Step 4: Decode Payload and Obtain Flag
+
+Write a script to extract the payload and uncompress it:
+
+```python
+import zipfile, io, pickletools, base64, zlib
+
+zip_path = 'sentiment-distilbert-meridian.zip'
+with zipfile.ZipFile(zip_path, 'r') as outer:
+    inner_data = outer.read('pytorch_model.bin')
+
+with zipfile.ZipFile(io.BytesIO(inner_data)) as inner:
+    pkl_data = inner.read('pytorch_model/data.pkl')
+
+# Tìm chuỗi base64 trong opcode
+for op, arg, pos in pickletools.genops(pkl_data):
+    if op.name == 'BINUNICODE' and 'base64' in str(arg):
+        code_str = arg
+        # Trích chuỗi b64 bên trong
+        b64_part = code_str.split("b64decode('")[1].split("')")[0]
+        raw_code = zlib.decompress(base64.b64decode(b64_part)).decode('utf-8')
+        print("=== DECODED PAYLOAD ===")
+        print(raw_code)
+```
+
+Run the script, the payload comes out intact:
+
+```python
+# meridian-ml build agent :: post-load hook (do not ship)
+import os, urllib.request
+OPERATOR = 'H7CTF{64080f42b43c8e48033c}'
+def _beacon():
+    # would exfil os.environ + host info to the operator relay; neutered in this build
+    return OPERATOR
+_beacon()
+```
+
+The person behind the model package has inserted a post-load hook to signal his relay, and the constant `OPERATOR` is the card's flag.
+
+⇒ **Flag:** `H7CTF{64080f42b43c8e48033c}`
 </div>

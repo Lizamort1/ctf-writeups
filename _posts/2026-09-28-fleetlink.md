@@ -52,7 +52,7 @@ flowchart TD
 `Signer.sign()` trong APK cho ra công thức chuẩn từng ký tự:
 
 ```text
-canonical = METHOD "\n" PATH "\n" <query sắp xếp theo key, nối bằng '&'> "\n" ts
+canonical = METHOD "\n" PATH "\n" <query sorted by key, joined with '&'> "\n" ts
 key       = SHA-256("fleetlink_signing_pepper_v3:" + deviceId)
 X-Sig     = hex( HMAC-SHA256(key, canonical) )
 headers   : X-Device-Id, X-Ts, X-Sig
@@ -70,9 +70,9 @@ Không cần chữ ký để dò đường: API trả **401** khi path tồn t�
 không tồn tại. Chỉ cần quét 2 cấp đường dẫn và nhìn mã:
 
 ```text
-/api/v1/trips            -> 401  (ton tai)
-/api/v1/fleet/manifest   -> 401  (ton tai)
-con lai                  -> 404
+/api/v1/trips            -> 401  (exists)
+/api/v1/fleet/manifest   -> 401  (exists)
+other paths              -> 404
 ```
 
 Đó là cách duy nhất tìm ra `/api/v1/fleet/manifest` mà không cần đoán từ tài liệu.
@@ -100,40 +100,78 @@ H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{fl33tl1nk_br0k3n_0bj3ct_l3v3l_4uth_b0l4}`
+> **Flag:** `H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}`
 
-This challenge is a **Web / API** challenge from H7CTF'26 involving a fleet tracking API platform (`FleetLink`).
 
-The vulnerability is Broken Object Level Authorization (BOLA / IDOR) on trip telemetry endpoints.
+Mobile/API post: has an Android APK and a backend API protected by a **request signature**. To read the data of an entire fleet, you must sign a valid request — and that's where the author shot himself in the foot.
+
+Read the description, the key is right in the challenge title: *"Sign for it yourself"*.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Web App: FleetLink Telemetry Dashboard"] --> B["Analyze API requests: GET /api/v1/vehicles/102/telemetry"]
-    B --> C["Identify BOLA / IDOR: Changing vehicle ID returns unauthorized telemetry"]
-    C --> D["Enumerate vehicle IDs: Iterate 1 to 500"]
-    D --> E["Vehicle 404 returns confidential emergency vehicle trace"]
-    E --> F["Extract route coordinates & base64 encoded incident notes"]
-    F --> G["Decode payload: Flag extracted"]
-    G --> H["Flag: h7ctf{fl33tl1nk_br0k3n_0bj3ct_l3v3l_4uth_b0l4}"]
+    A["Decompile the APK with androguard (no emulator needed)"] --> B["Find Signer.sign(), which exposes the complete signing logic"]
+    B --> C["canonical = METHOD \n PATH \n query sorted by key and joined with & \n ts"]
+    C --> D["key = SHA-256(pepper + deviceId)"]
+    D --> E["X-Sig = hex( HMAC-SHA256(key, canonical) )"]
+    E --> F["The pepper is a symmetric constant in the client<br/>=> anyone who reads the APK can sign valid requests"]
+    A --> G["Discover routes through the 401 versus 404 status oracle"]
+    G --> H["/api/v1/trips and /api/v1/fleet/manifest return 401 without headers<br/>unknown paths return 404"]
+    F --> I["Sign the X-Device-Id / X-Ts / X-Sig headers for the new path"]
+    H --> I
+    I --> J["Server rejects scope=mine for the full fleet and requires scope=all (dispatcher)"]
+    J --> K["Sign a request with scope=all -> 200"]
+    K --> L["Read dispatcher_manifest_signing_key"]
+    L --> M["H7CTF{fd2d95eb-...}"]
 ```
 
 ---
 
-## Step 1: BOLA Vulnerability Discovery
+## Step 1: The client exposes its signing logic
 
-The endpoint `/api/v1/vehicles/{id}/telemetry` fails to check whether the requesting user owns vehicle `{id}`.
-Sending:
-```http
-GET /api/v1/vehicles/404/telemetry HTTP/1.1
-Host: api.fleetlink.h7ctf.org
-Authorization: Bearer <driver_token>
+`Signer.sign()` in the APK produces the standard character-by-character formula:
+
+```text
+canonical = METHOD "\n" PATH "\n" <query sorted by key, joined with '&'> "\n" ts
+key       = SHA-256("fleetlink_signing_pepper_v3:" + deviceId)
+X-Sig     = hex( HMAC-SHA256(key, canonical) )
+headers   : X-Device-Id, X-Ts, X-Sig
 ```
-Returns VIP emergency vehicle records containing the flag.
 
-⇒ **Flag:** `h7ctf{fl33tl1nk_br0k3n_0bj3ct_l3v3l_4uth_b0l4}`
+Problem: pepper `fleetlink_signing_pepper_v3` is **a symmetric constant embedded in the client**. The server trusts the client, so anyone who reads the APK can self-sign a valid request for **any identity**. This is the classic "server trusts the client" class of errors.
 
+---
+
+## Step 2: Find hidden route using status code oracle
+
+No signature is needed to trace the path: the API returns **401** when the path exists without a header, and **404** when the path does not exist. Just scan 2 levels of paths and look at the code:
+
+```text
+/api/v1/trips            -> 401  (exists)
+/api/v1/fleet/manifest   -> 401  (exists)
+other paths              -> 404
+```
+
+That's the only way to find out `/api/v1/fleet/manifest` without guessing from the documentation.
+
+---
+
+## Step 3: Pass the `scope` gate
+
+The server directly stated the conditions:
+
+```text
+scope 'mine' cannot list the full fleet; requires scope=all (dispatcher)
+```
+
+Because I can sign the request arbitrarily, I just need to sign the correct canonical with `scope=all` on the new path ⇒ 200 OK, and the manifest dispatcher returns with the `dispatcher_manifest_signing_key` field — which is the flag.
+
+## Flag
+
+```text
+H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}
+```
 </div>

@@ -95,7 +95,7 @@ Mở file `https://cdn-static-3.abu.rocks/site.css` ra xem thì thấy ngay qu�
  */
 ```
 
-Dev note thẳng luôn là bundle này được dùng chung cho cả `clearpane.abu.rocks` và **`halcyon-strategies.h7tex.com`**! 
+Dev note thẳng luôn là bundle này được dùng chung cho cả `clearpane.abu.rocks` và **`halcyon-strategies.h7tex.com`**!
 Trang whistleblower nặc danh hóa ra chung hạ tầng và chủ sở hữu với một công ty bên ngoài.
 
 ---
@@ -208,41 +208,189 @@ User ID packet (Tag 13) có format `Name (Comment) <Email>`, tác giả nhét lu
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{publ1c_d0m41n_dns_s0ck3t_pwn_rce}`
+> **Flag:** `H7CTF{4fb846630ae38a205b}`
 
-This challenge belongs to the **Binary Exploitation (Pwn)** category from H7CTF'26. The target is a custom DNS caching daemon written in C.
 
-The vulnerability is an out-of-bounds array indexing in DNS label decompression.
+This article has a challenge description:
+
+> Some operators still think their domains are private. Infrastructure has a longer memory than they do.
+
+Read the description, there are 2 keys here:
+* **"operators"**: in the organizing committee/infra of this tournament is Abu, his familiar personal domain is `abu.rocks`
+* **"Infrastructure has a longer memory than they do"**: this sentence directly suggests **Certificate Transparency (CT Logs)**. Any SSL certificate that has ever been issued (Let's Encrypt, Cloudflare, DigiCert...) is permanently recorded in the CA's public log, even if the admin later deletes DNS or hides the subdomain, the infrastructure will still be recorded forever.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Binary: dns_daemon (ELF 64-bit)"] --> B["Analyze DNS name decompression loop"]
-    B --> C["Detect pointer compression loop bug: 0xC0 offset allows negative indexing"]
-    C --> D["Point compression offset before buffer start -> Reads internal heap pointers"]
-    D --> E["Construct recursive pointer compression chain -> Corrupt next-chunk size"]
-    E --> F["Fastbin dup / Tcache poisoning to overwrite free_hook"]
-    F --> G["Trigger shell execution via UDP packet payload"]
-    G --> H["Flag: h7ctf{publ1c_d0m41n_dns_s0ck3t_pwn_rce}"]
+    A["Description: Infrastructure has a longer memory than they do"] --> B["Look up CT Logs of abu.rocks (Certspotter / crt.sh)"]
+    B --> C["Detected 3 subdomains: clearpane, cdn-static-3, openpgpkey"]
+    C --> D["Check out clearpane.abu.rocks (Whistleblower platform)"]
+    C --> E["openpgpkey.abu.rocks (WKD Service)"]
+    D --> F["Look at the source and see the load https://cdn-static-3.abu.rocks/site.css"]
+    F --> G["Detected leaked comments: served to clearpane.abu.rocks, halcyon-strategies.h7tex.com"]
+    G --> H["Pivot to https://halcyon-strategies.h7tex.com"]
+    H --> I["Check https://halcyon-strategies.h7tex.com/.well-known/security.txt"]
+    I --> J["Extract: Contact curator@abu.rocks and Key published via WKD"]
+    J --> K["Hash local-part 'curator' using SHA-1"]
+    K --> L["Encode Z-Base-32: ny73kpdzrpmxkmtuocdhuu4nfffd6k8z"]
+    E --> M["Download PGP Key from WKD: https://openpgpkey.abu.rocks/.well-known/openpgpkey/abu.rocks/hu/ny73..."]
+    L --> M
+    M --> N["Parse binary packet OpenPGP (Tag 13 - User ID)"]
+    N --> O["Flag in the User ID comment: Curator (H7CTF{4fb846630ae38a205b})"]
 ```
 
 ---
 
-## Step 1: DNS Pointer Compression Bug
+## Step 1: Check CT Logs of abu.rocks
 
-When parsing standard RFC 1035 compression pointers (`0xC0 XX`), the daemon calculates:
-`name_ptr = buffer + (offset & 0x3FFF);`
-If `offset` points before the packet header, `name_ptr` indexes out-of-bounds, corrupting the heap layout.
+I use Certspotter API to dump all subdomains that have been issued SSL certificates:
+
+```bash
+curl -s "https://api.certspotter.com/v1/issuances?domain=abu.rocks&include_subdomains=true&expand=dns_names" | jq -r '.[].dns_names[]' | sort -u
+```
+
+It spits out a bunch of domains:
+```text
+abu.rocks
+cdn-static-3.abu.rocks
+clearpane.abu.rocks
+oob.abu.rocks
+openpgpkey.abu.rocks
+upload.abu.rocks
+```
+
+There are 3 notable ones:
+* `clearpane.abu.rocks`
+* `cdn-static-3.abu.rocks`
+* `openpgpkey.abu.rocks` (looking at the name, it smells like PGP's Web Key Directory)
 
 ---
 
-## Step 2: Exploit Execution
+## Step 2: Look for `clearpane.abu.rocks` & Leaks in the CSS file
 
-A custom DNS query packet triggering compression loop poisoning yields code execution.
+Open `https://clearpane.abu.rocks` and see that this is a page that receives anonymous denunciations (*"ClearPane - Secure Anonymous Submissions"*).
 
-⇒ **Flag:** `h7ctf{publ1c_d0m41n_dns_s0ck3t_pwn_rce}`
+F12 looks at the source to see what's there and it loads CSS and JS from the CDN subdomain:
+```html
+<link rel="stylesheet" href="https://cdn-static-3.abu.rocks/site.css">
+<script src="https://cdn-static-3.abu.rocks/m.js" data-account="PA-9F3C71E8"></script>
+```
 
+Open the file `https://cdn-static-3.abu.rocks/site.css` and immediately see the extremely careless leak of the dev:
+```css
+/* front-end theme -- static asset bundle
+ * origin: cdn-static-3.abu.rocks
+ * served to: clearpane.abu.rocks, halcyon-strategies.h7tex.com
+ * internal use only. do not redistribute.
+ */
+```
+
+Dev notes directly that this bundle is shared by both `clearpane.abu.rocks` and **`halcyon-strategies.h7tex.com`**! The anonymous whistleblower site turned out to share infrastructure and ownership with an outside company.
+
+---
+
+## Step 3: Pivot to `halcyon-strategies.h7tex.com`
+
+Go to `https://halcyon-strategies.h7tex.com` and this is a crisis communications company (*Strategic Communications & Narrative Risk Management*).
+
+I checked the familiar paths of the RFC web standard, discovered the file `.well-known/security.txt`: `https://halcyon-strategies.h7tex.com/.well-known/security.txt`
+
+Return content:
+```text
+# Halcyon Strategies -- secure contact
+# All sensitive correspondence is encrypted. Our key is published via WKD; fetch it by address.
+Contact: mailto:curator@abu.rocks
+Encryption: openpgp4fpr:6D4354288E06DA24551B157D946A296DA5F90AF6
+Preferred-Languages: en
+Expires: 2027-01-01T00:00:00.000Z
+```
+
+There are 2 keys here:
+* Email: `curator@abu.rocks`
+* Fingerprint: `6D4354288E06DA24551B157D946A296DA5F90AF6`
+* With instructions: *"Our key is published via WKD; fetch it by address."*
+
+At first, I tried to put the fingerprint on keyservers like `keys.openpgp.org`, `ubuntu`, `mit` to search but they all got 404. As it said, the key is hosted via WKD.
+
+---
+
+## Step 4: Get PGP Key via WKD (Web Key Directory)
+
+WKD is a standard that automatically detects OpenPGP keys over HTTPS based on email addresses. Its mechanism is:
+1. Get the `local-part` of the email: `curator`
+2. SHA-1 hash of the string `curator`: `sha1("curator")`
+3. Encode the result to the **z-base-32** charset (32 characters: `ybndrfg8ejkmcpqxot1uwisza345h769`)
+4. According to Advanced WKD standards, the URL will be:
+`https://openpgpkey.abu.rocks/.well-known/openpgpkey/abu.rocks/hu/<zbase32_hash>`
+
+Write a python script to hash and pull keys:
+
+```python
+import hashlib, urllib.request, ssl
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
+zbase32 = "ybndrfg8ejkmcpqxot1uwisza345h769"
+
+def encode_zbase32(b):
+    res, val, bits = [], 0, 0
+    for byte in b:
+        val = (val << 8) | byte
+        bits += 8
+        while bits >= 5:
+            bits -= 5
+            res.append(zbase32[(val >> bits) & 0x1f])
+    if bits > 0:
+        res.append(zbase32[(val << (5 - bits)) & 0x1f])
+    return "".join(res)
+
+local_part = "curator"
+h = hashlib.sha1(local_part.encode('utf-8')).digest()
+wkd_hash = encode_zbase32(h)
+print("WKD Hash:", wkd_hash)
+
+url = f"https://openpgpkey.abu.rocks/.well-known/openpgpkey/abu.rocks/hu/{wkd_hash}"
+req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+with urllib.request.urlopen(req, context=ctx) as resp:
+    data = resp.read()
+    print(f"Status: {resp.status}, Size: {len(data)} bytes")
+    with open("key.pgp", "wb") as f:
+        f.write(data)
+```
+
+Run script:
+```text
+WKD Hash: ny73kpdzrpmxkmtuocdhuu4nfffd6k8z
+Status: 200, Size: 436 bytes
+```
+
+Successfully pulled the 436 bytes file `key.pgp`.
+
+---
+
+## Step 5: Read PGP Packet to get Flag
+
+Open file `key.pgp` with strings or parse binary packet RFC 4880:
+
+```python
+with open("key.pgp", "rb") as f:
+    data = f.read()
+
+import re
+print(re.findall(b'[\x20-\x7e]{5,}', data))
+```
+
+Output:
+```text
+[b'Curator (H7CTF{4fb846630ae38a205b}) <curator@abu.rocks>']
+```
+
+The User ID packet (Tag 13) has the format `Name (Comment) <Email>`, the author puts the flag in the Comment field of the User ID.
+
+⇒ **Flag:** `H7CTF{4fb846630ae38a205b}`
 </div>

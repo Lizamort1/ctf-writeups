@@ -18,7 +18,7 @@ mermaid: true
 > **Flag:** `H7CTF{84046247-2f1f-4cb5-b20b-d5b22c164782}`
 
 
-Bài này thuộc category **Reverse Engineering** với một binary thực thi viết bằng ngôn ngữ **Go**. 
+Bài này thuộc category **Reverse Engineering** với một binary thực thi viết bằng ngôn ngữ **Go**.
 Đề bài cho dịch vụ `tollgate` và yêu cầu tìm cặp Key và IV hợp lệ để giải mã khối dữ liệu mật chứa cờ.
 
 Điểm mấu chốt: **Không có chuỗi Key/IV cố định (literal) nào trong binary**. Cả hai đều được sinh động tại thời điểm runtime.
@@ -113,42 +113,96 @@ print(flag.decode())
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{t0ll_st0ry_d3lph1_r3v_k3y_d3r1v4t10n}`
+> **Flag:** `H7CTF{84046247-2f1f-4cb5-b20b-d5b22c164782}`
 
-This challenge is a **Reverse Engineering** challenge from H7CTF'26. The binary is a 32-bit Delphi executable implementing a highway toll calculation system.
 
-The goal is to analyze the event handlers, reverse the key derivation logic, and decrypt the stored license record.
+This article belongs to the **Reverse Engineering** category with an executable binary written in the **Go** language. The problem is for the `tollgate` service and requires finding a valid Key and IV pair to decrypt a block of secret data containing a flag.
+
+Bottom line: **There is no fixed (literal) Key/IV string in binary**. Both are animated at runtime.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Binary: toll_calculator.exe (Delphi 32-bit)"] --> B["Analyze with IDR (Interactive Delphi Reconstructor)"]
-    B --> C["Locate button click event handler: TForm1.BtnCalculateClick"]
-    C --> D["Trace key derivation: Dynamic string concatenation from UI controls"]
-    D --> E["Extract RC4 key: Derived from license plate + secret vehicle tag"]
-    E --> F["Decrypt embedded ciphertext buffer in DFM form resources"]
-    F --> G["Flag: h7ctf{t0ll_st0ry_d3lph1_r3v_k3y_d3r1v4t10n}"]
+    A["Open the Go binary - Find the main.unlock function"] --> B["main.unlock calls a hash function that returns a 32-byte array<br/>- makeslice len=0x20 -> aes.NewCipher"]
+    B --> C["Identify this as SHA-256(token), not a constant"]
+    A --> D["makeslice(len=0x10) goes straight into NewCBCDecrypter"]
+    D --> E["Buffer has never been loaded with data => IV = 16 bytes 0x00"]
+    A --> F["Main.check function is compiled inline into main.main<br/>- ARX 4 word conversion loop at 0x498a02"]
+    F --> G["Read 4 tables in .rodata: k1, rol, k3, expected"]
+    G --> H["Each step is a bijective operation => Direct inversion, no brute force"]
+    H --> I["token_word = bswap(ror32(ex - k3, s) ^ k1)"]
+    I --> J["Recover token: H7-T0LLG4TE-KEY1"]
+    C --> K["AES-256 key = SHA-256(token)"]
+    E --> K
+    J --> K
+    K --> L["AES-256-CBC decodes 48 bytes at 0x557660"]
+    L --> M["Padding 0x05 x5 (valid PKCS#7) -> Obtains 43-character flag"]
+    M --> N["Flag: H7CTF{84046247-2f1f-4cb5-b20b-d5b22c164782}"]
 ```
 
 ---
 
-## Step 1: Delphi Event Handler Reversal
+## Step 1: Locate Ciphertext
 
-Using IDR to reconstruct the VCL event table, we identify `TForm1.BtnCalculateClick`.
-The function reads `Edit1.Text`, hashes it with a custom rolling checksum, and feeds it into an RC4 decryptor over resource `RCDATA_01`.
+48-byte ciphertext located in memory area `.noptrdata` vaddr `0x557660`, slice header in `0x55de10`:
+```text
+{ ptr = 0x557660, len = 0x30, cap = 0x30 }
+```
+48 bytes is equivalent to 3 AES-128/256 blocks, enough to contain the 43-character string `H7CTF{...}` with PKCS#7 padding.
 
-```python
-from Crypto.Cipher import ARC4
+---
 
-key = b"TOLL_GATE_2026_MASTER"
-cipher = ARC4.new(key)
-flag = cipher.decrypt(resource_bytes)
-print("Flag:", flag.decode())
+## Step 2: Analyze the Key and IV generation mechanism
+
+Check `main.unlock` at `0x49861a`:
+
+```asm
+call  <hash>                            ; Trả về [32]byte = SHA-256(token) -> Khóa AES-256
+makeslice(len=0x10)                     ; Khởi tạo buffer 16 byte không gán giá trị
+call  aes.NewCBCDecrypter(block, buf)   ; Buffer rỗng => IV = 16 byte 0x00
 ```
 
-⇒ **Flag:** `h7ctf{t0ll_st0ry_d3lph1_r3v_k3y_d3r1v4t10n}`
+---
 
+## Step 3: Reverse the ARX algorithm to restore Tokens
+
+The function `main.check` is inlined into `main.main`, turning into 4 loops over 4 32-bit words at `0x498a02`:
+
+```text
+w  = bswap(token_word)                    // big-endian
+w ^= k1[i]      @0x557300 -> 7c5afe6c 1ddf8cdb 9362ba25 a689a4ca
+w  = rol32(w, s[i]) @0x5574e0 -> [22, 12, 3, 20]
+w += k3[i]      @0x557310 -> b441f5cf 3fbcb9d9 10ceff09 7b7f535f
+so sánh w == ex[i] @0x557320 -> 824f1143 7bc67cb2 4a86f74e 5b3e302e
+```
+
+Because `xor`, `rol`, `add` are all bijective operations on $\mathbb{Z}/2^{32}\mathbb{Z}$, we solve each word inversely:
+
+```python
+token_word = bswap(ror32((ex[i] - k3[i]) & 0xffffffff, s[i]) ^ k1[i])
+```
+
+The result is a 16-byte token string: `H7-T0LLG4TE-KEY1`.
+
+---
+
+## Step 4: AES decryption obtains Flag
+
+```python
+import hashlib
+from Crypto.Cipher import AES
+
+token = b"H7-T0LLG4TE-KEY1"
+key = hashlib.sha256(token).digest()
+iv = b"\x00" * 16
+
+cipher = AES.new(key, AES.MODE_CBC, iv)
+flag = cipher.decrypt(ciphertext).rstrip(b"\x05")
+print(flag.decode())
+```
+
+⇒ **Flag:** `H7CTF{84046247-2f1f-4cb5-b20b-d5b22c164782}`
 </div>

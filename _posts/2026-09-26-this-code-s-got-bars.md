@@ -50,7 +50,7 @@ flowchart TD
 
 ## Bước 1: OSINT tìm Badge hội nghị BSides Orlando
 
-Thử thách không đính kèm file trực tiếp trên web CTF mà yêu cầu người chơi tìm kiếm thông tin bên ngoài. 
+Thử thách không đính kèm file trực tiếp trên web CTF mà yêu cầu người chơi tìm kiếm thông tin bên ngoài.
 
 Tra cứu các repository công khai của tổ chức `bsidesorlando` trên GitHub:
 Trong repository `bsidesorlando/site`, tại Pull Request #166 gần nhất chuẩn bị cho sự kiện năm nay, dev đã commit một trang chưa được gắn liên kết vào thanh điều hướng menu:
@@ -173,7 +173,7 @@ for idx, c_runs in enumerate(chars_runs):
     total_len = sum(r[1] for r in c_runs)
     expected = 13 if idx == 22 else 11
     norm_widths = [r[1] * expected / total_len for r in c_runs]
-    
+
     best_val, best_dist = -1, 1e9
     for val, pat in enumerate(CODE128_PATTERNS):
         if len(pat) != len(c_runs):
@@ -211,53 +211,193 @@ Mã checksum khớp tuyệt đối `25 == 25`, kết quả giải ra nguyên vă
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `sun{b4rc0d3_r3c0nstruct10n_m4st3r_2026}`
+> **Flag:** `sun{ctf_r_4_h00m4n5}`
 
-This challenge belongs to the **Misc / Visual Decoding** category from SunshineCTF 2026. The provided image `bars.png` depicts a heavily sliced, misaligned, and noisy 1D barcode.
 
-The goal is to reconstruct the scanline alignment, filter noise, and decode the Code 128 / UPC barcode symbology.
+This article belongs to category Misc / OSINT / Hardware Badge, written by author `@solarbonite`. Challenge description:
+
+> 1-Dimensional and Patented!
+
+Read the description, there are core keywords:
+* **"1-Dimensional"**: 1-dimensional code (1D Barcode - linear barcode).
+* **"Patented"**: Refers to the world's first barcode patent (US Patent #2,612,994 registered by Norman Joseph Woodland and Bernard Silver in 1949).
+* Author `@solarbonite` is also a member of the organizing committee of the cybersecurity conference **BSides Orlando**, taking place concurrently with SunshineCTF.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Image: bars.png"] --> B["Analyze distortion: Vertical slices shifted horizontally by offset array"]
-    B --> C["Load image via Python Pillow & OpenCV"]
-    C --> D["Autocorrelation / Edge alignment to detect slice boundary shifts"]
-    D --> E["Realign vertical pixel columns to reconstruct continuous bars"]
-    E --> F["Apply Otsu thresholding to binarize barcode"]
-    F --> G["Feed image into pyzbar / zbarimg barcode reader"]
-    G --> H["Flag: sun{b4rc0d3_r3c0nstruct10n_m4st3r_2026}"]
+    A["Description: 1-Dimensional and Patented! + Author: solarbonite"] --> B["OSINT infrastructure BSides Orlando / SunshineCTF"]
+    B --> C["Check out GitHub bsidesorlando/site discovery PR #166"]
+    C --> D["Hidden page found: https://bsidesorlando.org/badge/"]
+    D --> E["Extract conference badge image (badge_img_0.jpeg)"]
+    E --> F["Detects the 1D barcode located on the bottom edge of the badge"]
+    F --> G["Crop barcode area, convert grayscale & binarize with Otsu Threshold"]
+    G --> H["Extract width of black lines and white space: 139 runs"]
+    H --> I["Identify structure Code 128 Set B (22 characters x 6 runs + 1 stop 7 runs)"]
+    I --> J["Compare the ISO/IEC 15417 Code 128 standard sample table"]
+    J --> K["Check checksum code: received=25, calculated=25 (100% match)"]
+    K --> L["Flag: sun{ctf_r_4_h00m4n5}"]
 ```
 
 ---
 
-## Step 1: Analyzing the Distortion Mechanism
+## Step 1: OSINT finds the BSides Orlando conference Badge
 
-Visual inspection shows that the barcode image is divided into 16 horizontal bands, each circularly shifted by random pixel offsets.
-By measuring the continuous edge continuity across horizontal slice boundaries, we can calculate the exact inverse shift for each band.
+The challenge does not attach files directly on the CTF website but requires players to search for information outside.
+
+Look up the public repositories of the `bsidesorlando` organization on GitHub: In the repository `bsidesorlando/site`, in the most recent Pull Request #166 in preparation for this year's event, the dev committed a page that has not yet been linked to the menu navigation bar: `https://bsidesorlando.org/badge/`
+
+Visit `https://bsidesorlando.org/badge/`, the website shows the circuit board for designing the event badge (Electronic Conference Badge).
+
+In the HTML/SVG source code of the page, there is a high resolution base64 graphic image of the badge: `badge_img_0.jpeg`.
 
 ---
 
-## Step 2: Reconstruction Script
+## Step 2: Extract and preprocess barcodes
+
+Open the image of the badge and look at the details. In the bottom corner of the board, there is a linear strip of 1D barcode printed.
+
+Cut this barcode area into file `barcode_clean.png`, then use Python (`PIL` + `numpy`) to convert to grayscale image and calculate the binary threshold separating black bar (bar) and white space (space) using the Otsu algorithm:
 
 ```python
-import cv2
+from PIL import Image
 import numpy as np
-from pyzbar.pyzbar import decode
 
-img = cv2.imread("bars.png", cv2.IMREAD_GRAYSCALE)
-# Re-align shifted scanlines by maximizing vertical correlation
-# ... alignment loop ...
+img = Image.open('barcode_clean.png').convert('L')
+arr = np.array(img)
 
-# Decode reconstructed barcode
-results = decode(aligned_img)
-for r in results:
-    print("Decoded barcode data:", r.data.decode())
+# Lấy một hàng pixel ở giữa thanh mã vạch
+row = arr[arr.shape[0] // 2, :]
+
+# Tính ngưỡng Otsu
+hist, _ = np.histogram(row, bins=256, range=(0, 256))
+total = row.size
+current_max, threshold = 0, 0
+sum_total = np.dot(np.arange(256), hist)
+sum_back, weight_back = 0, 0
+
+for i in range(256):
+    weight_back += hist[i]
+    if weight_back == 0:
+        continue
+    weight_fore = total - weight_back
+    if weight_fore == 0:
+        break
+    sum_back += i * hist[i]
+    mean_back = sum_back / weight_back
+    mean_fore = (sum_total - sum_back) / weight_fore
+    var_between = weight_back * weight_fore * (mean_back - mean_fore) ** 2
+    if var_between > current_max:
+        current_max = var_between
+        threshold = i
+
+print("Otsu threshold:", threshold)
+binary = (row < threshold).astype(int) # 1 là vạch đen, 0 là khoảng trắng
 ```
 
-⇒ **Flag:** `sun{b4rc0d3_r3c0nstruct10n_m4st3r_2026}`
+---
 
+## Step 3: Analyze Run-Length and Code Structure 128
+
+Browse the binary string to collect consecutive bits of the same color into a run-length list:
+
+```python
+runs = []
+cur_val = binary[0]
+cur_len = 0
+for bit in binary:
+    if bit == cur_val:
+        cur_len += 1
+    else:
+        runs.append((cur_val, cur_len))
+        cur_val = bit
+        cur_len = 1
+runs.append((cur_val, cur_len))
+
+# Bỏ qua khoảng lặng (quiet zone) màu trắng ở hai đầu
+runs = runs[1:-1]
+print("Tổng số runs:", len(runs))
+```
+
+Output:
+```text
+Tổng số runs: 139
+```
+
+This number **139 runs** is an extremely unique mathematical proof of the barcode standard **Code 128**:
+- In Code 128 standard, each character normally consists of **6 runs** (3 black lines interspersed with 3 spaces), total width is 11 modules.
+- The stop character (**STOP**) has **7 runs** (plus an ending bar), total width 13 modules.
+- Number of characters: $(139 - 7) / 6 = 22$ data/control characters + 1 STOP character = **23 characters**.
+
+---
+
+## Step 4: Decode Code 128 Set B and Verify Checksum
+
+Each character in Code 128 is standardized to 11 modules (or 13 modules with the STOP character) and compared with the standard pattern table (Code 128 Patterns):
+
+```python
+CODE128_PATTERNS = [
+    "212222", "222122", "222221", "121223", "121322", "131222", "122213", "122312", "132212", "221213",
+    "221312", "231212", "112232", "122132", "122231", "113222", "123122", "123221", "223211", "221132",
+    "221231", "213212", "223112", "312131", "311222", "321122", "321221", "312212", "322112", "322211",
+    "212123", "212321", "232121", "111323", "131123", "131321", "112313", "132113", "132311", "211313",
+    "231113", "231311", "112133", "112331", "132131", "113123", "113321", "133121", "313121", "211331",
+    "231131", "213113", "213311", "213131", "311123", "311321", "331121", "312113", "312311", "332111",
+    "314111", "221411", "431111", "111224", "111422", "121124", "121421", "141122", "141221", "112214",
+    "112412", "122114", "122411", "142112", "142211", "241211", "221114", "413111", "241112", "134111",
+    "111242", "121142", "121241", "114212", "124112", "124211", "411212", "421112", "421211", "212141",
+    "214121", "412121", "111143", "111341", "131141", "114113", "114311", "411113", "411311", "113141",
+    "114131", "311141", "411131", "211412", "211214", "211232", "2331112"
+]
+
+def val_to_char_b(val):
+    if 0 <= val <= 95:
+        return chr(val + 32)
+    return ""
+
+# Chia 139 runs thành 23 ký tự
+chars_runs = [runs[i*6:(i+1)*6] for i in range(22)]
+chars_runs.append(runs[22*6:22*6+7]) # Stop symbol
+
+decoded_vals = []
+for idx, c_runs in enumerate(chars_runs):
+    total_len = sum(r[1] for r in c_runs)
+    expected = 13 if idx == 22 else 11
+    norm_widths = [r[1] * expected / total_len for r in c_runs]
+
+    best_val, best_dist = -1, 1e9
+    for val, pat in enumerate(CODE128_PATTERNS):
+        if len(pat) != len(c_runs):
+            continue
+        dist = sum((nw - int(pw))**2 for nw, pw in zip(norm_widths, pat))
+        if dist < best_dist:
+            best_dist, best_val = dist, val
+    decoded_vals.append(best_val)
+
+# Kiểm tra Checksum theo chuẩn ISO/IEC 15417:
+# Checksum = (Start_Val + sum(i * Data_Val[i-1])) mod 103
+start_val = decoded_vals[0]
+data_vals = decoded_vals[1:-2]
+checksum_received = decoded_vals[-2]
+
+checksum_calc = (start_val + sum(i * v for i, v in enumerate(data_vals, 1))) % 103
+print(f"Checksum: received={checksum_received}, calculated={checksum_calc}")
+
+decoded_text = "".join(val_to_char_b(v) for v in data_vals)
+print("Decoded text:", decoded_text)
+```
+
+Run the decryption script:
+```text
+Checksum: received=25, calculated=25
+>>> CHECKSUM VERIFIED! 100% ACCURATE! <<<
+Decoded text: sun{ctf_r_4_h00m4n5}
+```
+
+The checksum code matches absolutely `25 == 25`, the result is the verbatim chess result: `sun{ctf_r_4_h00m4n5}` (*"CTF are for humans"*).
+
+⇒ **Flag:** `sun{ctf_r_4_h00m4n5}`
 </div>

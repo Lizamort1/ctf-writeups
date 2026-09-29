@@ -54,6 +54,12 @@ class BlogPresentationTests(unittest.TestCase):
         avatar_rule = re.search(r"#sidebar #avatar img\s*\{(?P<body>.*?)\}", head, re.S)
         self.assertIsNotNone(avatar_rule)
         self.assertIn("object-fit: contain", avatar_rule.group("body"))
+        frame_rule = re.search(r"#sidebar #avatar\s*\{(?P<body>.*?)\}", head, re.S)
+        self.assertIsNotNone(frame_rule)
+        self.assertIn("border-radius: 50%", frame_rule.group("body"))
+        sidebar = (ROOT / "_includes" / "sidebar.html").read_text(encoding="utf-8")
+        self.assertIn('loading="eager"', sidebar)
+        self.assertNotIn("sidebar-lang-switch", sidebar)
         title_rule = re.search(
             r"(?m)^    #sidebar \.site-title\s*\{(?P<body>.*?)\}", head, re.S
         )
@@ -171,6 +177,66 @@ if (!link.hidden) throw new Error('Expected regenerated Vietnamese TOC link to s
         )
 
         self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_switching_language_redraws_visible_mermaid_diagram(self):
+        """Chirpy must recalculate an SVG that was measured while hidden."""
+        head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
+        script = head.split("<script>", 1)[1].split("</script>", 1)[0]
+        harness = r'''
+let language = 'en';
+const messages = [];
+const document = {
+  readyState: 'complete',
+  documentElement: {
+    getAttribute: () => language,
+    setAttribute: (_name, value) => { language = value; }
+  },
+  querySelectorAll: () => [],
+  querySelector: (selector) => selector === '.mermaid' ? {} : null,
+  addEventListener: () => {}
+};
+const window = {
+  addEventListener: () => {},
+  postMessage: (message) => messages.push(message)
+};
+global.document = document;
+global.window = window;
+new Function(process.argv[1])();
+window.setLanguage('vn');
+window.setLanguage('vn');
+window.setLanguage('en');
+if (messages.length !== 2 || messages.some(m => m.id !== 'theme-updated')) {
+  throw new Error('Expected one Mermaid redraw per actual language change');
+}
+'''
+        result = subprocess.run(
+            ["node", "-e", harness, script],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_post_translations_share_flags_and_technical_blocks(self):
+        """Prevents English write-ups from inventing another exploit or flag."""
+        for post in (ROOT / "_posts").glob("*.md"):
+            content = post.read_text(encoding="utf-8")
+            vn = content.split('<div class="lang-vn" markdown="1">', 1)[1].split("</div>", 1)[0]
+            en = content.split('<div class="lang-en" markdown="1">', 1)[1].split("</div>", 1)[0]
+            flags = lambda body: set(re.findall(r"\b[A-Z][A-Z0-9_]*\{[A-Za-z0-9_:-]+\}", body))
+            def blocks(body):
+                found = re.findall(r"(?ms)^```([^\n]*)\n(.*?)^```\s*$", body)
+                return [
+                    (kind, re.sub(r'"(?:\\.|[^"\\])*"', '""', code) if kind == "mermaid" else code)
+                    for kind, code in found
+                ]
+            self.assertEqual(flags(vn), flags(en), post.name)
+            self.assertEqual(blocks(vn), blocks(en), post.name)
+            strip_fences = lambda body: re.sub(r"(?ms)^```.*?^```\s*$", "", body)
+            inline_code = lambda body: set(re.findall(r"(?<!`)`([^`\n]+)`(?!`)", strip_fences(body)))
+            headings = lambda body: [len(mark) for mark in re.findall(r"(?m)^(#{1,6}) ", body)]
+            self.assertEqual(inline_code(vn), inline_code(en), post.name)
+            self.assertEqual(headings(vn), headings(en), post.name)
 
 
 if __name__ == "__main__":

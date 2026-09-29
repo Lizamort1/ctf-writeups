@@ -89,81 +89,69 @@ Host: target.ptitctf.vn
 
 > **Flag:** `PTITCTF{d0ubl3_url_3nc0d1ng_p4th_tr4v3rs4l}`
 
-This challenge belongs to the **Web** category. The target system is an informational portal that serves technical documentation about machine learning architectures and automation systems ("Machine Love").
 
-The objective is to exploit a directory traversal flaw (Path Traversal / Local File Read) to retrieve the sensitive flag file located on the backend server.
+This article belongs to category **Web**. The system is a portal that introduces and provides technical documentation about machine learning architectures and automation systems ("Machine Love").
+
+The goal is to exploit a directory traversal vulnerability (Path Traversal) to read a sensitive flag file on the backend server.
 
 ---
 
-## Solve Flow
+## Analysis Flow Diagram (Solve Flow)
 
 ```mermaid
 flowchart TD
-    A["Web Application: Machine Learning Documentation Portal (Machine Love)"] --> B["Explore Feature: ?file= or ?doc= parameter used to load internal documents"]
-    B --> C["Test Standard Directory Traversal: ../../../ -> Blocked by filter"]
-    C --> D["Identify Multi-tier Architecture: Reverse Proxy / WAF performs 1st URL decode"]
-    D --> E["Backend App performs 2nd decode: urllib.parse.unquote() before open()"]
-    E --> F["Craft Double URL-Encoding Payload: %252e%252e%252f"]
-    F --> G["1st decode becomes %2e%2e%2f (bypasses WAF) -> 2nd decode becomes ../"]
+    A["Web App: Machine Learning Document Viewer (Machine Love)"] --> B["Feature survey: The parameter ?file= or ?doc= is used to load internal files"]
+    B --> C["Test the payload through a normal directory: ../../../ -> Blocked by filter"]
+    C --> D["Detecting hierarchical architecture: Reverse Proxy / WAF 1st URL decoding"]
+    D --> E["The backend application decodes 2nd time: urllib.parse.unquote() before opening the file"]
+    E --> F["Build payload Double URL-Encoding: %252e%252e%252f"]
+    F --> G["The first time decodes to %2e%2e%2f (bypass filter) -> The second time decodes to ../"]
     G --> H["Successfully read flag file: /flag.txt"]
     H --> I["Flag: PTITCTF{d0ubl3_url_3nc0d1ng_p4th_tr4v3rs4l}"]
 ```
 
 ---
 
-## Step 1: Investigating the File Retrieval Mechanism and Filters
+## Step 1: Examine the file reading mechanism and filters
 
-The application allows users to read technical documentation through a dynamic endpoint:
+The system allows users to read technical documents through a dynamic endpoint:
 
 ```http
 GET /view?file=architecture.txt HTTP/1.1
 Host: target.ptitctf.vn
 ```
 
-When submitting basic directory traversal test payloads such as `../../../../etc/passwd` or `..%2f..%2fflag.txt`, the server immediately responds with an HTTP error `400 Bad Request` or `Path traversal detected!`. This demonstrates that the gateway/middleware tier enforces a pattern filter against `..` and `/`.
+When sending basic path checking strings like `../../../../etc/passwd` or `..%2f..%2fflag.txt`, the server immediately returns a `400 Bad Request` or `Path traversal detected!` error response. This shows that the gateway layer (or middleware) has a mechanism to check for the presence of the string `..` or `/`.
 
 ---
 
-## Step 2: Double URL-Encoding Bypass Technique
+## Step 2: Double URL-Encoding Bypass technique
 
-Analyzing the architecture behavior reveals a decoding discrepancy between architectural layers:
-1. **Outer Reverse Proxy / WAF:** Receives the client HTTP request, decodes the URL parameter once, and validates it against a pattern blacklist.
-2. **Backend Application Layer:** After extracting the request parameter, the backend developer calls a secondary decoding routine (`unquote(param)`) before concatenating it into the filesystem path `open(BASE_DIR + file_path)`.
+When analyzing the system's behavior, we notice that there is a phase difference in the data decoding process between architectural layers:
+1. **Outermost Proxy / WAF layer:** Receives requests from clients, performs URL decoding only once and then compares with the blacklist.
+2. **Backend Application Layer:** After receiving parameters from the request, the programmer calls a second decoding function (`unquote(param)`) before concatenating into the system file path `open(BASE_DIR + file_path)`.
 
-Leveraging this mismatch, we use **Double URL-Encoding**:
-* The dot character `.` has ASCII hex `0x2E` $\rightarrow$ First encoding is `%2e`.
-* The percent character `%` has ASCII hex `0x25` $\rightarrow$ Second encoding converts `%` to `%25`, yielding `%252e`.
-* Similarly, the forward slash `/` has hex `0x2F` $\rightarrow$ Second encoding yields `%252f`.
-* Therefore, the sequence `../` double-encoded becomes:
-  $$\text{"../"} \longrightarrow \text{"%2e%2e%2f"} \longrightarrow \text{"%252e%252e%252f"}$$
-
-When transmitted over HTTP, the gateway decodes `%25` into `%`, transforming `%252e%252e%252f` into `%2e%2e%2f`. Since `%2e%2e%2f` does not match the literal pattern `../`, it cleanly bypasses the WAF blacklist. Upon reaching the backend, the second `unquote()` call decodes `%2e%2e%2f` into `../`, effectively traversing directory boundaries.
+Taking advantage of this point, we apply the technique **Double URL-Encoding**:
+* The dot character `.` has an ASCII hex code of `0x2E` $\rightarrow$ The first encoding is `%2e`.
+* The percent sign `%` has an ASCII hex code of `0x25` $\rightarrow$ When encoding `%2e` a second time, `%` converts to `%25`, yielding the string `%252e`.
+* Similarly, the slash character `/` has the code `%2f` $\rightarrow$ 2nd encoding to `%252f`.
+* Therefore, the string `../` when encoded twice becomes:
+$$\text{"../"} \longrightarrow \text{"%2e%2e%2f"} \longrightarrow \text{"%252e%252e%252f"}$$
 
 ---
 
-## Step 3: Exploiting LFR and Retrieving the Flag
+## Step 3: Exploit LFR and Collect Flag
 
-We craft the final exploit request:
+When sending a request containing a double-encoded string:
 
 ```http
-GET /view?file=%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252fflag.txt HTTP/1.1
+GET /view?file=%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252fflag.txt HTTP/1.1
 Host: target.ptitctf.vn
 ```
 
-Automated Python exploit script:
+1. **At WAF:** The string `%252e%252e%252f` is decoded to `%2e%2e%2f`. Since this string does not contain an actual `.` character, it passes the blacklist checker perfectly valid.
+2. **At Backend:** The application calls `unquote("%2e%2e%2f")` converted to `../`, allowing it to escape the root document directory and read the file `/flag.txt` directly.
+3. The server returns the intact flag content in the HTTP response body.
 
-```python
-import requests
-
-url = "http://target.ptitctf.vn/view"
-payload = "%252e%252e%252f" * 7 + "flag.txt"
-params = {"file": payload}
-
-r = requests.get(url, params=params)
-print("Response Status:", r.status_code)
-print("Flag Content:", r.text.strip())
-```
-
-The server successfully returns HTTP 200 containing the flag.
-
+⇒ **Flag:** `PTITCTF{d0ubl3_url_3nc0d1ng_p4th_tr4v3rs4l}`
 </div>

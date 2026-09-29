@@ -97,48 +97,78 @@ Kết quả:
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{c0nstr41nt_z3_s0lv3r_l1n34r_s1mult4n30us}`
+> **Flag:** `H7CTF{34ccedaf-a705-42eb-b4d6-8f0ba8032150}`
 
-This challenge is a **Crypto / Math** puzzle from H7CTF'26. The script generates an array of 24 modular equations over large non-prime moduli.
 
-The challenge is solved by casting the modular relationships into an SMT integer solver.
+This article belongs to the category **Reverse Engineering** with the x86-64 ELF binary implementation. The problem requires entering a 16-byte key and checking through three groups of overlapping mathematical constraints. The title of the article is an algorithm suggestion: instead of searching blindly, exploit the connection between systems of equations to solve inversely.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Source: constraints.py"] --> B["Extract 24 modular equations: sum(a_ij * x_j) = b_i (mod M_i)"]
-    B --> C["Moduli M_i are composite 128-bit numbers"]
-    C --> D["Model system in Z3 SMT Solver: Variables x_0..x_23 in [0x20, 0x7E]"]
-    D --> E["Add modular reduction constraints: (Sum % M_i) == b_i"]
-    E --> F["Execute solver check -> sat within 2 seconds"]
-    F --> G["Extract ASCII character values for x_i"]
-    G --> H["Flag: h7ctf{c0nstr41nt_z3_s0lv3r_l1n34r_s1mult4n30us}"]
+    A["3 rounds of checks at 0x123d / 0x1267 / 0x1288"] --> B["Group A: buf_i XOR buf_(i+3 mod 16) == T1_i"]
+    B --> C["gcd(3,16) = 1 => Jump i -> i+3 is ONE cycle of 16 elements"]
+    C --> D["Select buf_0 => Deduce all remaining 15 bytes"]
+    D --> E["The search space narrowed down to exactly 256 candidates"]
+    A --> F["Group B: buf_2c * buf_(2c+1) mod 256 == T2_c"]
+    A --> G["Group C: rol3(buf_i) + buf_(i+5 mod 16) mod 256 == T3_i"]
+    E --> H["Browse 256 candidates, filter through groups B and C"]
+    F --> H
+    G --> H
+    H --> I["Obtained a unique solution: S4T-C0NSTR4INT!7"]
+    I --> J["Layer 2: MD5(key) -> AES-128-CBC, IV = 0, decrypt 48 bytes @0x2040"]
+    J --> K["Flag: H7CTF{34ccedaf-a705-42eb-b4d6-8f0ba8032150}"]
 ```
 
 ---
 
-## Step 1: Modeling with Z3
+## Step 1: Analyze 3 groups of constraints
+
+Decompiling the test function, the flag is valid when it simultaneously satisfies 3 systems of equations on the 16-byte array `buf`:
+
+| Group | Address | Constraint | Reference table |
+|---|---|---|---|
+| **A** | `0x123d` | `buf[i] ^ buf[(i+3)%16] == T1[i]` | `T1` @ `0x2090` |
+| **B** | `0x1267` | `(buf[2c] * buf[2c+1]) % 256 == T2[c]` | `T2` @ `0x2080` |
+| **C** | `0x1288` | `(rol3(buf[i]) + buf[(i+5)%16]) % 256 == T3[i]` | `T3` @ `0x2070` |
+
+---
+
+## Step 2: Exploit the Simple Cycle property
+
+At first glance, group A appears to be a complex system of 16 equations, but since $\gcd(3, 16) = 1$, the index transformation $i \to (i + 3) \pmod{16}$ forms **a single Euler cycle with all 16 vertices**: $$0 \to 3 \to 6 \to 9 \to 12 \to 15 \to 2 \to 5 \to 8 \to 11 \to 14 \to 1 \to 4 \to 7 \to 10 \to 13 \to 0$$
+
+Therefore, just by choosing the first byte `buf[0]` ($\in [0, 255]$), we will calculate all the remaining 15 bytes deterministically! The problem space immediately narrows from $256^{16}$ to only **256 cases**.
+
+Browse through 256 cases and check the conditions of groups B and C:
 
 ```python
-from z3 import *
-
-s = Solver()
-x = [Int(f'x_{i}') for i in range(24)]
-
-for v in x:
-    s.add(v >= 0x20, v <= 0x7E)
-
-# Add 24 linear modular equations
-# ...
-if s.check() == sat:
-    m = s.model()
-    res = bytes([m[v].as_long() for v in x])
-    print("Flag:", res.decode())
+# Duyệt 256 giá trị buf[0], tìm được chuỗi hợp lệ duy nhất:
+key = "S4T-C0NSTR4INT!7"
 ```
 
-⇒ **Flag:** `h7ctf{c0nstr41nt_z3_s0lv3r_l1n34r_s1mult4n30us}`
+---
 
+## Step 3: Decrypt Layer 2 to obtain the Flag
+
+After passing the test, the program takes `MD5(key)` as the AES-128-CBC key (IV = 16 bytes 0) to decrypt the 48 bytes payload stored at offset `0x2040`:
+
+```python
+import hashlib
+from Crypto.Cipher import AES
+
+key_str = b"S4T-C0NSTR4INT!7"
+aes_key = hashlib.md5(key_str).digest()
+iv = b"\x00" * 16
+
+cipher = AES.new(aes_key, AES.MODE_CBC, iv)
+flag = cipher.decrypt(ciphertext).rstrip(b"\x05")
+print(flag.decode())
+```
+
+Result:
+
+⇒ **Flag:** `H7CTF{34ccedaf-a705-42eb-b4d6-8f0ba8032150}`
 </div>

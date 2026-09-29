@@ -82,53 +82,64 @@ Chương trình duyệt qua toàn bộ các node hợp lệ và in ra flag:
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{c0unt3rs1gn_d1g1t4l_s1gn4tur3_n0nc3_r3us3}`
+> **Flag:** `H7CTF{011c87d4-b5c8-405d-923a-33dbed3e5bf7}`
 
-This challenge belongs to the **Crypto** category from H7CTF'26. The server signs transaction messages using ECDSA on the SECP256k1 curve.
 
-The vulnerability is biased/reused nonces ($k$) during ECDSA signing, leading to private key recovery.
+Article insane Rev/Docker, service `nc pwn.h7tex.com 43708`. Handout is a striped PIE binary + `note.txt`. Inside is a **homemade VM** that runs a "routing program" and only prints flags when the program is on the right path.
+
+Read binary + note, there are 2 keys here:
+
+* **"countersign"**: each edge of the graph carries a **MAC** (countersignature). Only edges that have a MAC
+that matches the current key will be passed through.
+* **`MINT <hex>`**: service that allows me to request a signature on the data I choose, with **the correct key**
+router used. This is not decoration, this is oracle.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Service: Countersign ECDSA Oracle"] --> B["Request signatures for two messages m1, m2"]
-    B --> C["Notice identical r value across both signatures: r1 == r2"]
-    C --> D["Confirm Nonce Reuse: k1 == k2"]
-    D --> E["Calculate nonce: k = (z1 - z2) / (s1 - s2) mod n"]
-    E --> F["Recover private key: d = (s1 * k - z1) * r^-1 mod n"]
-    F --> G["Forge valid signature for 'ADMIN_TRANSACTION_PAY_FLAG'"]
-    G --> H["Submit transaction -> Receive flag"]
-    H --> I["Flag: h7ctf{c0unt3rs1gn_d1g1t4l_s1gn4tur3_n0nc3_r3us3}"]
+    A["nc into service - core reboot for each connection"] --> B["GET: dump entire program image<br/>40 records: tag, guard, fallback, prog, edges"]
+    B --> C["MINT + hex for each edge (~130 edges, ~1s)"]
+    C --> D["Compare the returned MAC with the MAC in image<br/>- 51 LIVE edges are extracted / the rest are bait"]
+    D --> E["Translate opcode table in .rodata 0x406c to Python (model.py)"]
+    E --> F["Decision point: ROLR dst, X rotates in byte X (immediate), NOT reg_X"]
+    F --> G["All mixers/relays are bijective on r0..r5 - the guard bit is constant"]
+    G --> H["Going REVERSE from the check node: 6 XORI constants<br/>- reverse to the boot program"]
+    H --> I["Calculate unique input - RUN within the same connection"]
+    I --> J["Flag: H7CTF{011c87d4-b5c8-405d-923a-33dbed3e5bf7}"]
 ```
 
 ---
 
-## Step 1: ECDSA Nonce Reuse Mathematics
+## Step 1: Principle of survival: One single Connection
 
-When the same nonce $k$ is reused for two signatures $(r, s_1)$ and $(r, s_2)$ on message hashes $z_1, z_2$:
-$$s_1 - s_2 = k^{-1} (z_1 - z_2) \pmod n$$
-$$k = (z_1 - z_2) \cdot (s_1 - s_2)^{-1} \pmod n$$
-Once $k$ is recovered, the private key $d$ is derived:
-$$d = r^{-1} (s_1 \cdot k - z_1) \pmod n$$
+Each time **opening a TCP connection**, the new process rebuilds the entire thing: 16 key bytes, nonce, 40 splitmix64 tags and the program image.
+
+> `GET` + entire `MINT` + solve + `RUN` **must be on the same connection**.
 
 ---
 
-## Step 2: Exploit Script
+## Step 2: Use `MINT` as the live edge filtering oracle
+
+Use the `MINT` command for all ~130 edges in the virtual machine graph and compare directly with the MAC stored in the image:
 
 ```python
-from ecdsa import SECP256k1
-
-n = SECP256k1.order
-k = ((z1 - z2) * pow(s1 - s2, -1, n)) % n
-d = (pow(r, -1, n) * (s1 * k - z1)) % n
-
-# Forge admin signature
-sig = sign(d, "ADMIN_TRANSACTION_PAY_FLAG")
+live = [e for e in edges if mint(e_struct) == e.mac]
 ```
 
-⇒ **Flag:** `h7ctf{c0unt3rs1gn_d1g1t4l_s1gn4tur3_n0nc3_r3us3}`
+Filter out junk edges, accurately determine the route of 51 live edges leading to the final check node.
 
+---
+
+## Step 3: Reverse the VM hash and Run the `RUN` Command
+
+Reverse bijective operations from the check node to the original register state:
+- Build input 6 initialization register values.
+- Send the `RUN <input>` command within the session.
+
+The program browses through all valid nodes and prints the flag:
+
+⇒ **Flag:** `H7CTF{011c87d4-b5c8-405d-923a-33dbed3e5bf7}`
 </div>

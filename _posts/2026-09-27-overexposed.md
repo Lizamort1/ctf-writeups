@@ -180,7 +180,7 @@ while True:
     fn = trailing[idx+30:idx+30+fn_len].decode('utf-8', errors='ignore')
     data_start = idx + 30 + fn_len + extra_len
     comp_data = trailing[data_start:data_start+comp_size]
-    
+
     decomp = zlib.decompress(comp_data, -zlib.MAX_WBITS)
     print(f"File: {fn:10s} | Method: {method} | Decompressed: {decomp.decode()}")
     flag_parts[fn] = decomp.decode()
@@ -211,41 +211,193 @@ $$\text{Flag} = \text{part1} + \text{part2} + \text{part3} = \texttt{06da61b} + 
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{0v3r3xp0s3d_k3y_l34k_v14_f0rm4t_str1ng}`
+> **Flag:** `H7CTF{06da61b5c60e087c87c9}`
 
-This challenge is a **Pwn / Format String** challenge from H7CTF'26 running an ELF 64-bit diagnostic service.
 
-The vulnerability is a format string vulnerability in the audit logging function allowing arbitrary memory disclosure.
+This article belongs to category Misc / Forensics. Challenge description:
+
+> The comms team blacked out the sensitive photo before it went public. Nothing left in the pixels, they swore. For a redaction, it reveals an awful lot.
+
+Read the description, there are very interesting signals:
+* **"Nothing left in the pixels, they swore"**: The author has blacked out all pixels of the photo and confirmed that the data is not in the raster pixels. This completely eliminates conventional LSB or contrast/curve adjustment techniques.
+* **"a redaction, it reveals an awful lot"**: The hidden data is located in metadata chunks of the PNG file structure and attached data outside the render scope of the image.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["ELF 64-bit Service: overexposed"] --> B["Test input in log query: %p.%p.%p -> Leaks stack pointers"]
-    B --> C["Locate format string vulnerability: printf(user_input)"]
-    C --> D["Calculate stack offset of confidential key buffer (offset 14)"]
-    D --> E["Leak memory addresses using positional format specifiers: %14$s"]
-    E --> F["Dump master encryption key directly from heap/stack"]
-    F --> G["Decrypt stored flag payload"]
-    G --> H["Flag: h7ctf{0v3r3xp0s3d_k3y_l34k_v14_f0rm4t_str1ng}"]
+    A["Attached file: overexposed.png"] --> B["Analyze the Chunk structure of PNG files"]
+    B --> C["Detect the zTXt chunk located immediately after the IHDR"]
+    C --> D["Decompress zlib chunk zTXt (Keyword: part1) obtained: 06da61b"]
+    B --> E["Check after the IEND end chunk"]
+    E --> F["Detected 372 bytes of strange attached data (Trailing Zip)"]
+    F --> G["Opening the ZIP with a regular tool only sees readme.txt"]
+    G --> H["Hint in readme.txt: 'read the raw local headers'"]
+    H --> I["Parse Local File Header PK 0x03 0x04 directly in raw stream"]
+    I --> J["Found part2.txt (0x8e451a5e) -> Extract Deflate: 5c60e08"]
+    I --> K["Found part3.txt (0x7341081c) -> Extract Deflate: 7c87c9"]
+    D --> L["Match 3 parts: 06da61b + 5c60e08 + 7c87c9"]
+    J --> L
+    K --> L
+    L --> M["Complete Flag: H7CTF{06da61b5c60e087c87c9}"]
 ```
 
 ---
 
-## Step 1: Format String Exploitation
+## Step 1: Examine the Chunk structure of the PNG file
 
-Sending `%14$s` dereferences the pointer at offset 14, which directly contains the flag string in memory:
+According to the PNG specification (ISO/IEC 15948), the file consists of an 8-byte signature `89 50 4E 47 0D 0A 1A 0A` and a sequence of chunks in the format: `[Length 4B][Type 4B][Data][CRC 4B]`.
+
+I wrote a script to scan all chunks in the file:
 
 ```python
-from pwn import *
+import struct
 
-p = remote("target.h7ctf.org", 5002)
-p.sendline(b"%14$s")
-print("Flag:", p.recvline().decode().strip())
+filepath = 'overexposed.png'
+with open(filepath, 'rb') as f:
+    data = f.read()
+
+offset = 8
+while offset < len(data):
+    if offset + 8 > len(data):
+        break
+    length, ctype = struct.unpack('>I4s', data[offset:offset+8])
+    ctype_str = ctype.decode('ascii', errors='ignore')
+    print(f"Chunk: {ctype_str:4s} | Offset: {offset:6d} | Length: {length:6d}")
+    offset += 8 + length + 4 # 8 header + data + 4 CRC
+    if ctype == b'IEND':
+        print(f"--> Found IEND at offset {offset-12}. Trailing bytes: {len(data) - offset} bytes")
+        break
 ```
 
-⇒ **Flag:** `h7ctf{0v3r3xp0s3d_k3y_l34k_v14_f0rm4t_str1ng}`
+Output:
+```text
+Chunk: IHDR | Offset:      8 | Length:     13
+Chunk: zTXt | Offset:     33 | Length:     25
+Chunk: IDAT | Offset:     70 | Length:   2340
+Chunk: IEND | Offset:   2422 | Length:      0
+--> Found IEND at offset 2422. Trailing bytes: 372 bytes
+```
 
+Two obvious abnormalities:
+1. A compressed text chunk **`zTXt`** appears immediately after `IHDR`.
+2. After the end of file chunk **`IEND`** there is still **372 bytes** of redundant data (*trailing payload*).
+
+---
+
+## Step 2: Extract Chunk `zTXt` to obtain Part 1
+
+Structure of a `zTXt` chunk:
+- `Keyword`: ASCII string ending with null byte `0x00`.
+- `Compression method`: 1 byte (value `0x00` represents the zlib Deflate algorithm).
+- `Compressed text`: zlib data stream.
+
+Write the extraction and decompression script:
+
+```python
+import zlib
+
+filepath = 'overexposed.png'
+with open(filepath, 'rb') as f:
+    data = f.read()
+
+ztxt_idx = data.find(b'zTXt')
+length = int.from_bytes(data[ztxt_idx-4:ztxt_idx], 'big')
+chunk_data = data[ztxt_idx+4:ztxt_idx+4+length]
+
+keyword, comp_data = chunk_data.split(b'\x00', 1)
+part1_text = zlib.decompress(comp_data[1:]).decode('utf-8')
+
+print("=== PART 1 ===")
+print("Keyword:", keyword.decode())
+print("Value  :", part1_text)
+```
+
+Output:
+```text
+=== PART 1 ===
+Keyword: part1
+Value  : 06da61b
+```
+
+We have the first part of the flag: `06da61b`.
+
+---
+
+## Step 3: Analyze Trailing Zip & Technical Omitted Central Directory
+
+Check the 372 bytes after the `IEND` chunk: The first byte is `PK\x03\x04`, which means this is a ZIP file attached to the image file extension.
+
+If using the command `unzip` or the standard library `zipfile.ZipFile`, it can only read a single file:
+```text
+File: readme.txt (235 bytes)
+Content:
+This archive's directory lists one file. The directory is not the archive.
+Members can exist without the index admitting them -- read the raw local headers.
+And remember what you are looking at: a picture carries more than its pixels.
+```
+
+The author's message is very clear:
+> *"This archive's directory lists one file. The directory is not the archive. Members can exist without the index admitting them -- read the raw local headers."*
+
+In ZIP format:
+- Each stored file begins with a **Local File Header** (`PK\x03\x04`).
+- At the end of the ZIP file there is a table of contents called **Central Directory** (`PK\x01\x02`).
+- Standard ZIP reading tools only browse the Central Directory. The author intentionally deleted `part2.txt` and `part3.txt` from Central Directory, but their compressed data and Local File Header are still intact in the file body!
+
+---
+
+## Step 4: Parse Raw Local Headers and Decode Parts 2 & 3
+
+Write a script that automatically detects all signature `PK\x03\x04` in the trailing data block and directly extracts the raw deflate:
+
+```python
+import struct, zlib
+
+filepath = 'overexposed.png'
+with open(filepath, 'rb') as f:
+    data = f.read()
+
+iend_idx = data.find(b'IEND')
+trailing = data[iend_idx+8:]
+
+pos = 0
+flag_parts = {}
+
+while True:
+    idx = trailing.find(b'PK\x03\x04', pos)
+    if idx == -1:
+        break
+    header = trailing[idx:idx+30]
+    (ver, flags, method, mtime, mdate, crc32, comp_size, uncomp_size, fn_len, extra_len) = struct.unpack('<HHHHHIIIHH', header[4:30])
+    fn = trailing[idx+30:idx+30+fn_len].decode('utf-8', errors='ignore')
+    data_start = idx + 30 + fn_len + extra_len
+    comp_data = trailing[data_start:data_start+comp_size]
+
+    decomp = zlib.decompress(comp_data, -zlib.MAX_WBITS)
+    print(f"File: {fn:10s} | Method: {method} | Decompressed: {decomp.decode()}")
+    flag_parts[fn] = decomp.decode()
+    pos = idx + 4
+```
+
+Output:
+```text
+File: readme.txt  | Method: 8 | Decompressed: This archive's directory lists one file...
+File: part2.txt   | Method: 8 | Decompressed: 5c60e08
+File: part3.txt   | Method: 8 | Decompressed: 7c87c9
+```
+
+We obtain:
+- `part2`: `5c60e08`
+- `part3`: `7c87c9`
+
+---
+
+## Step 5: Completely match the Flag
+
+Combine 3 parts sequentially: $$\text{Flag} = \text{part1} + \text{part2} + \text{part3} = \texttt{06da61b} + \texttt{5c60e08} + \texttt{7c87c9} = \texttt{06da61b5c60e087c87c9}$$
+
+⇒ **Flag:** `H7CTF{06da61b5c60e087c87c9}`
 </div>

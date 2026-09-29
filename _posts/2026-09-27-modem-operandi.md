@@ -18,7 +18,7 @@ mermaid: true
 > **Flag:** `H7CTF{476f0831f4c4eec5b790}`
 
 
-Bài này thuộc category **Reverse Engineering** với file đính kèm `warden.zip` (dung lượng 2,921 bytes). 
+Bài này thuộc category **Reverse Engineering** với file đính kèm `warden.zip` (dung lượng 2,921 bytes).
 Bên trong là một tệp thực thi ELF 64-bit PIE đã strip, liên kết động với OpenSSL 3.
 
 Chương trình gồm 3 tầng xử lý:
@@ -101,42 +101,82 @@ Tính `MD5("H7X-9F2A-COREKEY")`, dùng làm khóa AES-128-CBC với IV = 16 byte
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{m0d3m_0p3r4nd1_4t_c0mm4nd_1nj3ct10n}`
+> **Flag:** `H7CTF{476f0831f4c4eec5b790}`
 
-This challenge is a **Reverse / Firmware** challenge from H7CTF'26 based on an embedded cellular modem controller firmware.
 
-The vulnerability is an AT command parser buffer overflow and injection flaw leading to command execution.
+This article belongs to the category **Reverse Engineering** with attached file `warden.zip` (capacity 2,921 bytes). Inside is a striped 64-bit PIE ELF executable, dynamically linked to OpenSSL 3.
+
+The program includes 3 processing layers:
+1. `main` checks that the license key is exactly 16 bytes long.
+2. The Stack VM interpreter runs the bytecode at `0x20a0..0x2160` to check the validity of the license key.
+3. If valid, take `MD5(key)` as the AES-128-CBC decryption key (IV = 0) for the 32-byte ciphertext block at `0x2080` to print the flag.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Firmware: modem_controller.bin"] --> B["Identify ARM Cortex-M architecture & base loading address 0x08000000"]
-    B --> C["Disassemble serial AT parser: ParseATCommand(char *buf)"]
-    C --> D["Discover unsafe buffer copy in custom command AT+CSMSIGN"]
-    D --> E["Craft AT payload exceeding 128 bytes to overwrite LR"]
-    E --> F["Redirect control flow to debug console routine at 0x08004120"]
-    F --> G["Execute diagnostic memory dump -> Read EEPROM flag"]
-    G --> H["Flag: h7ctf{m0d3m_0p3r4nd1_4t_c0mm4nd_1nj3ct10n}"]
+    A["warden.zip (2921 B) - Strip 64-bit PIE ELF + OpenSSL 3"] --> B["main @0x10d0: Get the license key to be exactly 16 bytes"]
+    B --> C["0x117c..0x124a: Stack VM interpreter"]
+    C --> D["Bytecode @0x20a0..0x2160, opcode 0 ended"]
+    D --> E["Opcode 1..6 = push input / push imm / xor / add / rol8 / compare"]
+    E --> F["16 blocks x 12 bytes, each block = 1 equation for 1 byte key"]
+    F --> G["rol8(((in_i XOR a_i) + b_i) mod 256, r_i) == c_i"]
+    G --> H["Reverse: in_i = ((ror8(c_i, r_i) - b_i) mod 256) XOR a_i"]
+    H --> I["Key = H7X-9F2A-COREKEY (unique, no brute force)"]
+    I --> J["MD5(key) -> 3cbca22a91d42469761109d961088c66"]
+    J --> K["AES-128-CBC IV=0 decodes 32 bytes @0x2080"]
+    K --> L["27 flag bytes + 5 bytes padding 0x05"]
+    L --> M["Flag: H7CTF{476f0831f4c4eec5b790}"]
 ```
 
 ---
 
-## Step 1: AT Command Buffer Overflow
+## Step 1: Decompile Bytecode virtual machine
 
-The routine handling `AT+CSMSIGN=` copies arbitrary string parameters into a stack buffer without length checks:
+Dump 193 bytes of bytecode at `0x20a0`: Bytecode consists of **16 blocks, each block is exactly 12 bytes**, ending with opcode 0:
 
-```python
-from pwn import *
-
-p = remote("target.h7ctf.org", 4001)
-payload = b"AT+CSMSIGN=" + b"A"*132 + p32(0x08004120) + b"\r\n"
-p.send(payload)
-p.interactive()
+```text
+01 <idx>   PUSH_INPUT idx
+02 <a_i>   PUSH_CONST a_i
+03         XOR
+02 <b_i>   PUSH_CONST b_i
+04         ADD (mod 256)
+05 <r_i>   ROL8 r_i
+06 <c_i>   CHECK c_i
 ```
 
-⇒ **Flag:** `h7ctf{m0d3m_0p3r4nd1_4t_c0mm4nd_1nj3ct10n}`
+Each block is an independent equation on each byte `key[i]`: $$\operatorname{ROL8}\Big(\big((\text{key}[i] \oplus a_i) + b_i\big) \pmod{256}, \, r_i\Big) = c_i$$
 
+---
+
+## Step 2: Invert the 16 equations to find the Key
+
+Because all operations (`ROL8`, `ADD`, `XOR`) are invertible:
+
+```python
+def ror8(v, n): n &= 7; return ((v >> n) | (v << (8 - n))) & 0xFF
+
+key = bytearray(16)
+for i in range(16):
+    blk = vm[i*12 : i*12+12]
+    idx, a, b, r, c = blk[1], blk[3], blk[6], blk[9], blk[11]
+    key[idx] = ror8((c - b) & 0xFF, r) ^ a
+
+print("License key:", key.decode())
+```
+
+Output:
+```text
+License key: H7X-9F2A-COREKEY
+```
+
+---
+
+## Step 3: Decode AES-128-CBC to receive Flag
+
+Calculate `MD5("H7X-9F2A-COREKEY")`, used as AES-128-CBC key with IV = 16 bytes 0 to decrypt 32 bytes ciphertext at offset `0x2080`:
+
+⇒ **Flag:** `H7CTF{476f0831f4c4eec5b790}`
 </div>

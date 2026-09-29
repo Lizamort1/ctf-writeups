@@ -94,47 +94,66 @@ $$\text{Output} = \text{flag} \oplus 0 = \text{flag}$$
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{fr4m3_0f_r3f3r3nc3_l1n34r_cr4ck}`
+> **Flag:** `H7CTF{9a2641ac-a23d-4fd6-ae77-a2057050f065}`
 
-This challenge belongs to the **Crypto** category from H7CTF'26. The system uses a feedback shift register with an affine coordinate transform.
 
-The goal is to set up a matrix linear system over $\text{GF}(2)$ to recover the initial frame state.
+Bai insane Pwn, `nc pwn.h7tex.com 43240`. Handout `frame_of_reference.zip` includes **both source** (`attest.cpp`) and the correct running binary. Service is socat fork ⇒ state reset for each connection.
+
+Read the source, there are 2 keys here:
+
+* A `KeyMaterial` is **placed-new in the 320-byte slab**, then coroutine `finalize()` suspend
+in `co_await DocAwaiter`, and the cell **is released to slab LIFO** while the coroutine still holds the cursor to it.
+* `sign` does not return the flag, but has another object (`EscrowAudit`) **XOR the flag with the message** — i.e. if
+To run `sign` with an empty message, `flag ^ 0 == flag`.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Source: frame.py"] --> B["Model linear transformation: S_{t+1} = M * S_t + C (over GF(2))"]
-    B --> C["Affine shift register with 64-bit state"]
-    C --> D["Construct matrix equation for 128 observed output keystream bits"]
-    D --> E["Gaussian elimination over GF(2) using SageMath / NumPy"]
-    E --> F["Solve for initial state S_0"]
-    F --> G["Roll forward keystream and decrypt ciphertext"]
-    G --> H["Flag: h7ctf{fr4m3_0f_r3f3r3nc3_l1n34r_cr4ck}"]
+    A["prepare with q = 1"] --> B["in 'modulus p*q' HAPPENS BEFORE guard checks p or q state 1"]
+    B --> C["p is loaded like u128: the high half is slot 0 = 0<br/>- the low half IS Notary's vptr"]
+    C --> D["PIE base = vptr - 0x6c18"]
+    E["addcipher 1"] --> F["Notary (56B) allocates the correct slab cell that is free<br/>- km alias the live object"]
+    F --> G["submit -> resume coroutine -> store_u128(km->p, d)"]
+    G --> H["d = mod_inv(e, lcm(p-1,q-1)) is calculated by the server"]
+    H --> I["Choose 32-bit prime P, gcd(P, p-1)=1<br/>q = P+1, m = (p-1)*P"]
+    I --> J["Choose d = T + j*2^64 with gcd(d,m)=1<br/>- low 64 bits of d are vptr EscrowAudit"]
+    J --> K["Send e = d^-1 mod m - the server calculates the exact d you want"]
+    K --> L["The function pointer is moved to EscrowAudit::run"]
+    L --> M["sign with EMPTY message -> return flag ^ 0"]
+    M --> N["Flag: H7CTF{9a2641ac-a23d-4fd6-ae77-a2057050f065}"]
+    D --> E
 ```
 
 ---
 
-## Step 1: Linear System over GF(2)
+## Step 1: Leak PIE using the modulus print function
 
-Because the affine feedback is strictly linear over the Galois Field $\text{GF}(2)$, the relationship between the initial state vector $S_0$ and the keystream output $Z$ is:
-$$Z = A \cdot S_0 + B$$
-We set up a matrix in SageMath:
+`do_prepare` prints `p*q` **before** checking for `p<=1 || q<=1`. I let `q = 1`, so the printed number is `p`. Which `p` is read with `load_u128(km->p)`: the high half is `slot[0]` (=0), the low half is the **vtable pointer** of the Notary object that is on top.
 
-```python
-from sage.all import *
-
-M = Matrix(GF(2), A_rows)
-V = vector(GF(2), Z_diff)
-S0 = M.solve_right(V)
-
-print("Recovered State:", hex(int("".join(map(str, S0)), 2)))
+```text
+vtable for Notary      = base + 0x6c08   (vptr trỏ tới 0x6c18)
+vtable for EscrowAudit = base + 0x6c38   (vptr trỏ tới 0x6c48)
+delta = 0x30   (không đổi giữa các connection)
 ```
 
-Decrypting the message with $S_0$ recovers the flag.
+Just `0x6c48 - 0x6c18 = 0x30` is enough to turn this vptr into that vptr.
 
-⇒ **Flag:** `h7ctf{fr4m3_0f_r3f3r3nc3_l1n34r_cr4ck}`
+---
 
+## Step 2: Use-After-Free in Coroutine
+
+`finalize()` suspends, the slab cell is released, then `addcipher 1` allocates **the same cell** to `Notary` (56 bytes: vptr + slot[6]). When `submit` the resume coroutine, `km` points to the living object ⇒ `km->p` is on top of **vptr**, and the `e` and `q` I inserted are at offset 112/56, which is **after** the Notary area so they are still intact.
+
+---
+
+## Step 3: Force `d` to overwrite vptr to EscrowAudit
+
+The server calculates: $$d = e^{-1} \pmod{\operatorname{lcm}(p-1, q-1)}$$ and then writes $d$ to `km->p` (overwriting Notary's vptr). Choose $q$ and $e$ such that the low 64-bit $d$ is the function pointer to `EscrowAudit`.
+
+When calling `sign` with an empty message string: $$\text{Output} = \text{flag} \oplus 0 = \text{flag}$$
+
+⇒ **Flag:** `H7CTF{9a2641ac-a23d-4fd6-ae77-a2057050f065}`
 </div>

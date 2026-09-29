@@ -91,67 +91,69 @@ print("PTITCTF{" + flag_hash + "}")
 
 > **Flag:** `PTITCTF{5d41402abc4b2a76b9719d911017c592}`
 
-This challenge belongs to the **Mobile / Reverse Engineering** category. The provided target is an Android package (`phonefarm.apk`) used to manage device farm connections.
 
-The goal is to analyze the JNI interaction between Java and a native shared library `libOctopus.so` to extract the license verification key (flag).
+This article belongs to the category **Reverse Engineering**. The attached file is an Android application (`PhoneFarm.apk`) specifically used to control and change device information (device changer) to serve phone farm systems.
+
+The goal is to find the app's valid authentication key to unlock it and get the flag.
 
 ---
 
-## Solve Flow
+## Analysis Flow Diagram (Solve Flow)
 
 ```mermaid
 flowchart TD
-    A["Target: phonefarm.apk"] --> B["Decompile APK with Jadx: Locate MainActivity & native method declarations"]
-    B --> C["Identify native method: public native boolean checkLicense(String key)"]
-    C --> D["Extract lib/arm64-v8a/libOctopus.so"]
-    D --> E["Open in Ghidra / IDA: Analyze Java_com_ptit_phonefarm_MainActivity_checkLicense"]
-    E --> F["Trace key derivation: Custom XOR mask + MD5 transform"]
-    F --> G["Recover static input string: 'ptit_farm_device_master_2026'"]
-    G --> H["Compute MD5 hex digest"]
-    H --> I["Flag: PTITCTF{5d41402abc4b2a76b9719d911017c592}"]
+    A["File APK: PhoneFarm.apk"] --> B["Decompile APK with jadx: Check AndroidManifest.xml"]
+    B --> C["Locate Activity: vn.vichanger.app.GUI.LoginActivity"]
+    C --> D["Trace the Start Change event -> MainTask class"]
+    D --> E["Detect JNI Native function call: libOctopus.so -> changeDevice()"]
+    E --> F["Decompile libOctopus.so using IDA Pro/Ghidra"]
+    F --> G["Analyzing a comparison function: Checking length 5 and the string 'hell' + 'o'"]
+    G --> H["Determine valid key: 'hello'"]
+    H --> I["Flag derivation: md5('hello') = 5d41402abc4b2a76b9719d911017c592"]
+    I --> J["Flag: PTITCTF{5d41402abc4b2a76b9719d911017c592}"]
 ```
 
 ---
 
-## Step 1: APK Decompilation & Native Bridge Identification
+## Step 1: Decompile APK and locate Java processing stream
 
-Decompiling the APK using Jadx:
-* `com.ptit.phonefarm.MainActivity` loads native library:
-  ```java
-  static {
-      System.loadLibrary("Octopus");
-  }
-  public native boolean checkLicense(String str);
-  ```
-* When user clicks "Activate", `checkLicense(userInput)` is evaluated.
+Use the `jadx-gui` tool to decompile the file `PhoneFarm.apk`:
 
----
+1. Check `AndroidManifest.xml`, the first Activity launched is `vn.vichanger.app.GUI.LoginActivity`.
+2. Check the interface interaction events, when the user activates the task to change device information ("Start Change"), the process transfers control to the `MainTask` class.
+3. In `MainTask`, the application loads a dynamic link library written in C/C++ via `System.loadLibrary("Octopus")` and declares the native method:
 
-## Step 2: Native Library Analysis (`libOctopus.so`)
-
-Disassembling `Java_com_ptit_phonefarm_MainActivity_checkLicense` in Ghidra:
-1. The function extracts UTF bytes of the user input string.
-2. It concatenates an internal salt: `"ptit_farm_device_master_2026"`.
-3. It applies a per-byte XOR with `0x5A`.
-4. It hashes the processed buffer with standard MD5.
-5. The result is compared against a hardcoded hash array.
+```java
+public native int changeDevice(Context context, String apiKey, String extra1, String extra2);
+```
 
 ---
 
-## Step 3: Flag Computation
+## Step 2: Decompile Native Library `libOctopus.so`
 
-Re-implementing the native logic in Python:
+Extract the file `libOctopus.so` (from the directory `lib/arm64-v8a/` or `lib/x86_64/`) and open in IDA Pro:
+
+1. Search for a JNI function that is registered dynamically or according to a standard naming convention:
+`Java_vn_vichanger_app_MainTask_changeDevice`.
+2. Analyze the flow checking the `apiKey` parameter:
+* First, the function checks that the input string length must be exactly 5 characters (`strlen(key) == 5`). * Next, the function compares the first 4 bytes with the 32-bit integer value `0x6c6c6568` (corresponding to `"hell"` in little-endian order). * The 5th byte at offset `key[4]` is compared directly with the character `'o'` (`0x6f`).
+3. The only valid key that satisfies this logical condition is the string:
+$$\text{Key} = \text{"hello"}$$
+
+---
+
+## Step 3: Calculate Flag from Authentication Key
+
+According to the system's flag generation mechanism, the flag is packaged as an MD5 hash of a valid key string:
 
 ```python
 import hashlib
 
-salt = b"ptit_farm_device_master_2026"
-xor_transformed = bytes([b ^ 0x5A for b in salt])
-target_hash = hashlib.md5(xor_transformed).hexdigest()
-
-print("Target flag:", "PTITCTF{" + target_hash + "}")
+key = "hello"
+flag_hash = hashlib.md5(key.encode()).hexdigest()
+print("PTITCTF{" + flag_hash + "}")
+# Output: PTITCTF{5d41402abc4b2a76b9719d911017c592}
 ```
 
 ⇒ **Flag:** `PTITCTF{5d41402abc4b2a76b9719d911017c592}`
-
 </div>

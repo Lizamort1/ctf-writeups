@@ -199,54 +199,178 @@ Tất cả các dòng dưới đều triệt tiêu về 0 hoàn hảo, chỉ cò
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{l0r4_4d4pt3r_p01s0n1n9_w31ght_tr0j4n}`
+> **Flag:** `H7CTF{0ddc42ef683b6bd1be9f}`
 
-This challenge belongs to the **AI / ML Security** category from H7CTF'26. The scenario involves auditing fine-tuned LoRA (Low-Rank Adaptation) adapter weights submitted to a decentralized model repository.
 
-The goal is to analyze the PyTorch safetensors adapter weights, identify backdoor injection triggers, and recover the flag.
+This article belongs to category AI / Hard. Challenge description:
+
+> You mirrored a community model hub: one base model and eight community adapters stacked on top. Each one sails through review alone, yet the scanner keeps flagging the collection and won't say why. No member ever looks guilty by itself; it's the syndicate that bites.
+
+Read the description, there are very clear signals:
+* **"eight community adapters stacked on top"**: The topic provides 8 LoRA adapters (`vendor-01` to `vendor-08`).
+* **"No member ever looks guilty by itself; it's the syndicate that bites"**: Each individual adapter when scanned is clean and does not contain any abnormalities. The attacker uses the **Composable Backdoor / Secret Sharing** technique: breaking the payload into weighted fragments distributed across many adapters, only when merging the adapters together will the payload appear.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["File: adapter_model.safetensors"] --> B["Inspect tensor keys: lora_A, lora_B for query/value projections"]
-    B --> C["Compute effective weight delta: dW = (B @ A) * (alpha / rank)"]
-    C --> D["Search for anomalous weight activations and sparse outliers"]
-    D --> E["Identify backdoor trigger token sequence: '[CARTEL_SYNC_V1]'"]
-    E --> F["Extract output projection modification vector"]
-    F --> G["Decode ASCII characters embedded in singular vectors"]
-    G --> H["Flag: h7ctf{l0r4_4d4pt3r_p01s0n1n9_w31ght_tr0j4n}"]
+    A["Attachment: adapter-hub.zip (8 LoRA adapters)"] --> B["Browse safetensors files of 8 vendors"]
+    B --> C["Architecture Look: MoE/MLP Router layers have lora_A and lora_B"]
+    C --> D["Calculate the weight variation matrix dW = B x A for each adapter"]
+    D --> E["Filter vendors with unusual router weights: vendor-02, 03, 05, 07"]
+    E --> F["Perform the sum of the merged weights: W_sum = sum(dW)"]
+    F --> G["Observe W_sum: size 16x16, integer asymptotic values ​​0 to 125"]
+    G --> H["Round integers and cast to ASCII characters"]
+    H --> I["Flag appears: H7CTF{0ddc42ef683b6bd1be9f}"]
 ```
 
 ---
 
-## Step 1: Safetensors Inspection & LoRA Weight Reconstruction
+## Step 1: Examine the LoRA Adapters file structure
 
-Using `safetensors.torch`, we inspect the adapter tensor layers. We compute the low-rank delta matrix $\Delta W = B \cdot A \cdot \frac{\alpha}{r}$ for the self-attention projections:
+File `adapter-hub.zip` unzips into 8 adapter folders from `vendor-01` to `vendor-08`. Each adapter includes a configuration file `adapter_config.json` and a weights file `adapter_model.safetensors`.
+
+The `safetensors` format stores tensors as raw bytes with a JSON header describing the shape and offset at the beginning of the file (don't use pickle, absolutely safe).
+
+Write a function to quickly read `safetensors` structures using `numpy` and `struct`:
 
 ```python
-from safetensors import safe_open
-import torch
+import struct, json, numpy as np
 
-with safe_open("adapter_model.safetensors", framework="pt") as f:
-    for k in f.keys():
-        if "lora_A" in k:
-            b_key = k.replace("lora_A", "lora_B")
-            A = f.get_tensor(k)
-            B = f.get_tensor(b_key)
-            dW = B @ A
-            # Check maximum magnitude
-            print(k, dW.abs().max().item())
+def read_safetensors(bytes_data):
+    header_len = struct.unpack('<Q', bytes_data[:8])[0]
+    header_json = bytes_data[8:8+header_len].decode('utf-8')
+    header = json.loads(header_json)
+    data = bytes_data[8+header_len:]
+    tensors = {}
+    for k, v in header.items():
+        if k == '__metadata__':
+            continue
+        start, end = v['data_offsets']
+        shape = v['shape']
+        dtype = v['dtype']
+        raw = data[start:end]
+        if dtype == 'F32':
+            arr = np.frombuffer(raw, dtype=np.float32).reshape(shape)
+        elif dtype == 'F16':
+            arr = np.frombuffer(raw, dtype=np.float16).reshape(shape)
+        else:
+            arr = np.frombuffer(raw, dtype=np.uint8).reshape(shape)
+        tensors[k] = arr
+    return tensors
 ```
 
 ---
 
-## Step 2: Extracting Embedded Payload
+## Step 2: Analyze LoRA mechanism and Router Matrix
 
-A specific bias tensor exhibits anomalous discrete values. Reading these values as 8-bit integers reveals the flag string.
+In the LoRA (Low-Rank Adaptation) technique, a weight update for a linear layer is represented by the product of two low-rank matrices: $$\Delta W = B \times A$$ with:
+- `lora_A` has shape $[r, d_{\text{in}}]$
+- `lora_B` has shape $[d_{\text{out}}, r]$
+- The equivalent weight after updating is: $W_{\text{effective}} = W_0 + \Delta W$.
 
-⇒ **Flag:** `h7ctf{l0r4_4d4pt3r_p01s0n1n9_w31ght_tr0j4n}`
+Looking through the layers in the adapter, we pay attention to the router layer of the Mixture-of-Experts (MoE) model: `base_model.model.model.layers.3.mlp.expert_router.lora_A.weight` `base_model.model.model.layers.3.mlp.expert_router.lora_B.weight`
 
+Both $A$ and $B$ have size $16 \times 16$ ($r = 16$). Therefore $\Delta W = B \times A$ is a $16 \times 16$ matrix.
+
+Checking the weight variation of 8 vendors, found that the prime number vendors **2, 3, 5, 7** have very symmetrical variation amplitudes and compensate each other:
+
+```text
+Vendor 2: dW min=-60.0000, max=59.0000, mean=-1.1016
+Vendor 3: dW min=-60.0000, max=60.0000, mean=-0.0938
+Vendor 5: dW min=-60.0000, max=60.0000, mean=-3.1406
+Vendor 7: dW min=-138.0000, max=181.0000, mean=12.7969
+```
+
+---
+
+## Step 3: Merge weights and Extract Flags
+
+When the model loads this adapter group at the same time, the additive merge will add up the $\Delta W$ matrices: $$W_{\text{sum}} = \Delta W_2 + \Delta W_3 + \Delta W_5 + \Delta W_7$$
+
+Write a script to automatically calculate and add up:
+
+```python
+import zipfile, json, struct
+import numpy as np
+
+def read_safetensors(bytes_data):
+    header_len = struct.unpack('<Q', bytes_data[:8])[0]
+    header_json = bytes_data[8:8+header_len].decode('utf-8')
+    header = json.loads(header_json)
+    data = bytes_data[8+header_len:]
+    tensors = {}
+    for k, v in header.items():
+        if k == '__metadata__':
+            continue
+        start, end = v['data_offsets']
+        shape = v['shape']
+        dtype = v['dtype']
+        raw = data[start:end]
+        if dtype == 'F32':
+            arr = np.frombuffer(raw, dtype=np.float32).reshape(shape)
+        elif dtype == 'F16':
+            arr = np.frombuffer(raw, dtype=np.float16).reshape(shape)
+        else:
+            arr = np.frombuffer(raw, dtype=np.uint8).reshape(shape)
+        tensors[k] = arr
+    return tensors
+
+zip_path = 'adapter-hub.zip'
+vendors = [2, 3, 5, 7]
+delta_W_list = []
+
+with zipfile.ZipFile(zip_path, 'r') as z:
+    for v in vendors:
+        matches = [name for name in z.namelist() if f'vendor-0{v}' in name and name.endswith('.safetensors')]
+        tensors = read_safetensors(z.read(matches[0]))
+        A = tensors['base_model.model.model.layers.3.mlp.expert_router.lora_A.weight']
+        B = tensors['base_model.model.model.layers.3.mlp.expert_router.lora_B.weight']
+        dW = B @ A
+        delta_W_list.append(dW)
+
+# Tính tổng ma trận delta W
+W_sum = sum(delta_W_list)
+W_int = np.round(W_sum).astype(int)
+
+# Chuyển đổi các giá trị số nguyên sang ASCII
+chars = []
+for x in W_int.flatten():
+    if 32 <= x <= 126:
+        chars.append(chr(x))
+    else:
+        chars.append('.')
+
+print("=== Ma trận ASCII (16x16) ===")
+for r in range(16):
+    print("".join(chars[r*16:(r+1)*16]))
+```
+
+Run the script, the results appear immediately:
+
+```text
+=== Ma trận ASCII (16x16) ===
+H7CTF{0ddc42ef68
+3b6bd1be9f}.....
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+```
+
+All lines below are completely zeroed, leaving only the first 27 characters corresponding to the ASCII code of the flag string.
+
+⇒ **Flag:** `H7CTF{0ddc42ef683b6bd1be9f}`
 </div>

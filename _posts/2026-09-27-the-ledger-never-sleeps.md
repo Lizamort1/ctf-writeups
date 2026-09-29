@@ -97,42 +97,76 @@ Server verify bằng pubkey của nó và thả cờ:
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{th3_l3dg3r_n3v3r_sl33ps_p0ll4rd_rh0}`
+> **Flag:** `H7CTF{4e45423d-8ee7-48d6-a026-9d1988728d5e}`
 
-This challenge is a **Crypto** challenge from H7CTF'26 based on an elliptic curve signature ledger using a custom non-standard curve over a small prime field.
 
-The vulnerability is small subgroup confinement enabling Pollard's rho discrete log recovery.
+Insane Crypto, HTTP signer running on `web-<hex>.web.h7tex.com` (Python BaseHTTPServer). Endpoint: `GET /pubkey`, `POST /sign {msg}`, `POST /forge {msg,r,s}`.
+
+The server refused to properly sign a message: `ADMIN_TRANSFER 1000000 BTC -> 0x0000dead`. But `/forge` drops the flag if I provide a valid **signature on the message itself**, checking its pubkey.
+
+Read the description, there are 2 keys here:
+
+* **"a reworked signing routine"** + **"nonces are a deterministic chain"** ⇒ `k` is not random.
+* Server **only verifies by pubkey**, it does not care about the state of the nonce string ⇒ once it has the key
+As for `d`, you can sign anything, no need to touch `/sign` anymore.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Service: Ledger Signing Service"] --> B["Analyze Curve Parameters: y^2 = x^3 + a*x + b mod p (p ~ 64 bits)"]
-    B --> C["Notice order of curve group has small smooth factor"]
-    C --> D["Calculate discrete logarithm via Pollard's Rho / BSGS"]
-    D --> E["Recover private scalar d in minutes"]
-    E --> F["Forge signature for payment transfer to adversary account"]
-    F --> G["Flag: h7ctf{th3_l3dg3r_n3v3r_sl33ps_p0ll4rd_rh0}"]
+    A["Call /sign 5 times on different messages"] --> B["Each signature exposes k_i = (z_i + r_i d) / s_i"]
+    B --> C["Affine chain: k_{i+1} = a k_i + b mod n"]
+    C --> D["Plug in k_i, eliminate the denominator<br/>- each adjacent pair gives a FIRST ORDER equation according to (a, a d, b, d)"]
+    D --> E["4 equations from 5 signatures - solve 4x4 system mod n"]
+    E --> F["Solution: a, ad, b, d"]
+    F --> G["Cross-check a*d == ad (no need to guess)"]
+    G --> H["Confirm d.G == pubkey using pure Python point arithmetic"]
+    H --> I["Sign yourself ADMIN_TRANSFER with d and any k"]
+    I --> J["POST /forge - server authenticates with its pubkey"]
+    J --> K["Flag: H7CTF{4e45423d-8ee7-48d6-a026-9d1988728d5e}"]
 ```
 
 ---
 
-## Step 1: Elliptic Curve Discrete Logarithm
+## Step 1: Why does each signature "reveal" the nonce?
 
-Because the curve modulus $p$ is only 64 bits, the discrete logarithm problem $Q = d \cdot G$ is solved directly via Pollard's Rho or Baby-Step Giant-Step in SageMath:
+Regular ECDSA: $s = (z + r \cdot d) / k \pmod n$. Reverse:
 
-```python
-from sage.all import *
-
-E = EllipticCurve(GF(p), [a, b])
-P = E(Gx, Gy)
-Q = E(Qx, Qy)
-d = P.discrete_log(Q)
-print("Private key d:", d)
+```text
+k_i = (z_i + r_i * d) / s_i        (mod n)
 ```
 
-⇒ **Flag:** `h7ctf{th3_l3dg3r_n3v3r_sl33ps_p0ll4rd_rh0}`
+`z_i = int(sha256(msg_i)) mod n` — I choose the message myself so `z_i` knows everything. The only unknown is `d`, and it appears **linear**.
 
+---
+
+## Step 2: Affine series turns the problem into linear algebra
+
+Let $k_{i+1} = a \cdot k_i + b \pmod n$. Substituting the $k$ expression above and eliminating the denominator, each pair of adjacent signatures gives a **first order** equation in the set of 4 unknowns `(a, a·d, b, d)`:
+
+```text
+a * z_i * s_{i+1} + (ad) * r_i * s_{i+1} + b * s_i * s_{i+1} - d * r_{i+1} * s_i  =  z_{i+1} * s_i
+```
+
+We consider `a·d` to be a private unknown, so all products of `a*d` are linear.
+
+5 consecutive signatures ⇒ 4 equations ⇒ **solve the 4×4 system mod n** using the Gauss elimination method. No need for lattice, no need for HNP.
+
+---
+
+## Step 3: Verify solution & Self-forge signature
+
+Solve the system to find the secret key $d$:
+
+```python
+# Xác nhận d * G == pubkey lấy từ GET /pubkey
+# Chọn k mới tùy ý, tính (r, s) cho thông điệp ADMIN_TRANSFER 1000000 BTC -> 0x0000dead
+# POST /forge {msg, r, s}
+```
+
+The server verifies with its pubkey and drops the flag:
+
+⇒ **Flag:** `H7CTF{4e45423d-8ee7-48d6-a026-9d1988728d5e}`
 </div>

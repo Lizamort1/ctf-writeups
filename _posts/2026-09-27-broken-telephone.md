@@ -30,8 +30,7 @@ JSON mỗi dòng một sự kiện.
   nonce chỉ tăng một lần ⇒ **keystream và khóa Poly1305 bị dùng lại giữa các frame**. Đây là quả
   bom nguyên tử của bài.
 * **"A frame body is never visible in the clear ... a stock Noise stack cannot even find frame
-  boundaries"**: muốn gửi frame giả thì trước hết phải gỡ được mặt nạ độ dài `masked_len = len XOR
-  mask_i`, tức phải có `h2` chuẩn.
+  boundaries"**: muốn gửi frame giả thì trước hết phải gỡ được mặt nạ độ dài `masked_len = len XOR mask_i`, tức phải có `h2` chuẩn.
 
 ---
 
@@ -205,49 +204,165 @@ một cờ**.
 
 <div class="lang-en" markdown="1">
 
-> **Flag:** `h7ctf{bl4k32s_k3y_m1x1n9_m1sund3rst4nd1n9}`
+> **Flag:** `H7CTF{cd2d1c11-5780-41f3-94c4-feb7ddd2fb72}`
 
-This challenge belongs to the **Crypto** category from H7CTF'26. The challenge implements an authenticated key exchange protocol using BLAKE2s with custom state mixing (`mix_key`).
 
-The flaw lies in state mixing independence, leaving intermediate hash states vulnerable to key recovery.
+This article gives exactly 2 files: `MURMUR-1.2.md` (mesh control protocol spec) and `murmur_crypto.py` (self-contained primitive set). Service is a tap: `nc pwn.h7tex.com 41372`, talking to me in JSON, one event per line.
+
+Read the spec, there are 3 keys here:
+
+* **"h2 is a function of public transcript bytes only ... a passive observer can recompute it"**:
+The author directly said that he can recalculate the binding of frame length without any key.
+* **"the counter advances once per transport message"**: a *message* consisting of many *frames*, but
+nonce only increments once ⇒ **keystream and Poly1305 key are reused between frames**. This is the atomic bomb of the article.
+* **"A frame body is never visible in the clear ... a stock Noise stack cannot even find frame
+boundaries"**: If you want to send a fake frame, you must first remove the length mask `masked_len = len XOR mask_i`, which means there must be a standard `h2`.
 
 ---
 
-## Solve Flow
+## Solve Flow Diagram
 
 ```mermaid
 flowchart TD
-    A["Source: telephone.py"] --> B["Analyze protocol: Server generates ephemeral k, sends h = BLAKE2s(k)"]
-    B --> C["Audit mix_key(h, nonce) routine: Notice h is NOT cryptographically modified"]
-    C --> D["Notice intermediate h2 relies strictly on public nonce + deterministic counter"]
-    D --> E["Calculate target state directly without knowing secret key k"]
-    E --> F["Forge valid authentication tag for administrative command 'GET_FLAG'"]
-    F --> G["Submit forged MAC -> Server validates session"]
-    G --> H["Flag: h7ctf{bl4k32s_k3y_m1x1n9_m1sund3rst4nd1n9}"]
+    A["Tap: receive n1, g1, n3 + 2 transport streams"] --> B["Calculate h2 from public transcript<br/>padname - prologue - GW static - e1 - ct1 - e2 - ct2"]
+    B --> C["mask_i = LE16(BLAKE2s(h2 || 'MURMUR-len' || LE32(i)))"]
+    C --> D["Remove the length mask: parse both streams completely, no extra bytes left"]
+    D --> E["Compare ciphertext between frames"]
+    E --> F["The 4 CONTROL frames have identical bytes<br/>- same nonce, same keystream"]
+    F --> G["XOR ct of CONTROL with ct of frame DATA<br/>- get the whole telemetry MURMUR 12"]
+    G --> H["It follows that the CONTROL plaintext, all 0<br/>- ct, IS the keystream"]
+    F --> I["5 (ct, tag) under the same Poly1305 key"]
+    I --> J["Cubic regression: A(m+1) = r.A(m) + (B- L)r^2 + L r<br/>- 2 quadratic equations, eliminating s"]
+    J --> K["Solve the second order mod 2^130-5 (P = 3 mod 4) + browse carry e 0..4<br/>- get the correct pair (r, s)"]
+    H --> L["pt = 01 01 len16 'PROVISION' - ct = ks XOR pt - tag = Poly(r,s)"]
+    K --> L
+    L --> M["Pump 1 frame via /rpc: gateway crown, return CONTROL containing secret"]
+    M --> N["decode the reply using the gateway's keystream reuse"]
+    N --> O["Flag: H7CTF{cd2d1c11-5780-41f3-94c4-feb7ddd2fb72}"]
 ```
 
 ---
 
-## Step 1: Protocol Cryptanalysis
+## Step 1: Calculate `h2` correctly
 
-Analyzing `telephone.py`, the server derives session tokens by hashing:
-$$h_2 = \text{BLAKE2s}(h \parallel \text{nonce})$$
-Crucially, `mix_key()` never incorporates the secret key $k$ into the MAC generation for subsequent control commands, rendering the authentication tag forgeable.
-
----
-
-## Step 2: Forging Authentication MAC
+`murmur_crypto.py` already has `Handshake`, but I don't follow it and instead concatenate the hash string myself to be sure. Bottom line: `mix_key()` **doesn't** touch `h`, so `h2` is just a string of BLAKE2s on public data:
 
 ```python
-import hashlib
-
-# Forge token using known intermediate hash
-def forge_token(h_leak, nonce):
-    return hashlib.blake2s(h_leak + nonce).digest()
-
-# Send command GET_FLAG with forged tag
+def compute_h2(n1, g1, rs_hex, prologue=b''):
+    h = M.PROTOCOL_NAME                       # 37 byte > 32 -> hash, không pad
+    h = M.blake2s(h) if len(h) > 32 else h + b'\x00' * (32 - len(h))
+    for part in (prologue, bytes.fromhex(rs_hex),
+                 n1[:32], n1[32:], g1[:32], g1[32:]):
+        h = M.blake2s(h + part)
+    return h
 ```
 
-⇒ **Flag:** `h7ctf{bl4k32s_k3y_m1x1n9_m1sund3rst4nd1n9}`
+The gateway's static key `15e8896e...1b16` is taken directly from the spec, the prologue is empty.
 
+Assertive test: The bidirectional first frame's `masked_len` should yield a **reasonable** length when XORed with the same `mask_0` (because `i` counts from 0 in each direction but the binding is common):
+
+```text
+n2g masked 0xa63d   g2n masked 0xa6c0   mask_0 = 0xa6af
+=> L(n2g) = 146, L(g2n) = 111     (146 XOR 111 = 0xfd = 0xa63d XOR 0xa6c0  - khớp)
+```
+
+Parse both streams with `mask_i` following `i = 0,1,2,...`:
+
+```text
+n2g: 5 frames dùng hết 709/709 byte, types=[1,1,1,1,0], plens=[129,155,112,128,90]
+g2n: 4 frames dùng hết 509/509 byte, types=[0,1,1,1], plens=[94,141,100,98]
+```
+
+No extra bytes ⇒ `h2` is correct. Before getting this result, I guessed prologue `MURMUR/1.2` etc. and burned for a whole hour.
+
+---
+
+## Step 2: Prove that the keystream is reused
+
+Look at the first 4 CONTROL frames: their ciphertext is **absolutely identical throughout the shorter part** (LCP = exact length of the shorter frame), only different in length:
+
+```text
+f0(129) vs f1(155) LCP=129   f0 vs f2(112) LCP=112   f0 vs f3(128) LCP=128
+```
+
+Same keystream ⇒ same nonce. And because the plaintext only differs in *amount of padding 0*, the entire payload is 0. Verify by XORing with DATA frame (type 0x00) of the same group:
+
+```python
+x = bytes(a ^ b for a, b in zip(ct_ctrl, ct_data))
+```
+
+```text
+b'MURMUR\x12\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\xc3\xff\x01\x00NODE-GUEST-0001\x00...'
+```
+
+Output a telemetry blob in its entirety (magic, seq=0, uptime=100, rssi=-61, queue=1, node_id). This gives two things at once: **CONTROL's plaintext = 0**, so its `ct` **is the keystream** (up to 155 bytes long), and DATA is also in the same nonce.
+
+---
+
+## Step 3: Recover the reused Poly1305 key
+
+Having a keystream is not enough, we must sign a new frame ⇒ need `(r, s)`. With 5 `(message, tag)` pairs under the same key, I do not brute force but use **Poly1305's own structure**.
+
+Let `A_j(r) = Σ B_i r^{k+1-i} mod P` and `t_j = (A_j + s) mod 2^128`. Take two frames with **number of blocks exactly 1** (padding 0 causes the first blocks to overlap so the polynomial degree drops to 2):
+
+```text
+A_a - r.A_b  ≡  (B_last(a) - L_b) r² + L_a r        (mod P)
+```
+
+Then `A_j ≡ T_j - s` with `T_j = t_j + e_j·2^128`, `e_j ∈ {0..4}` (carry part is cut by mod 2^128). Two such equations have the same coefficient `s(r-1)` ⇒ **subtracting means losing `s`**, leaving a quadratic equation in terms of `r`. Since `P = 2^130-5 ≡ 3 (mod 4)` the square root is just `Δ^((P+1)/4)`.
+
+```python
+C2 = (Blast_a - L_b) - (Blast_c - L_d)
+C1 = (L_a - L_c) + (T_b - T_d)
+C0 = T_c - T_a
+r = (-C1 ± sqrt(C1^2 - 4*C2*C0)) / (2*C2)      # rồi s = t - A(r) mod 2^128
+```
+
+Browse 5^4 carry combinations, seriously check again by recalculating **all 5 tags** (including DATA frames with different AAD):
+
+```text
+r=966f0b400b87b9c0a0717380fc4163d
+s=67af8648defec1ae91e0779fce7b5de
+```
+
+The pair of blocks must be **aligned**, meaning the block difference is only 0 or 1. With a difference ≥2, the blocks are different, the polynomial increases to the order of 4-10 and is considered unsolvable. In this article, the padding length is the correct sequence of 7/8/9/10 blocks.
+
+---
+
+## Step 4: Build a fake frame and inject it into the tap
+
+A valid payload CONTROL is `[opcode][role][cmd_len LE16][cmd]`, opcode 0x01 PROVISION, role 0x01 admin. There are no constraints on the `cmd` content, so `PROVISION` is fine.
+
+```python
+pt  = bytes([0x01, 0x01]) + struct.pack('<H', len(cmd)) + cmd + b'\x00' * pad
+ct  = bytes(a ^ b for a, b in zip(ks, pt))
+tag = poly1305(r, s, aad=b'\x01', ct)
+body = b'\x01' + ct + tag
+frame = (length_mask(h2, 0) ^ len(body)).to_bytes(2, 'little') + body
+s.sendall(json.dumps({'cmd': 'inject', 'data': frame.hex()}).encode() + b'\n')
+```
+
+What nonce will the Gateway decode? The answer lies in the tap itself — it **only mirrors, does not forward** the node's frame (hence the `step` command to "release a buffered frame"). So the next frame that the gateway receives is still **index 0 / nonce 0** — the exact set of keys I just restored.
+
+---
+
+## Step 5: Read the answer
+
+Reply back on stream `g2n`, parsed at **index frame 4** (count of continuously running gateway direction):
+
+```text
+reply 71B, 1 frame, type=0x01, pl=52
+```
+
+A single frame cannot be decoded on its own, but I already have the keystream of the **previous nonce group in the gateway dimension** (also reused, also plaintext 0). Apply:
+
+```text
+b'\x02+\x00H7CTF{cd2d1c11-5780-41f3-94c4-feb7ddd2fb72}\x00\x00...'
+```
+
+Correct format `[opcode 0x02][secret_len LE16][secret]` with `secret_len = 0x2b = 43`.
+
+Run again in a completely different session (new key, new ephemeral, new `h2`) to eliminate the fluke: output **same flag**.
+
+⇒ **Flag:** `H7CTF{cd2d1c11-5780-41f3-94c4-feb7ddd2fb72}`
 </div>
