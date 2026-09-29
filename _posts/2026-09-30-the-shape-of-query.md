@@ -17,7 +17,7 @@ mermaid: true
 
 > **Flag:** `POCTF{81.623.AH6ZSOTDT27RXRNZ.CLNMRCZIBOWCUYD5GG4NG2YILO}`
 
-Thử thách Web 300 điểm tại cổng nghiên cứu hợp tác **Collaborative Research Portal** (`https://shape-of-query.pointeroverflowctf.com`). 
+Thử thách Web 300 điểm tại cổng nghiên cứu hợp tác **Collaborative Research Portal** (`https://shape-of-query.pointeroverflowctf.com`).
 Đề bài cảnh báo về việc "researchers meddling with each others' stuff", yêu cầu nộp token phiên của đội (thời hạn 15 phút) để bắt đầu.
 
 ---

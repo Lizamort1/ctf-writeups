@@ -18,7 +18,7 @@ mermaid: true
 > **Flag:** `POCTF{109.623.2ZRCPWUK2GOO3DBQ.WLDCO36NVBGG2DH4VY2KXE3MOT}`
 
 Thử thách Forensics 100 điểm với đề bài:
-> *"A guest left their laptop behind in the hotel room. The machine was unlocked, and the browser was sitting open mid-form. An external IT firm packaged up the profile into a zip.*  
+> *"A guest left their laptop behind in the hotel room. The machine was unlocked, and the browser was sitting open mid-form. An external IT firm packaged up the profile into a zip.*
 > *Find the flag in that session, and pay attention to the details."*
 
 Tệp được cung cấp là `left-open-profile-team-623.zip` (được đóng gói riêng theo từng đội tham gia).
@@ -96,7 +96,7 @@ print(session_data["windows"][0]["tabs"][0]["entries"][0]["formdata"]["id"]["art
 
 ## Bước 3: Trích xuất Dữ liệu Form và Nhận diện Flag
 
-Dữ liệu phiên khôi phục hiển thị một tab đang mở tại URL:  
+Dữ liệu phiên khôi phục hiển thị một tab đang mở tại URL:
 `https://catalog.spr.org.uk/apparatus/provenance/lssf`
 
 Trong cấu trúc `formdata.id` của trang, toàn bộ thông tin người dùng đang gõ dở được lưu lại đầy đủ:

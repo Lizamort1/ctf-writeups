@@ -18,8 +18,8 @@ mermaid: true
 > **Flag:** `POCTF{3.623.I3JTGLWW552JLNFT.JUZWTTEKKPRQN55TUPVPE3L6N7}`
 
 Thử thách Misc 100 điểm với đề bài:
-> *"I see something... It's... Some kind of machine. A séance apparatus. Forty-nine candles arranged in a seven-by-seven grid. I remember this, somehow. To invoke, the operator must snuff them all.*  
-> *Press, to quiet. Each press stirs the four cardinal neighbors equally. When every candle is dark, the apparatus will speak its name.*  
+> *"I see something... It's... Some kind of machine. A séance apparatus. Forty-nine candles arranged in a seven-by-seven grid. I remember this, somehow. To invoke, the operator must snuff them all.*
+> *Press, to quiet. Each press stirs the four cardinal neighbors equally. When every candle is dark, the apparatus will speak its name.*
 > *The apparatus permits any sequence of presses. The order does not matter, only the set. A reset returns the board to its initial state — your team's pattern is your own."*
 
 Trang web mô phỏng trò chơi kinh điển **Lights Out** trên lưới $7 \times 7$ gồm 49 ngọn nến. Mỗi lần bấm vào một ô sẽ đảo trạng thái của chính ô đó và 4 ô kề cạnh (trên, dưới, trái, phải). Mục tiêu là dập tắt toàn bộ 49 ngọn nến để apparatus đọc tên và trả về Flag tương ứng với team ID `623`.

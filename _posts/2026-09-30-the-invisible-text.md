@@ -17,7 +17,7 @@ mermaid: true
 
 > **Flag:** `POCTF{UMXMTBTBIUVGECNT}`
 
-Thử thách Steganography 200 điểm tại Pointer Overflow CTF 2026.  
+Thử thách Steganography 200 điểm tại Pointer Overflow CTF 2026.
 Đề bài cung cấp tệp mã nguồn Python duy nhất mang tên `invisible_text_623.py` (sinh riêng cho đội `623`). Gợi ý: thông điệp bí mật được cất giấu ngay bên trong tệp nguồn và chỉ cần *"look closely"* tại vị trí thích hợp.
 
 ---

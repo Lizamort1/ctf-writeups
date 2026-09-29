@@ -18,9 +18,9 @@ mermaid: true
 > **Flag:** `POCTF{127.623.VZ4XA3V56I2JQQMU.X3LP2HNY765JXN7DXH65J4JFYM}`
 
 Thử thách Exploitation 200 điểm với đề bài:
-> *"Welcome to Madam Elara's Personalized Fortune Reading Service. Take a seat and allow me to gaze into your future...*  
-> *Oh... The veil is parting... My format call is working! I see it! A flag is in your future!*  
-> *Madame Elara's parlour speaks netcat: `nc read-my-fortune.pointeroverflowctf.com 9000`*  
+> *"Welcome to Madam Elara's Personalized Fortune Reading Service. Take a seat and allow me to gaze into your future...*
+> *Oh... The veil is parting... My format call is working! I see it! A flag is in your future!*
+> *Madame Elara's parlour speaks netcat: `nc read-my-fortune.pointeroverflowctf.com 9000`*
 > *She will ask for your session token before beginning."*
 
 Tệp mã nguồn `service.py` được cung cấp công khai kèm Dockerfile môi trường chạy thực tế.

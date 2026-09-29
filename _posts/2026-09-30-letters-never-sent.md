@@ -18,7 +18,7 @@ mermaid: true
 > **Flag:** `POCTF{2.623.QWL2PQDDL4O65HCM.FTWGRFCLINJFDPRI3WZJJD45UQ}`
 
 Thử thách Cryptography 100 điểm với đề bài:
-> *"Here we have a letter that was recovered from the estate of Dr. H. Aldous Whitmore. It was never posted. Along with the letter, a strange message was discovered. We have no doubt that Dr. Whitmore meant to keep it secret, given his... Association with occult societies that was discovered after his death. Despite this, the relationship to the letter remains unclear, but a connection cannot be discounted.*  
+> *"Here we have a letter that was recovered from the estate of Dr. H. Aldous Whitmore. It was never posted. Along with the letter, a strange message was discovered. We have no doubt that Dr. Whitmore meant to keep it secret, given his... Association with occult societies that was discovered after his death. Despite this, the relationship to the letter remains unclear, but a connection cannot be discounted.*
 > *Find the key the letter hides, and read what Whitmore could not bring himself to send."*
 
 Bản mã được cấp trên thẻ thử thách của đội:
@@ -48,7 +48,7 @@ flowchart TD
 Bức thư viết tay gửi tới:
 > *"To Admiral Sir Francis Beaufort, K.C.B. - Hydrographer to the Navy"*
 
-Nội dung bức thư ca ngợi: *"the elegance of your method — that reciprocal tableau which bears your name"*.  
+Nội dung bức thư ca ngợi: *"the elegance of your method — that reciprocal tableau which bears your name"*.
 Đây là chỉ dẫn trực tiếp tới **Beaufort Cipher** (bảng mã tự nghịch đảo do Francis Beaufort phát minh), trong đó quá trình mã hóa và giải mã đều tuân theo công thức:
 
 $$p = (k - c) \pmod{26}$$
