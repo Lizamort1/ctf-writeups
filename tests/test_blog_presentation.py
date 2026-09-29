@@ -132,6 +132,7 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertNotIn('<details class="competition-category" open>', categories)
         self.assertNotIn('/categories/{{ sub_category', categories)
         self.assertIn('/competitions/', post)
+        self.assertIn('site.data.competitions | where: "name", competition_name | first', post)
         self.assertIn('#{{ subject_slug }}', post)
         self.assertIn('post.categories[0] == page.competition', detail)
 
