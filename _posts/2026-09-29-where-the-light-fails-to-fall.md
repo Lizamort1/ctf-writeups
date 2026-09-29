@@ -3,7 +3,7 @@ title: "Where the Light Fails to Fall"
 date: 2026-09-29 21:35:00 +0700
 categories: ["Pointer Overflow CTF 2026", "OSINT"]
 tags: ["osint", "geolocation", "astronomy"]
-description: "Bài giải Where the Light Fails to Fall (Pointer Overflow CTF 2026 - OSINT)."
+description: "Bài giải chi tiết thử thách Where the Light Fails to Fall (Pointer Overflow CTF 2026 - OSINT)."
 math: true
 mermaid: true
 ---
