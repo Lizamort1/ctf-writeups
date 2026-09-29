@@ -30,7 +30,7 @@ layout: default
             </div>
           </div>
           <div class="competition-card-image">
-            <img src="{{ competition.image | relative_url }}" alt="{{ competition.name }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+            <img src="{{ competition.image }}" alt="{{ competition.name }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
           </div>
         </a>
       {% endif %}

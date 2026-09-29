@@ -18,7 +18,7 @@ layout: page
       <p class="lang-en">{{ competition.description_en }}</p>
       <span class="competition-detail-count">{{ post_count }} <span class="lang-vn">bài viết</span><span class="lang-en">writeups</span></span>
     </div>
-    <img src="{{ competition.image | relative_url }}" alt="{{ competition.name }}">
+    <img src="{{ competition.image }}" alt="{{ competition.name }}">
   </div>
 
   {% for subject in subjects %}
