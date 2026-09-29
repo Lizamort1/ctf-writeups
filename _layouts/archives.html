@@ -5,14 +5,7 @@ layout: page
 
 {% include lang.html %}
 
-<!-- Long HD Style Language Switcher on Archives Page -->
-<div class="lang-switch d-flex justify-content-center align-items-center mb-4" role="tablist" aria-label="Language switch">
-  <button class="lang-btn active" role="tab" type="button" data-lang="en" aria-selected="true">EN</button>
-  <span class="text-muted opacity-50 px-2">•</span>
-  <button class="lang-btn" role="tab" type="button" data-lang="vn" aria-selected="false">VN</button>
-</div>
-
-<div id="archives" class="archive-tournaments">
+<div id="competition-archives" class="archive-tournaments">
   {% assign competitions = site.posts | group_by_exp: "post", "post.categories[0]" %}
   {% assign competition_count = competitions | size %}
   {% assign post_count = site.posts | size %}
@@ -44,17 +37,13 @@ layout: page
 
       <ul class="list-unstyled tournament-posts-list mb-0">
         {% for post in t_posts %}
-          <li class="d-flex align-items-center justify-content-between py-2 px-2 rounded tournament-post-item">
-            <div class="d-flex align-items-center text-truncate me-3">
-              {% assign sub_cat = post.categories[1] %}
-              {% if sub_cat %}
-                <span class="badge badge-category me-2">{{ sub_cat }}</span>
-              {% endif %}
-              <a href="{{ post.url | relative_url }}" class="text-truncate post-title-link">
-                {{ post.title }}
-              </a>
-            </div>
-            <time class="text-muted small text-nowrap">
+          <li class="tournament-post-item">
+            {% assign sub_cat = post.categories[1] %}
+            {% if sub_cat %}
+              <span class="badge-category">{{ sub_cat }}</span>
+            {% endif %}
+            <a href="{{ post.url | relative_url }}" class="post-title-link">{{ post.title }}</a>
+            <time datetime="{{ post.date | date_to_xmlschema }}">
               {{ post.date | date: "%b %d" }}
             </time>
           </li>
