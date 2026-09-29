@@ -83,11 +83,6 @@ không cần HNP.
 
 Giải hệ tìm được khóa bí mật $d$:
 
-```python
-# Xác nhận d * G == pubkey lấy từ GET /pubkey
-# Chọn k mới tùy ý, tính (r, s) cho thông điệp ADMIN_TRANSFER 1000000 BTC -> 0x0000dead
-# POST /forge {msg, r, s}
-```
 
 Server verify bằng pubkey của nó và thả cờ:
 
@@ -160,11 +155,6 @@ We consider `a·d` to be a private unknown, so all products of `a*d` are linear.
 
 Solve the system to find the secret key $d$:
 
-```python
-# Xác nhận d * G == pubkey lấy từ GET /pubkey
-# Chọn k mới tùy ý, tính (r, s) cho thông điệp ADMIN_TRANSFER 1000000 BTC -> 0x0000dead
-# POST /forge {msg, r, s}
-```
 
 The server verifies with its pubkey and drops the flag:
 

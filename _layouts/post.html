@@ -24,13 +24,13 @@ script_includes:
     {% endif %}
 
     <div class="post-meta text-muted">
-      <!-- published date -->
+
       <span>
         {{ site.data.locales[lang].post.posted }}
         {% include datetime.html date=page.date tooltip=true lang=lang %}
       </span>
 
-      <!-- lastmod date -->
+
       {% if page.last_modified_at and page.last_modified_at != page.date %}
         <span>
           {{ site.data.locales[lang].post.updated }}
@@ -56,7 +56,7 @@ script_includes:
       {% endif %}
 
       <div class="d-flex justify-content-between">
-        <!-- author(s) -->
+
         <span>
           {% if page.author %}
             {% assign authors = page.author %}
@@ -83,7 +83,7 @@ script_includes:
         </span>
 
         <div>
-          <!-- pageviews -->
+
           {% if site.pageviews.provider and site.analytics[site.pageviews.provider].id %}
             <span>
               <em id="pageviews">
@@ -93,7 +93,7 @@ script_includes:
             </span>
           {% endif %}
 
-          <!-- read time -->
+
           {% include read-time.html content=content prompt=true lang=lang %}
         </div>
       </div>
@@ -128,7 +128,7 @@ script_includes:
 
   <div class="post-tail-wrapper text-muted">
     <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-      <!-- categories -->
+
       {% if page.categories.size > 0 %}
         <div class="post-meta">
           <i class="far fa-folder-open fa-fw me-1"></i>
@@ -145,11 +145,11 @@ script_includes:
         </div>
       {% endif %}
 
-      <!-- "Edit this post" link -->
+
       {% include post-edit.html lang=lang %}
     </div>
 
-    <!-- tags -->
+
     {% if page.tags.size > 0 %}
       <div class="post-tags">
         <i class="fa fa-tags fa-fw me-1"></i>
@@ -184,7 +184,7 @@ script_includes:
 
       {% include post-sharing.html lang=lang %}
     </div>
-    <!-- .post-tail-bottom -->
+
   </div>
-  <!-- div.post-tail-wrapper -->
+
 </article>

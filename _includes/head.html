@@ -11,7 +11,7 @@
     {% seo title=false %}
   {%- endcapture -%}
 
-  <!-- Setup Open Graph image -->
+
 
   {% if page.image %}
     {% assign src = page.image.path | default: page.image %}
@@ -49,7 +49,7 @@
   {{ seo_tags }}
 
   {%- if site.social.fediverse_handle %}
-    <!-- Fediverse handle/creator -->
+
     <meta name="fediverse:creator" content="{{ site.social.fediverse_handle }}">
   {% endif %}
 
@@ -70,7 +70,7 @@
 
   {% include_cached favicons.html %}
 
-  <!-- Resource Hints -->
+
   {% unless site.assets.self_host.enabled %}
     {% for hint in site.data.origin.cors.resource_hints %}
       {% for link in hint.links %}
@@ -79,21 +79,21 @@
     {% endfor %}
   {% endunless %}
 
-  <!-- Bootstrap -->
+
   {% unless jekyll.environment == 'production' %}
     <link rel="stylesheet" href="{{ site.data.origin.cors.bootstrap.css }}">
   {% endunless %}
 
-  <!-- Theme style -->
+
   <link rel="stylesheet" href="{{ '/assets/css/:THEME.css' | replace: ':THEME', site.theme | relative_url }}">
 
-  <!-- Web Font -->
+
   <link rel="stylesheet" href="{{ site.data.origin[type].webfonts | relative_url }}">
 
-  <!-- Font Awesome Icons -->
+
   <link rel="stylesheet" href="{{ site.data.origin[type].fontawesome.css | relative_url }}">
 
-  <!-- 3rd-party Dependencies -->
+
 
   {% if site.toc and page.toc %}
     <link rel="stylesheet" href="{{ site.data.origin[type].toc.css | relative_url }}">
@@ -104,18 +104,18 @@
   {% endif %}
 
   {% if page.layout == 'page' or page.layout == 'post' %}
-    <!-- Image Popup -->
+
     <link rel="stylesheet" href="{{ site.data.origin[type].glightbox.css | relative_url }}">
   {% endif %}
 
-  <!-- Scripts -->
+
 
   <script src="{{ '/assets/js/dist/theme.min.js' | relative_url }}"></script>
 
   {% include js-selector.html lang=lang %}
 
   {% if jekyll.environment == 'production' %}
-    <!-- PWA -->
+
     {% if site.pwa.enabled %}
       <script
         defer
@@ -123,7 +123,7 @@
       ></script>
     {% endif %}
 
-    <!-- Web Analytics -->
+
     {% for analytics in site.analytics %}
       {% capture str %}{{ analytics }}{% endcapture %}
       {% assign platform = str | split: '{' | first %}
@@ -133,11 +133,9 @@
     {% endfor %}
   {% endif %}
 
-  <!-- Dynamic Van Gogh Art Themes (Dark: Starry Night | Light: Irises) -->
+
   <style>
-    /* ============================================================
-       1. DARK MODE: The Starry Night (Vincent van Gogh, 1889)
-       ============================================================ */
+
     #sidebar {
       background-image: linear-gradient(rgba(17, 24, 39, 0.85), rgba(17, 24, 39, 0.90)), url('{{ "/assets/img/vangogh.jpg" | relative_url }}') !important;
       background-size: cover !important;
@@ -194,9 +192,7 @@
       opacity: 1 !important;
     }
 
-    /* ============================================================
-       2. LIGHT MODE: Irises (Vincent van Gogh, 1889)
-       ============================================================ */
+
     html[data-bs-theme="light"] #sidebar {
       background-image: linear-gradient(rgba(248, 250, 252, 0.56), rgba(241, 245, 249, 0.68)), url('{{ "/assets/img/vangogh-light.jpg" | relative_url }}') !important;
       background-size: cover !important;
@@ -264,9 +260,7 @@
       color: #d97706 !important;
     }
 
-    /* ============================================================
-       3. BILINGUAL SWITCHER & ARCHIVES STYLING
-       ============================================================ */
+
     .lang-switch {
       display: inline-flex;
       justify-content: center;
@@ -316,7 +310,7 @@
       transform: scale(.95);
     }
 
-    /* Keep Vietnamese prose readable without changing technical code samples. */
+
     body,
     button,
     input,
@@ -424,7 +418,7 @@
       overflow-wrap: anywhere;
     }
 
-    /* Primary CSS rules for language visibility (Default: English) */
+
     html:not([data-lang="vn"]) .lang-vn,
     html[data-lang="en"] .lang-vn {
       display: none !important;
@@ -467,7 +461,7 @@
       display: block !important;
     }
 
-    /* Archives by tournament styling */
+
     .archive-tournaments .tournament-posts-list {
       margin: 0;
       padding: 0;
@@ -568,7 +562,7 @@
       }
     }
 
-    /* Competition landing cards and timeline use the dark reference palette. */
+
     html:has(#competition-home) #main-wrapper,
     html:has(#competition-timeline) #main-wrapper {
       background: #1b1b1e;
@@ -1027,9 +1021,89 @@
         height: 9rem;
       }
     }
+
+    html:not([data-bs-theme="dark"]):has(#competition-home) #main-wrapper,
+    html:not([data-bs-theme="dark"]):has(#competition-timeline) #main-wrapper {
+      background: #fff;
+      color: #343a40;
+    }
+
+    html:not([data-bs-theme="dark"]):has(#competition-home) #main-wrapper h1,
+    html:not([data-bs-theme="dark"]):has(#competition-timeline) #main-wrapper h1 {
+      color: #242a32;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-home-intro > p:last-child,
+    html:not([data-bs-theme="dark"]) .competition-section-lead,
+    html:not([data-bs-theme="dark"]) .competition-timeline-year,
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry time {
+      color: #68717e;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-eyebrow,
+    html:not([data-bs-theme="dark"]) .competition-card-kicker {
+      color: #376ca9;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-card {
+      background: #fff;
+      border-color: #dfe3e8;
+      color: #303741 !important;
+      box-shadow: 0 12px 30px rgba(40, 54, 73, .07);
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-card:hover,
+    html:not([data-bs-theme="dark"]) .competition-card:focus-visible {
+      border-color: #8daed8;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-card h2 {
+      color: #263341;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-card-copy > p,
+    html:not([data-bs-theme="dark"]) .competition-card-meta {
+      color: #66717f;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry {
+      border-left-color: #cbd2db;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry::before {
+      background: #9ba9bb;
+      border-color: #d5dce5;
+      box-shadow: 0 0 0 3px #fff;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry > a,
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry:nth-of-type(even) > a {
+      color: #2468b1;
+      background: #f5f7fa;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry > a:hover,
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry > a:focus-visible {
+      color: #174f8d;
+      background: #eaf1fa;
+    }
+
+    html:not([data-bs-theme="dark"]) .competition-timeline-entry a span {
+      color: #65707d;
+    }
+
+    html:not([data-bs-theme="dark"]):has(#competition-home) #main-wrapper footer,
+    html:not([data-bs-theme="dark"]):has(#competition-timeline) #main-wrapper footer {
+      color: #737b86 !important;
+    }
+
+    html:not([data-bs-theme="dark"]):has(#competition-home) #main-wrapper footer a,
+    html:not([data-bs-theme="dark"]):has(#competition-timeline) #main-wrapper footer a {
+      color: #316ba9;
+    }
   </style>
 
-  <!-- Global bilingual switching controller (defaults to English). -->
+
   <script>
     (function() {
       function getPreferredLang() {

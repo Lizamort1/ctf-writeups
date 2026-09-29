@@ -66,7 +66,7 @@ Không gian bài toán lập tức thu hẹp từ $256^{16}$ xuống chỉ còn 
 Duyệt qua 256 trường hợp và kiểm tra điều kiện của nhóm B và C:
 
 ```python
-# Duyệt 256 giá trị buf[0], tìm được chuỗi hợp lệ duy nhất:
+
 key = "S4T-C0NSTR4INT!7"
 ```
 
@@ -145,7 +145,7 @@ Therefore, just by choosing the first byte `buf[0]` ($\in [0, 255]$), we will ca
 Browse through 256 cases and check the conditions of groups B and C:
 
 ```python
-# Duyệt 256 giá trị buf[0], tìm được chuỗi hợp lệ duy nhất:
+
 key = "S4T-C0NSTR4INT!7"
 ```
 

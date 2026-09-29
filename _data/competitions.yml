@@ -8,8 +8,8 @@
   slug: sunshinectf-2026
   image: /assets/img/competitions/sunshinectf-2026.png
   image_source: https://2026.sunshinectf.org/themes/sunshine-retro/static/img/sunshinectf-2026-home.png
-  description_vn: Các bài giải SunshineCTF 2026 thuộc AI, Misc và Reverse Engineering.
-  description_en: SunshineCTF 2026 writeups in AI, Misc, and Reverse Engineering.
+  description_vn: Các bài giải SunshineCTF 2026 thuộc Misc, OSINT và Reverse Engineering.
+  description_en: SunshineCTF 2026 writeups in Misc, OSINT, and Reverse Engineering.
 - name: PTITCTF 2026
   slug: ptitctf-2026
   image: /assets/img/competitions/ptitctf-2026.jpg

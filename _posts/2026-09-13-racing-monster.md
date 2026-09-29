@@ -49,7 +49,7 @@ def rol8(x, n):
     n %= 8
     return ((x << n) | (x >> (8 - n))) & 255
 
-# Mô phỏng 80 vòng biến đổi
+
 for r in range(80):
     carry = 93 + 17 * r
     for i in range(len(code)):
@@ -95,7 +95,7 @@ for i in range(49):
 
 flag = bytes(answer).decode('ascii')
 print("Flag:", flag)
-# Output: PTITCTF{0nly_th3_f4st_surv1v3_th3_m0nst3rs_ch4s3}
+
 ```
 
 Kiểm tra lại toàn bộ chuỗi thu được thỏa mãn tất cả 49 điều kiện của máy ảo.
@@ -140,7 +140,7 @@ def rol8(x, n):
     n %= 8
     return ((x << n) | (x >> (8 - n))) & 255
 
-# Mô phỏng 80 vòng biến đổi
+
 for r in range(80):
     carry = 93 + 17 * r
     for i in range(len(code)):
@@ -185,7 +185,7 @@ for i in range(49):
 
 flag = bytes(answer).decode('ascii')
 print("Flag:", flag)
-# Output: PTITCTF{0nly_th3_f4st_surv1v3_th3_m0nst3rs_ch4s3}
+
 ```
 
 Recheck the entire obtained string that satisfies all 49 conditions of the virtual machine.

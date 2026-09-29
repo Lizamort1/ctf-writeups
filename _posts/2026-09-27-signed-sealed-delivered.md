@@ -61,7 +61,7 @@ public class Signer {
         String canonical = method + "\n" + path + "\n" + sortQuery(query) + "\n" + ts;
         byte[] key = sha256(PEPPER + deviceId);
         String sig = hmacSha256Hex(key, canonical);
-        // ...
+
     }
 }
 ```
@@ -168,7 +168,7 @@ public class Signer {
         String canonical = method + "\n" + path + "\n" + sortQuery(query) + "\n" + ts;
         byte[] key = sha256(PEPPER + deviceId);
         String sig = hmacSha256Hex(key, canonical);
-        // ...
+
     }
 }
 ```

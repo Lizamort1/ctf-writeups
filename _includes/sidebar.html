@@ -1,4 +1,4 @@
-<!-- The Side Bar -->
+
 
 <aside aria-label="Sidebar" id="sidebar" class="d-flex flex-column align-items-end">
   <header class="profile-wrapper">
@@ -17,11 +17,11 @@
       <span class="lang-en">Just a personal blog</span>
     </p>
   </header>
-  <!-- .profile-wrapper -->
+
 
   <nav class="flex-column flex-grow-1 w-100 ps-0">
     <ul class="nav">
-      <!-- home -->
+
       <li class="nav-item{% if page.layout == 'home' %}{{ " active" }}{% endif %}">
         <a href="{{ '/' | relative_url }}" class="nav-link">
           <i class="fa-fw fas fa-home"></i>
@@ -31,7 +31,7 @@
           </span>
         </a>
       </li>
-      <!-- the real tabs -->
+
       {% for tab in site.tabs %}
         <li class="nav-item{% if tab.url == page.url %}{{ " active" }}{% endif %}">
           <a href="{{ tab.url | relative_url }}" class="nav-link">
@@ -63,7 +63,7 @@
             {% endif %}
           </a>
         </li>
-        <!-- .nav-item -->
+
       {% endfor %}
     </ul>
   </nav>
@@ -173,6 +173,5 @@
       {% endif %}
     {% endfor %}
   </div>
-  <!-- .sidebar-bottom -->
+
 </aside>
-<!-- #sidebar -->

@@ -1,4 +1,4 @@
-<!-- The Top Bar -->
+
 
 <header id="topbar-wrapper" class="flex-shrink-0" aria-label="Top Bar">
   <div
@@ -9,7 +9,7 @@
       {% assign paths = page.url | split: '/' %}
 
       {% if paths.size == 0 or page.layout == 'home' %}
-        <!-- index page -->
+
         <span>{{ site.data.locales[include.lang].tabs.home | capitalize }}</span>
 
       {% else %}
@@ -38,7 +38,7 @@
         {% endfor %}
       {% endif %}
     </nav>
-    <!-- endof #breadcrumb -->
+
 
     <button type="button" id="sidebar-trigger" class="btn btn-link" aria-label="Sidebar">
       <i class="fas fa-bars fa-fw"></i>
@@ -55,7 +55,7 @@
       {% endif %}
     </div>
 
-    <!-- Longhd Style Dual-Language Toggle (EN / VN) with Direct Click Handlers -->
+
     <div class="lang-switch topbar-lang-switch ms-auto me-3" role="tablist" aria-label="Language switch">
       <button class="lang-btn active" role="tab" type="button" data-lang="en" aria-selected="true" onclick="window.setLanguage('en'); return false;">EN</button>
       <span class="opacity-50 px-1" style="font-size: 0.8rem; color: inherit;">/</span>

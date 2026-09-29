@@ -73,7 +73,7 @@ Chuẩn bị một tệp mã nguồn Python `pwncodec.py` định nghĩa giao di
 import codecs
 import os
 
-# Mã lệnh thực thi khi module được import
+
 flag = os.environ.get("GZCTF_FLAG", os.environ.get("FLAG", "NO_FLAG"))
 with open("/data/media/flag.txt", "w") as f:
     f.write(flag)
@@ -164,7 +164,7 @@ Prepare a Python source file `pwncodec.py` that defines the standard codec inter
 import codecs
 import os
 
-# Mã lệnh thực thi khi module được import
+
 flag = os.environ.get("GZCTF_FLAG", os.environ.get("FLAG", "NO_FLAG"))
 with open("/data/media/flag.txt", "w") as f:
     f.write(flag)

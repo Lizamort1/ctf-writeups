@@ -70,7 +70,7 @@ while offset < len(data):
     length, ctype = struct.unpack('>I4s', data[offset:offset+8])
     ctype_str = ctype.decode('ascii', errors='ignore')
     print(f"Chunk: {ctype_str:4s} | Offset: {offset:6d} | Length: {length:6d}")
-    offset += 8 + length + 4 # 8 header + data + 4 CRC
+    offset += 8 + length + 4
     if ctype == b'IEND':
         print(f"--> Found IEND at offset {offset-12}. Trailing bytes: {len(data) - offset} bytes")
         break
@@ -266,7 +266,7 @@ while offset < len(data):
     length, ctype = struct.unpack('>I4s', data[offset:offset+8])
     ctype_str = ctype.decode('ascii', errors='ignore')
     print(f"Chunk: {ctype_str:4s} | Offset: {offset:6d} | Length: {length:6d}")
-    offset += 8 + length + 4 # 8 header + data + 4 CRC
+    offset += 8 + length + 4
     if ctype == b'IEND':
         print(f"--> Found IEND at offset {offset-12}. Trailing bytes: {len(data) - offset} bytes")
         break

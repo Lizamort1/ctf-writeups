@@ -63,9 +63,9 @@ Ciphertext 48 byte nằm ở vùng nhớ `.noptrdata` vaddr `0x557660`, slice he
 Kiểm tra `main.unlock` tại `0x49861a`:
 
 ```asm
-call  <hash>                            ; Trả về [32]byte = SHA-256(token) -> Khóa AES-256
-makeslice(len=0x10)                     ; Khởi tạo buffer 16 byte không gán giá trị
-call  aes.NewCBCDecrypter(block, buf)   ; Buffer rỗng => IV = 16 byte 0x00
+call  <hash>
+makeslice(len=0x10)
+call  aes.NewCBCDecrypter(block, buf)
 ```
 
 ---
@@ -75,7 +75,7 @@ call  aes.NewCBCDecrypter(block, buf)   ; Buffer rỗng => IV = 16 byte 0x00
 Hàm `main.check` bị inline vào `main.main`, biến thành 4 vòng lặp trên 4 word 32-bit tại `0x498a02`:
 
 ```text
-w  = bswap(token_word)                    // big-endian
+w  = bswap(token_word)
 w ^= k1[i]      @0x557300 -> 7c5afe6c 1ddf8cdb 9362ba25 a689a4ca
 w  = rol32(w, s[i]) @0x5574e0 -> [22, 12, 3, 20]
 w += k3[i]      @0x557310 -> b441f5cf 3fbcb9d9 10ceff09 7b7f535f
@@ -160,9 +160,9 @@ flowchart TD
 Check `main.unlock` at `0x49861a`:
 
 ```asm
-call  <hash>                            ; Trả về [32]byte = SHA-256(token) -> Khóa AES-256
-makeslice(len=0x10)                     ; Khởi tạo buffer 16 byte không gán giá trị
-call  aes.NewCBCDecrypter(block, buf)   ; Buffer rỗng => IV = 16 byte 0x00
+call  <hash>
+makeslice(len=0x10)
+call  aes.NewCBCDecrypter(block, buf)
 ```
 
 ---
@@ -172,7 +172,7 @@ call  aes.NewCBCDecrypter(block, buf)   ; Buffer rỗng => IV = 16 byte 0x00
 The function `main.check` is inlined into `main.main`, turning into 4 loops over 4 32-bit words at `0x498a02`:
 
 ```text
-w  = bswap(token_word)                    // big-endian
+w  = bswap(token_word)
 w ^= k1[i]      @0x557300 -> 7c5afe6c 1ddf8cdb 9362ba25 a689a4ca
 w  = rol32(w, s[i]) @0x5574e0 -> [22, 12, 3, 20]
 w += k3[i]      @0x557310 -> b441f5cf 3fbcb9d9 10ceff09 7b7f535f

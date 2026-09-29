@@ -87,13 +87,6 @@ F12 soi source xem có gì thì thấy nó load CSS và JS từ subdomain CDN:
 ```
 
 Mở file `https://cdn-static-3.abu.rocks/site.css` ra xem thì thấy ngay quả leak cực kỳ bất cẩn của dev:
-```css
-/* front-end theme -- static asset bundle
- * origin: cdn-static-3.abu.rocks
- * served to: clearpane.abu.rocks, halcyon-strategies.h7tex.com
- * internal use only. do not redistribute.
- */
-```
 
 Dev note thẳng luôn là bundle này được dùng chung cho cả `clearpane.abu.rocks` và **`halcyon-strategies.h7tex.com`**!
 Trang whistleblower nặc danh hóa ra chung hạ tầng và chủ sở hữu với một công ty bên ngoài.
@@ -109,8 +102,6 @@ Mình check các path quen thuộc của RFC web standard, phát hiện ra file 
 
 Nội dung trả về:
 ```text
-# Halcyon Strategies -- secure contact
-# All sensitive correspondence is encrypted. Our key is published via WKD; fetch it by address.
 Contact: mailto:curator@abu.rocks
 Encryption: openpgp4fpr:6D4354288E06DA24551B157D946A296DA5F90AF6
 Preferred-Languages: en
@@ -280,13 +271,6 @@ F12 looks at the source to see what's there and it loads CSS and JS from the CDN
 ```
 
 Open the file `https://cdn-static-3.abu.rocks/site.css` and immediately see the extremely careless leak of the dev:
-```css
-/* front-end theme -- static asset bundle
- * origin: cdn-static-3.abu.rocks
- * served to: clearpane.abu.rocks, halcyon-strategies.h7tex.com
- * internal use only. do not redistribute.
- */
-```
 
 Dev notes directly that this bundle is shared by both `clearpane.abu.rocks` and **`halcyon-strategies.h7tex.com`**! The anonymous whistleblower site turned out to share infrastructure and ownership with an outside company.
 
@@ -300,8 +284,6 @@ I checked the familiar paths of the RFC web standard, discovered the file `.well
 
 Return content:
 ```text
-# Halcyon Strategies -- secure contact
-# All sensitive correspondence is encrypted. Our key is published via WKD; fetch it by address.
 Contact: mailto:curator@abu.rocks
 Encryption: openpgp4fpr:6D4354288E06DA24551B157D946A296DA5F90AF6
 Preferred-Languages: en

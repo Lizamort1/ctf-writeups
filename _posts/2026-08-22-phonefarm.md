@@ -80,7 +80,7 @@ import hashlib
 key = "hello"
 flag_hash = hashlib.md5(key.encode()).hexdigest()
 print("PTITCTF{" + flag_hash + "}")
-# Output: PTITCTF{5d41402abc4b2a76b9719d911017c592}
+
 ```
 
 ⇒ **Flag:** `PTITCTF{5d41402abc4b2a76b9719d911017c592}`
@@ -152,7 +152,7 @@ import hashlib
 key = "hello"
 flag_hash = hashlib.md5(key.encode()).hexdigest()
 print("PTITCTF{" + flag_hash + "}")
-# Output: PTITCTF{5d41402abc4b2a76b9719d911017c592}
+
 ```
 
 ⇒ **Flag:** `PTITCTF{5d41402abc4b2a76b9719d911017c592}`

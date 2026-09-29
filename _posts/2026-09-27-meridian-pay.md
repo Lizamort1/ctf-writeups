@@ -66,7 +66,7 @@ Trong mã nguồn Java, lớp `ApiClient` cấu hình đường dẫn API và c�
 public class ApiClient {
     public static final String BASE_URL = "https://web-<instance_id>.web.h7tex.com";
     public static final String CLIENT_HEADER = "MeridianPay-Android/3.2.1 (attested)";
-    // ...
+
 }
 ```
 
@@ -74,7 +74,7 @@ Kiểm tra API cơ sở:
 ```bash
 U=https://web-<instance_id>.web.h7tex.com
 curl -s $U/
-# Trả về: {"service":"Meridian Pay API","version":"3.2.1"}
+
 ```
 
 Đăng ký / đăng nhập thiết bị để nhận mã xác thực `Bearer Token`:
@@ -199,7 +199,7 @@ Kiểm tra phương thức `openFile()` trong lớp `ExportProvider`:
 ```java
 public ParcelFileDescriptor openFile(Uri uri, String mode) {
     File baseDir = new File(getContext().getFilesDir(), "receipts");
-    String subPath = uri.getPath().substring(7); // Bỏ tiền tố /export/
+    String subPath = uri.getPath().substring(7);
     File targetFile = new File(baseDir, subPath);
     return ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY);
 }
@@ -291,7 +291,7 @@ In the Java source code, the `ApiClient` class configures the API path and commu
 public class ApiClient {
     public static final String BASE_URL = "https://web-<instance_id>.web.h7tex.com";
     public static final String CLIENT_HEADER = "MeridianPay-Android/3.2.1 (attested)";
-    // ...
+
 }
 ```
 
@@ -299,7 +299,7 @@ Check out the base API:
 ```bash
 U=https://web-<instance_id>.web.h7tex.com
 curl -s $U/
-# Trả về: {"service":"Meridian Pay API","version":"3.2.1"}
+
 ```
 
 Register/log in device to receive `Bearer Token` authentication code:
@@ -422,7 +422,7 @@ Check out the `openFile()` method in the `ExportProvider` class:
 ```java
 public ParcelFileDescriptor openFile(Uri uri, String mode) {
     File baseDir = new File(getContext().getFilesDir(), "receipts");
-    String subPath = uri.getPath().substring(7); // Bỏ tiền tố /export/
+    String subPath = uri.getPath().substring(7);
     File targetFile = new File(baseDir, subPath);
     return ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY);
 }

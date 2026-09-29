@@ -152,11 +152,11 @@ with zipfile.ZipFile(zip_path, 'r') as z:
         dW = B @ A
         delta_W_list.append(dW)
 
-# Tính tổng ma trận delta W
+
 W_sum = sum(delta_W_list)
 W_int = np.round(W_sum).astype(int)
 
-# Chuyển đổi các giá trị số nguyên sang ASCII
+
 chars = []
 for x in W_int.flatten():
     if 32 <= x <= 126:
@@ -331,11 +331,11 @@ with zipfile.ZipFile(zip_path, 'r') as z:
         dW = B @ A
         delta_W_list.append(dW)
 
-# Tính tổng ma trận delta W
+
 W_sum = sum(delta_W_list)
 W_int = np.round(W_sum).astype(int)
 
-# Chuyển đổi các giá trị số nguyên sang ASCII
+
 chars = []
 for x in W_int.flatten():
     if 32 <= x <= 126:

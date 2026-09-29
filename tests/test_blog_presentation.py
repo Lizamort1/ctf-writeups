@@ -9,10 +9,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BlogPresentationTests(unittest.TestCase):
     def test_every_post_keeps_one_bilingual_content_pair(self):
-        """Catches a post losing one language block during presentation repairs."""
+
         posts = sorted((ROOT / "_posts").glob("*.md"))
 
-        self.assertEqual(40, len(posts))
+        self.assertEqual(39, len(posts))
         for post in posts:
             content = post.read_text(encoding="utf-8")
             self.assertEqual(
@@ -27,7 +27,7 @@ class BlogPresentationTests(unittest.TestCase):
             )
 
     def test_sidebar_navigation_uses_title_case_labels(self):
-        """Catches navigation returning to visually noisy all-caps labels."""
+
         sidebar = (ROOT / "_includes" / "sidebar.html").read_text(encoding="utf-8")
 
         for label in (
@@ -45,7 +45,7 @@ class BlogPresentationTests(unittest.TestCase):
             self.assertIn(label, sidebar)
 
     def test_site_identity_and_avatar_are_presented_completely(self):
-        """Keeps the public brand name and fills the round avatar without a white ring."""
+
         config = (ROOT / "_config.yml").read_text(encoding="utf-8")
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
 
@@ -69,14 +69,14 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertIn("font-weight: 600", title_rule.group("body"))
 
     def test_light_sidebar_keeps_van_gogh_art_visible(self):
-        """Catches the light overlay returning to the washed-out screenshot state."""
+
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
 
         self.assertIn("rgba(248, 250, 252, 0.56)", head)
         self.assertIn("rgba(241, 245, 249, 0.68)", head)
 
     def test_writeup_typography_avoids_accidental_heavy_text(self):
-        """Quoted challenge descriptions should not use monospace code formatting."""
+
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
 
         self.assertIn(".content strong", head)
@@ -94,7 +94,7 @@ class BlogPresentationTests(unittest.TestCase):
                     )
 
     def test_archives_are_derived_from_posts_instead_of_hard_coded(self):
-        """The timeline contains one linked row per competition, never one per writeup."""
+
         archives = (ROOT / "_layouts" / "archives.html").read_text(encoding="utf-8")
 
         self.assertIn('group_by_exp: "post", "post.categories[0]"', archives)
@@ -108,20 +108,32 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertNotIn('assign tournament_list = "', archives)
 
     def test_competition_navigation_keeps_subjects_scoped(self):
-        """Shared subject names must not link back to global category archives."""
+
         categories = (ROOT / "_layouts" / "categories.html").read_text(encoding="utf-8")
         post = (ROOT / "_layouts" / "post.html").read_text(encoding="utf-8")
         detail = (ROOT / "_layouts" / "competition.html").read_text(encoding="utf-8")
 
         self.assertIn('post.categories[0] == competition.name', categories)
         self.assertIn('group_by_exp: "post", "post.categories[1]"', categories)
+        self.assertIn('<details class="competition-category">', categories)
+        self.assertNotIn('<details class="competition-category" open>', categories)
         self.assertNotIn('/categories/{{ sub_category', categories)
         self.assertIn('/competitions/', post)
         self.assertIn('#{{ subject_slug }}', post)
         self.assertIn('post.categories[0] == page.competition', detail)
 
+    def test_sunshine_posts_use_the_requested_subjects(self):
+        expected = {
+            "2026-09-26-vecnet.md": "Misc",
+            "2026-09-26-this-code-s-got-bars.md": "OSINT",
+        }
+        for filename, subject in expected.items():
+            content = (ROOT / "_posts" / filename).read_text(encoding="utf-8")
+            self.assertIn(f'categories: ["SunshineCTF 2026", "{subject}"]', content)
+        self.assertFalse((ROOT / "_posts" / "2026-09-26-helpdesk-freebie.md").exists())
+
     def test_home_has_one_authentic_image_card_per_competition(self):
-        """Checks each competition landing page and its local event image are present."""
+
         home = (ROOT / "_layouts" / "home.html").read_text(encoding="utf-8")
         self.assertIn("site.data.competitions", home)
         self.assertIn('post.categories[0] == competition.name', home)
@@ -136,7 +148,7 @@ class BlogPresentationTests(unittest.TestCase):
             self.assertTrue((ROOT / "assets" / "img" / "competitions" / f"{slug}.{extension}").is_file())
 
     def test_shared_template_has_language_controller(self):
-        """Catches loss of the shared language switch and TOC synchronization."""
+
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
 
         self.assertIn("function syncLanguageUi", head)
@@ -144,7 +156,7 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertIn("localStorage.setItem('blog_lang_pref', targetLang)", head)
 
     def test_language_controller_survives_html_whitespace_compression(self):
-        """Catches line comments swallowing the controller after Jekyll compression."""
+
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
         script = head.split("<script>", 1)[1].split("</script>", 1)[0]
         compressed_script = " ".join(script.splitlines())
@@ -159,7 +171,7 @@ class BlogPresentationTests(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_toc_filter_reapplies_after_toc_regeneration(self):
-        """Catches responsive TOC refreshes restoring headings from both languages."""
+
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
         script = head.split("<script>", 1)[1].split("</script>", 1)[0]
         harness = r'''
@@ -212,7 +224,7 @@ if (!link.hidden) throw new Error('Expected regenerated Vietnamese TOC link to s
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_switching_language_redraws_visible_mermaid_diagram(self):
-        """Chirpy must recalculate an SVG that was measured while hidden."""
+
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
         script = head.split("<script>", 1)[1].split("</script>", 1)[0]
         harness = r'''
@@ -251,7 +263,7 @@ if (messages.length !== 2 || messages.some(m => m.id !== 'theme-updated')) {
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_post_translations_share_flags_and_technical_blocks(self):
-        """Prevents English write-ups from inventing another exploit or flag."""
+
         for post in (ROOT / "_posts").glob("*.md"):
             content = post.read_text(encoding="utf-8")
             vn = content.split('<div class="lang-vn" markdown="1">', 1)[1].split("</div>", 1)[0]

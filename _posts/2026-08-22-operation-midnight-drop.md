@@ -87,7 +87,7 @@ $$\text{Cookie} = \text{Target\_Addr} \oplus (\text{session\_token} \ll 12) \opl
 Gửi gói tin Type 4 với subcommand `P` để trích xuất cookie của tiến trình, sau đó thực hiện phép XOR đảo ngược để thu được địa chỉ thực của `puts`:
 ```python
 puts_addr = leak(b'P') ^ (key << 12) ^ 0x5A5A5A5A41414141
-libc_base = puts_addr - PUTS_OFF  # Offset 0x87cc0 trên glibc 2.39
+libc_base = puts_addr - PUTS_OFF
 ```
 Tương tự, gửi subcommand `D` cho phép tính toán chính xác địa chỉ nạp thực thi của binary (`PIE Base`).
 
@@ -201,7 +201,7 @@ Inside the report structure, cookie values ​​are stored for control, includi
 Send a Type 4 packet with subcommand `P` to extract the process cookie, then perform reverse XOR to obtain the actual address of `puts`:
 ```python
 puts_addr = leak(b'P') ^ (key << 12) ^ 0x5A5A5A5A41414141
-libc_base = puts_addr - PUTS_OFF  # Offset 0x87cc0 trên glibc 2.39
+libc_base = puts_addr - PUTS_OFF
 ```
 Similarly, sending subcommand `D` allows the exact calculation of the binary's executable load address (`PIE Base`).
 

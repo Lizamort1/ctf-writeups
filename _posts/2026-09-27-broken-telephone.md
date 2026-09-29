@@ -65,7 +65,7 @@ liệu công khai:
 
 ```python
 def compute_h2(n1, g1, rs_hex, prologue=b''):
-    h = M.PROTOCOL_NAME                       # 37 byte > 32 -> hash, không pad
+    h = M.PROTOCOL_NAME
     h = M.blake2s(h) if len(h) > 32 else h + b'\x00' * (32 - len(h))
     for part in (prologue, bytes.fromhex(rs_hex),
                  n1[:32], n1[32:], g1[:32], g1[32:]):
@@ -109,9 +109,7 @@ Cùng keystream ⇒ cùng nonce. Và vì plaintext chỉ khác nhau ở *lượn
 
 ```python
 x = bytes(a ^ b for a, b in zip(ct_ctrl, ct_data))
-```
-
-```text
+text
 b'MURMUR\x12\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\xc3\xff\x01\x00NODE-GUEST-0001\x00...'
 ```
 
@@ -141,7 +139,7 @@ hai theo `r`. Vì `P = 2^130-5 ≡ 3 (mod 4)` nên căn bậc hai chỉ là `Δ^
 C2 = (Blast_a - L_b) - (Blast_c - L_d)
 C1 = (L_a - L_c) + (T_b - T_d)
 C0 = T_c - T_a
-r = (-C1 ± sqrt(C1^2 - 4*C2*C0)) / (2*C2)      # rồi s = t - A(r) mod 2^128
+r = (-C1 ± sqrt(C1^2 - 4*C2*C0)) / (2*C2)
 ```
 
 Duyệt 5^4 tổ hợp carry, nghiêm túc kiểm tra lại bằng cách tính lại **cả 5 tag** (kể cả frame DATA
@@ -249,7 +247,7 @@ flowchart TD
 
 ```python
 def compute_h2(n1, g1, rs_hex, prologue=b''):
-    h = M.PROTOCOL_NAME                       # 37 byte > 32 -> hash, không pad
+    h = M.PROTOCOL_NAME
     h = M.blake2s(h) if len(h) > 32 else h + b'\x00' * (32 - len(h))
     for part in (prologue, bytes.fromhex(rs_hex),
                  n1[:32], n1[32:], g1[:32], g1[32:]):
@@ -289,9 +287,7 @@ Same keystream ⇒ same nonce. And because the plaintext only differs in *amount
 
 ```python
 x = bytes(a ^ b for a, b in zip(ct_ctrl, ct_data))
-```
-
-```text
+text
 b'MURMUR\x12\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\xc3\xff\x01\x00NODE-GUEST-0001\x00...'
 ```
 
@@ -315,7 +311,7 @@ Then `A_j ≡ T_j - s` with `T_j = t_j + e_j·2^128`, `e_j ∈ {0..4}` (carry pa
 C2 = (Blast_a - L_b) - (Blast_c - L_d)
 C1 = (L_a - L_c) + (T_b - T_d)
 C0 = T_c - T_a
-r = (-C1 ± sqrt(C1^2 - 4*C2*C0)) / (2*C2)      # rồi s = t - A(r) mod 2^128
+r = (-C1 ± sqrt(C1^2 - 4*C2*C0)) / (2*C2)
 ```
 
 Browse 5^4 carry combinations, seriously check again by recalculating **all 5 tags** (including DATA frames with different AAD):

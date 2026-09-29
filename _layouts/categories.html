@@ -13,7 +13,7 @@ layout: page
       {% assign subjects = posts | group_by_exp: "post", "post.categories[1]" | sort: "name" %}
       {% assign subject_count = subjects | size %}
       {% capture competition_url %}/competitions/{{ competition.slug }}/{% endcapture %}
-      <details class="competition-category" open>
+      <details class="competition-category">
         <summary>
           <span class="competition-category-name"><i class="far fa-folder-open" aria-hidden="true"></i> {{ competition.name }}</span>
           <span class="competition-category-count">{{ subject_count }} <span class="lang-vn">chuyên mục</span><span class="lang-en">subjects</span> · {{ post_count }} <span class="lang-vn">bài viết</span><span class="lang-en">writeups</span></span>
