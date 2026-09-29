@@ -140,7 +140,7 @@ Thanks to this mechanism, all sensitive keywords do not appear as explicit strin
 
 ---
 
-## Step 3: Mine RCE and Collect Flags
+## Step 3: Achieve RCE and collect the flag
 
 In Jinja2, the default `lipsum` or `cycler` object is always available in the global context. From the object's constructor, we can access the `__globals__` dictionary containing the `os` module:
 

@@ -129,7 +129,7 @@ The license key check includes 4 constant tables placed in `.rodata`:
 - `B` is at `0x51b0` (ADD table)
 - `C` is in `0x52b0` (Expected table)
 
-After a successful check, the program does not compare strings but constructs a 27-byte token using XOR between the key and the subtables.
+After a successful check, the program does not compare strings but **constructs a 27-byte token** using XOR between the key and the subtables.
 
 ---
 

@@ -190,7 +190,7 @@ Perform a dictionary list scan of common API paths, detecting secret endpoints:
 
 ---
 
-## Step 3: Bypass checks Dispatcher and Collect Flag permissions
+## Step 3: Bypass the dispatcher permission check and collect the flag
 
 When sending a request with a valid signature to `/api/v1/fleet/manifest`, the server responds:
 ```text

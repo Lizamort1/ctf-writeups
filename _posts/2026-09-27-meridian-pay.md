@@ -355,7 +355,7 @@ Returned results:
 
 ---
 
-## Step 3: Crack 2 (Target v2) — Mass Assignment Leo `admin` rights
+## Step 3: Crack 2 (Target v2) — Elevate `admin` privileges via Mass Assignment
 
 Check the ledger administration endpoint `/api/v1/admin/ledger`:
 ```bash
@@ -428,7 +428,7 @@ public ParcelFileDescriptor openFile(Uri uri, String mode) {
 }
 ```
 
-This function concatenates the string `subPath` directly into `baseDir` without checking the directory traversal character (`../`) at all**. An attacker can escape the `receipts` directory to read any private files in the `/data/data/com.meridian.pay/` application directory.
+This function concatenates `subPath` directly into `baseDir` **without checking for directory traversal (`../`)**. An attacker can escape the `receipts` directory to read private files in the `/data/data/com.meridian.pay/` application directory.
 
 At the same time, the application saves the initial token and session memo in plaintext in `shared_prefs/session_config.xml`. When sending a request to query the official account:
 ```bash
@@ -449,7 +449,7 @@ The response that returns the verification account's session note from the devic
 
 ---
 
-## Summary Flag Meridian Pay
+## Meridian Pay flag summary
 
 - **Target V1 (Atestation Bypass):** `H7CTF{a410a8b0-a1f0-479c-a003-24c2001b4943}`
 - **Target V2 (Admin Role Mass Assignment):** `H7CTF{74d3a92e-3563-4abe-bccf-70ae8e5a7774}`

@@ -326,7 +326,7 @@ We have the first part of the flag: `06da61b`.
 
 ---
 
-## Step 3: Analyze Trailing Zip & Technical Omitted Central Directory
+## Step 3: Analyze the trailing ZIP and its missing central directory
 
 Check the 372 bytes after the `IEND` chunk: The first byte is `PK\x03\x04`, which means this is a ZIP file attached to the image file extension.
 

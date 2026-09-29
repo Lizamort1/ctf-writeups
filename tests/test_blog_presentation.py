@@ -237,6 +237,7 @@ if (messages.length !== 2 || messages.some(m => m.id !== 'theme-updated')) {
             headings = lambda body: [len(mark) for mark in re.findall(r"(?m)^(#{1,6}) ", body)]
             self.assertEqual(inline_code(vn), inline_code(en), post.name)
             self.assertEqual(headings(vn), headings(en), post.name)
+            self.assertEqual(vn.count("**"), en.count("**"), post.name)
 
 
 if __name__ == "__main__":
