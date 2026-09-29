@@ -580,6 +580,17 @@
       color: #e7e8eb;
     }
 
+    html:has(#competition-home) #main-wrapper footer,
+    html:has(#competition-timeline) #main-wrapper footer {
+      background: transparent;
+      color: #9fa3ab !important;
+    }
+
+    html:has(#competition-home) #main-wrapper footer a,
+    html:has(#competition-timeline) #main-wrapper footer a {
+      color: #b4cfff;
+    }
+
     .competition-home,
     .competition-timeline {
       max-width: 76rem;
@@ -685,8 +696,16 @@
     }
 
     .competition-card-image {
+      min-width: 0;
       min-height: 16.8rem;
       background: #0d0f13;
+    }
+
+    .competition-card-image .preview-img {
+      width: 100%;
+      height: 100%;
+      background: transparent !important;
+      animation: none !important;
     }
 
     .competition-card-image img {
@@ -970,7 +989,7 @@
 
     @media (max-width: 767.98px) {
       .competition-card {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .competition-card-image {
