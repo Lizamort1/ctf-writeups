@@ -1,6 +1,6 @@
 ---
 title: "After hours..."
-date: 2026-10-05 09:55:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "AI"]
 tags: ["ai", "social-engineering", "chatbot"]
 description: "Bài giải After hours: lấy temporary server-room pass từ Morgan."

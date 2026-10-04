@@ -1,6 +1,6 @@
 ---
 title: "FLAPPY BOARD"
-date: 2026-10-05 09:02:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Reverse Engineering"]
 tags: ["reverse", "game", "unicorn"]
 description: "Bài giải FLAPPY BOARD: khôi phục vật lý trò chơi và hoàn thành ba lượt bay."

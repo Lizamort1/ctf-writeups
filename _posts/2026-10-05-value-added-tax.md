@@ -1,6 +1,6 @@
 ---
 title: "Value-Added Tax"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "OSINT"]
 tags: ["cdctf", "osint"]
 description: "Bài giải Value-Added Tax trong CDCTF 2026."

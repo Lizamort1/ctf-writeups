@@ -1,6 +1,6 @@
 ---
 title: "Welcome to Crimson Clinic (3/3)"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "Social Engineering"]
 tags: ["cdctf", "social-engineering"]
 description: "Bài giải Welcome to Crimson Clinic (3/3) trong CDCTF 2026."

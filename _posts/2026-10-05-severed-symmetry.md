@@ -1,6 +1,6 @@
 ---
 title: "Severed Symmetry"
-date: 2026-10-05 09:04:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Crypto"]
 tags: ["crypto", "multivariate", "finite-field"]
 description: "Bài giải Severed Symmetry: tìm cấu trúc ẩn của hệ đa thức trên F17 và giải mã ba khối."

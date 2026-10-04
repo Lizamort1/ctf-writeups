@@ -1,6 +1,6 @@
 ---
 title: "Lamp Drill"
-date: 2026-10-05 09:00:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Hardware Reverse Engineering"]
 tags: ["hardware", "logic-gates", "svg"]
 description: "Bài giải Lamp Drill của CSS CTF 2026: đọc bảng chân trị, giải mã các hàng đèn thành ký tự."

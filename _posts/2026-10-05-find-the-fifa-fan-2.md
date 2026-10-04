@@ -1,6 +1,6 @@
 ---
 title: "Find the FIFA Fan 2/2"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "OSINT"]
 tags: ["cdctf", "osint"]
 description: "Bài giải Find the FIFA Fan 2/2 trong CDCTF 2026."

@@ -1,6 +1,6 @@
 ---
 title: "The Astrolobe Overwrite"
-date: 2026-10-05 09:03:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Misc"]
 tags: ["misc", "virtual-machine", "self-modifying-code"]
 description: "Bài giải The Astrolobe Overwrite: dựng telemetry cho máy ảo tự sửa mã và vượt cổng ba vòng."

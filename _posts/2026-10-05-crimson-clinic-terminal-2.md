@@ -1,6 +1,6 @@
 ---
 title: "Crimson Clinic Terminal 2: Triage"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "AI"]
 tags: ["cdctf", "ai"]
 description: "Bài giải Crimson Clinic Terminal 2: Triage trong CDCTF 2026."

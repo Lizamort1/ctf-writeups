@@ -1,6 +1,6 @@
 ---
 title: "Ghost in the Pool"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "Forensics"]
 tags: ["cdctf", "forensics"]
 description: "Bài giải Ghost in the Pool trong CDCTF 2026."

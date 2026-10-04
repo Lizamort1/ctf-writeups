@@ -1,6 +1,6 @@
 ---
 title: "Welcome to Crimson Clinic BONUS 5"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "OSINT"]
 tags: ["cdctf", "osint"]
 description: "Bài giải Welcome to Crimson Clinic BONUS 5 trong CDCTF 2026."

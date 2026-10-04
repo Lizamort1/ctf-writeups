@@ -1,6 +1,6 @@
 ---
 title: "Jeffery Barrett 2: Bury the Hatchet"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "AI"]
 tags: ["cdctf", "ai"]
 description: "Bài giải Jeffery Barrett 2: Bury the Hatchet trong CDCTF 2026."

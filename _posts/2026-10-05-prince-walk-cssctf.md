@@ -1,6 +1,6 @@
 ---
 title: "prince walk"
-date: 2026-10-05 09:01:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Reverse Engineering"]
 tags: ["reverse", "elf", "unicorn"]
 description: "Bài giải prince walk: phân tích chương trình ELF và chạy hàm giải mã tại tọa độ đích."

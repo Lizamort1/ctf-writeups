@@ -1,6 +1,6 @@
 ---
 title: "Maintenance Log"
-date: 2026-10-05 09:45:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Pwn"]
 tags: ["pwn", "stack-pivot", "off-by-one"]
 description: "Bài giải Maintenance Log: rò địa chỉ buffer và chuyển hướng stack."

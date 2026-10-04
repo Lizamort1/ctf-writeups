@@ -1,6 +1,6 @@
 ---
 title: "Jeffery Barrett 1: The Gag Order"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "AI"]
 tags: ["cdctf", "ai"]
 description: "Bài giải Jeffery Barrett 1: The Gag Order trong CDCTF 2026."

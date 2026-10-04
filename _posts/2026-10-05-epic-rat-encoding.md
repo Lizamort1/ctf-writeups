@@ -1,6 +1,6 @@
 ---
 title: "Epic Rat Encoding"
-date: 2026-10-05 09:30:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "Reverse Engineering"]
 tags: ["cdctf", "reverse-engineering"]
 description: "Bài giải Epic Rat Encoding trong CDCTF 2026."

@@ -1,6 +1,6 @@
 ---
 title: "Welcome to Nexus"
-date: 2026-10-05 09:47:00 +0700
+date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Welcome"]
 tags: ["welcome"]
 description: "Bài mở đầu CSS CTF 2026 Return of Nexus."
