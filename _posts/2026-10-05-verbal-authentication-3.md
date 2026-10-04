@@ -19,7 +19,7 @@ description: "Bài giải Verbal Authentication Transmissions 3/5: Pretty Good P
 
 ## Cách giải
 
-Khôi phục passphrase từ gợi ý và dùng GnuPG giải thông điệp. Tệp plaintext sau giải mã bắt đầu bằng “Good work:” rồi chứa flag; giữ nguyên chữ hoa và chữ số trong chuỗi.
+Passphrase `Password123!` mở được khóa PGP. Dùng GnuPG giải thông điệp; kiểm tra CRC24 của bản mã và kết quả `GOODMDC`. Bản rõ bắt đầu bằng “Good work:” rồi chứa flag; giữ nguyên chữ hoa và chữ số trong chuỗi.
 
 ⇒ **Flag:** `cdctf{pr3t7y_g00d_piv4cy_fl4G}`
 
@@ -33,7 +33,7 @@ The challenge provides a passphrase-protected PGP message. Use the ASCII-armored
 
 ## Solution
 
-Recover the passphrase from the clues and decrypt the message with GnuPG. The resulting plaintext begins “Good work:” and then contains the flag; preserve its original capitalization and digits.
+The passphrase `Password123!` unlocks the PGP key. Decrypt the message with GnuPG, checking the ciphertext CRC24 and `GOODMDC` result. The plaintext begins “Good work:” and then contains the flag; preserve its capitalization and digits.
 
 ⇒ **Flag:** `cdctf{pr3t7y_g00d_piv4cy_fl4G}`
 

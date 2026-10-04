@@ -199,6 +199,11 @@ class BlogPresentationTests(unittest.TestCase):
             self.assertEqual(2, len(flags), post.name)
             self.assertEqual(flags[0], flags[1], post.name)
 
+    def test_new_post_images_do_not_apply_baseurl_twice(self):
+        for post in (ROOT / "_posts").glob("2026-10-05-*.md"):
+            content = post.read_text(encoding="utf-8")
+            self.assertNotRegex(content, r"!\[[^\]]*\]\(\{\{.*relative_url.*\}\}\)", post.name)
+
     def test_shared_template_has_language_controller(self):
 
         head = (ROOT / "_includes" / "head.html").read_text(encoding="utf-8")
