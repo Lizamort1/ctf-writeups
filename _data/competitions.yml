@@ -4,6 +4,18 @@
   image_source: https://pointeroverflowctf.com/img/logo-mini.png
   description_vn: Bài giải POCTF 2026 theo các mảng OSINT, Web, Crypto, Forensics, Exploitation, Reverse Engineering, Steganography và Misc.
   description_en: POCTF 2026 writeups across OSINT, Web, Crypto, Forensics, Exploitation, Reverse Engineering, Steganography, and Misc.
+- name: CSS CTF 2026
+  slug: cssctf-2026
+  image: /assets/img/competitions/cssctf-2026.png
+  image_source: https://ctf.cybersecurity.sydney/files/248924e5a50cbb9186175c07297c7f08/Silver_logo.png
+  description_vn: Bài giải CSS CTF 2026 từ cuộc thi Return of Nexus.
+  description_en: Writeups from CSS CTF 2026 Return of Nexus.
+- name: CDCTF 2026
+  slug: cdctf-2026
+  image: /assets/img/competitions/cdctf-2026.png
+  image_source: https://www.cdctf.net/files/cdctf-theme/cd-logo.png
+  description_vn: Bài giải Crimson Defense CTF 2026 theo từng thử thách.
+  description_en: Challenge writeups from Crimson Defense CTF 2026.
 - name: H7CTF 2026
   slug: h7ctf-2026
   image: /assets/img/competitions/h7ctf-2026.png

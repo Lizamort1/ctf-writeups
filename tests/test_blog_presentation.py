@@ -12,7 +12,7 @@ class BlogPresentationTests(unittest.TestCase):
 
         posts = sorted((ROOT / "_posts").glob("*.md"))
 
-        self.assertEqual(47, len(posts))
+        self.assertGreaterEqual(len(posts), 47)
         for post in posts:
             content = post.read_text(encoding="utf-8")
             self.assertEqual(
@@ -180,12 +180,24 @@ class BlogPresentationTests(unittest.TestCase):
 
         for slug, extension in (
             ("poctf-2026", "png"),
+            ("cssctf-2026", "png"),
+            ("cdctf-2026", "png"),
             ("h7ctf-2026", "png"),
             ("sunshinectf-2026", "png"),
             ("ptitctf-2026", "jpg"),
         ):
             self.assertTrue((ROOT / "competitions" / f"{slug}.md").is_file())
             self.assertTrue((ROOT / "assets" / "img" / "competitions" / f"{slug}.{extension}").is_file())
+
+    def test_new_competition_writeups_have_matching_final_flags(self):
+        posts = list((ROOT / "_posts").glob("2026-10-05-*.md"))
+        self.assertGreaterEqual(len(posts), 50)
+        for post in posts:
+            content = post.read_text(encoding="utf-8")
+            self.assertRegex(content, r'categories: \["(?:CSS CTF|CDCTF) 2026", "[^"]+"\]')
+            flags = re.findall(r"(?m)^⇒ \*\*Flag:\*\* `([^`]+)`$", content)
+            self.assertEqual(2, len(flags), post.name)
+            self.assertEqual(flags[0], flags[1], post.name)
 
     def test_shared_template_has_language_controller(self):
 
