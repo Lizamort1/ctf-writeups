@@ -21,6 +21,15 @@ description: "Bài giải Luke Luck Likes Lakes 69 trong CDCTF 2026."
 
 Mở đúng vị trí trên Google Maps thấy nhãn “Jack Zou Lake”. Dùng tên hiển thị trên bản đồ thay cho tên địa lý ban đầu; người chơi đã xác nhận flag này đúng.
 
+```mermaid
+flowchart LR
+  A["Nhận dạng hồ ở Ontario"]
+  B["Mở vị trí trên Google Maps"]
+  C["Đọc nhãn hiển thị"]
+  D["Dùng Jack Zou Lake"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Jack Zou Lake}`
 
 </div>
@@ -34,6 +43,15 @@ The satellite image depicts a lake in Ontario. Comparing shorelines with maps po
 ## Solution
 
 The same spot is labeled “Jack Zou Lake” on Google Maps. Use the displayed map label rather than the initial geographic name; the player confirmed this flag.
+
+```mermaid
+flowchart LR
+  A["Identify the Ontario lake"]
+  B["Open the location in Google Maps"]
+  C["Read the displayed label"]
+  D["Use Jack Zou Lake"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Jack Zou Lake}`
 

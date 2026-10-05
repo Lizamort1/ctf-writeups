@@ -21,6 +21,15 @@ Tệp message_encoder.c biến thông điệp thành các số lớn. Đọc l�
 
 Chuyển từng số về tám byte big-endian rồi ghép theo thứ tự ban đầu. Bản rõ hẹn gặp tại Tom Bevill Building vào trưa thứ Năm tuần sau; mã hóa ngược xác nhận khớp cả tám số đầu vào.
 
+```mermaid
+flowchart LR
+  A["Đọc quy tắc trong message_encoder.c"]
+  B["Đổi số về 8 byte big-endian"]
+  C["Ghép các khối theo thứ tự"]
+  D["Đọc thông điệp và flag"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Tom_Bevill_Building_at_noon_next_week_Thursday}`
 
 </div>
@@ -34,6 +43,15 @@ The message_encoder.c file turns a message into large integers. Reverse its conv
 ## Solution
 
 Convert every integer to eight big-endian bytes and concatenate the blocks in order. The plaintext names Tom Bevill Building at noon next Thursday; encoding it again matches all eight input integers.
+
+```mermaid
+flowchart LR
+  A["Read the rule in message_encoder.c"]
+  B["Convert each number to 8-byte big-endian"]
+  C["Join the blocks in order"]
+  D["Read the message and flag"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Tom_Bevill_Building_at_noon_next_week_Thursday}`
 

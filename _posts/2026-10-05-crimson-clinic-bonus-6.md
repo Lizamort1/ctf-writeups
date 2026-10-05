@@ -21,6 +21,15 @@ Bài của Lora Wang ngày 22/03/2026 nói cô nhận nuôi một chú chó con 
 
 Hashtag Goldy4Ever trong bài sau tiết lộ tên Goldy. Dùng đúng cách viết đó trong flag.
 
+```mermaid
+flowchart LR
+  A["Đọc bài của Lora Wang"]
+  B["Tìm bài của bạn cùng phòng"]
+  C["Nhận ra hashtag Goldy4Ever"]
+  D["Lấy tên Goldy"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Goldy}`
 
 </div>
@@ -34,6 +43,15 @@ Lora Wang’s 22 March 2026 post says she adopted a puppy but does not name it. 
 ## Solution
 
 The hashtag Goldy4Ever reveals the name Goldy. Use that exact spelling in the flag.
+
+```mermaid
+flowchart LR
+  A["Read Lora Wang's post"]
+  B["Find the roommate's post"]
+  C["Spot the Goldy4Ever hashtag"]
+  D["Recover the name Goldy"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Goldy}`
 

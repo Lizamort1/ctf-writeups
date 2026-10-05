@@ -21,6 +21,16 @@ Sau khi biết người Jeffery ghét là Francis Miller, nhiệm vụ mới yê
 
 Đưa từng sự việc riêng: Francis xử lý sai sót bảo hiểm, tự tìm nguyên nhân các hồ sơ bị từ chối, rồi cảm ơn và giúp đồng nghiệp hoàn thành ca làm. Khi ba định kiến INSURERS, DUMB và PRICK lần lượt được gỡ, bot trả về flag; người chơi đã xác nhận kết quả.
 
+```mermaid
+flowchart LR
+  A["Xác định ba định kiến"]
+  B["Gửi từng sự việc riêng"]
+  C["Gỡ INSURERS"]
+  D["Gỡ DUMB và PRICK"]
+  E["Nhận flag từ bot"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{th1s_guy_1snt_s0_b@d!}`
 
 </div>
@@ -34,6 +44,16 @@ After identifying Francis Miller, the sequel asks us to change Jeffery’s opini
 ## Solution
 
 Present one incident at a time: Francis resolves an insurance issue, independently diagnoses denied claims, and thanks and helps a colleague after a long shift. Clearing the INSURERS, DUMB, and PRICK objections in order makes the bot return the flag, which the player confirmed.
+
+```mermaid
+flowchart LR
+  A["Identify the three biases"]
+  B["Send each incident separately"]
+  C["Clear INSURERS"]
+  D["Clear DUMB and PRICK"]
+  E["Receive the bot flag"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{th1s_guy_1snt_s0_b@d!}`
 

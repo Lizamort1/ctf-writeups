@@ -21,6 +21,15 @@ Tìm bài đăng của Emily Peterson về bữa tiệc Giáng sinh công ty. B�
 
 Tên con mèo xuất hiện nguyên văn trong phần chú thích bài đăng: Bubba. Giữ đúng chữ hoa đầu tên theo định dạng đề.
 
+```mermaid
+flowchart LR
+  A["Tìm bài đăng của Emily"]
+  B["Theo dõi câu chuyện bữa tiệc"]
+  C["Đọc tên mèo của Jeffery"]
+  D["Giữ đúng chữ hoa"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Bubba}`
 
 </div>
@@ -34,6 +43,15 @@ Find Emily Peterson’s post about the company Christmas party. It says she met 
 ## Solution
 
 The post explicitly names the cat Bubba. Preserve the initial capital letter in the challenge’s requested format.
+
+```mermaid
+flowchart LR
+  A["Find Emily's post"]
+  B["Follow the company-party story"]
+  C["Read Jeffery's cat name"]
+  D["Preserve the capitalization"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Bubba}`
 

@@ -21,6 +21,15 @@ description: "Bài giải Welcome to Crimson Clinic BONUS 4 trong CDCTF 2026."
 
 Một bài viết cảm ơn mẹ của Mrs. Barrett-Reynolds mang món peach cobbler tới buổi họp mặt; bài của Brandon Barrett cũng nhắc món mẹ thường làm. Dùng tên món với dấu cách như cú pháp mẫu.
 
+```mermaid
+flowchart LR
+  A["Tìm bài đăng gia đình Barrett"]
+  B["Đối chiếu bài về buổi họp mặt"]
+  C["Xác định món tráng miệng"]
+  D["Giữ dấu cách trong đáp án"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{peach cobbler}`
 
 </div>
@@ -34,6 +43,15 @@ The challenge asks for Maryanne Barrett’s signature dessert. Search Crimson So
 ## Solution
 
 A post thanks Mrs. Barrett-Reynolds’s mother for bringing peach cobbler; Brandon Barrett also mentions his mother’s usual dessert. Use the dish name with a space, matching the prompt’s format.
+
+```mermaid
+flowchart LR
+  A["Search the Barrett family posts"]
+  B["Cross-check the gathering post"]
+  C["Identify the dessert"]
+  D["Preserve the space in the answer"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{peach cobbler}`
 

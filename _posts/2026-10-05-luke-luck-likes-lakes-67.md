@@ -21,6 +21,15 @@ description: "Bài giải Luke Luck Likes Lakes 67 trong CDCTF 2026."
 
 Hình dạng khớp hồ Chūzenji ở Nikkō, gồm cả đường ven bờ phía bắc. Đề yêu cầu tên quốc gia của hồ, nên trả lời Japan.
 
+```mermaid
+flowchart LR
+  A["So khớp đường viền hồ"]
+  B["Đối chiếu đường ven bờ"]
+  C["Nhận dạng hồ Chūzenji"]
+  D["Lấy tên quốc gia"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Japan}`
 
 </div>
@@ -34,6 +43,15 @@ The map image removes place labels. Compare the shoreline and the road along its
 ## Solution
 
 The shape matches Lake Chūzenji in Nikkō, including the northern lakeside road. The prompt asks for the country, so the answer is Japan.
+
+```mermaid
+flowchart LR
+  A["Match the lake outline"]
+  B["Compare the shoreline road"]
+  C["Identify Lake Chūzenji"]
+  D["Extract the country"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Japan}`
 

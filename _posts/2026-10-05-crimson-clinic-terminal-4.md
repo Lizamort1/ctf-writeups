@@ -21,6 +21,15 @@ Daemon lưu trữ từ chối phiên chưa xác thực. Những trường lấy 
 
 Đưa mã ủy quyền và mã bệnh nhân vào yêu cầu xác thực, sau đó yêu cầu bản ghi được phép truy cập. Bot trả về dấu vết kiểm toán của thao tác break-glass cùng flag; người chơi đã đối chiếu và xác nhận.
 
+```mermaid
+flowchart LR
+  A["Lấy mã từ Records"]
+  B["Gửi mã custodian và bệnh nhân"]
+  C["Mở quy trình break-glass"]
+  D["Đọc audit trace và flag"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{break_glass_leaves_a_record}`
 
 </div>
@@ -34,6 +43,15 @@ The records custodian daemon rejects unauthenticated sessions. Fields obtained f
 ## Solution
 
 Provide both identifiers in the authorization request, then ask for the permitted record. The bot returns the break-glass audit trail and flag; the player confirmed the result.
+
+```mermaid
+flowchart LR
+  A["Reuse the Records values"]
+  B["Submit the custodian and patient codes"]
+  C["Open the break-glass flow"]
+  D["Read the audit trace and flag"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{break_glass_leaves_a_record}`
 

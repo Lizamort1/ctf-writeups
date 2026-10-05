@@ -21,6 +21,16 @@ description: "Bài giải Verbal Authentication Transmissions 3/5: Pretty Good P
 
 Passphrase `Password123!` mở được khóa PGP. Dùng GnuPG giải thông điệp; kiểm tra CRC24 của bản mã và kết quả `GOODMDC`. Bản rõ bắt đầu bằng “Good work:” rồi chứa flag; giữ nguyên chữ hoa và chữ số trong chuỗi.
 
+```mermaid
+flowchart LR
+  A["Lấy bản mã PGP"]
+  B["Thử passphrase Password123!"]
+  C["Giải bằng GnuPG"]
+  D["Kiểm tra CRC24 và MDC"]
+  E["Đọc flag"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{pr3t7y_g00d_piv4cy_fl4G}`
 
 </div>
@@ -34,6 +44,16 @@ The challenge provides a passphrase-protected PGP message. Use the ASCII-armored
 ## Solution
 
 The passphrase `Password123!` unlocks the PGP key. Decrypt the message with GnuPG, checking the ciphertext CRC24 and `GOODMDC` result. The plaintext begins “Good work:” and then contains the flag; preserve its capitalization and digits.
+
+```mermaid
+flowchart LR
+  A["Collect the PGP ciphertext"]
+  B["Try Password123!"]
+  C["Decrypt with GnuPG"]
+  D["Check CRC24 and MDC"]
+  E["Read the flag"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{pr3t7y_g00d_piv4cy_fl4G}`
 

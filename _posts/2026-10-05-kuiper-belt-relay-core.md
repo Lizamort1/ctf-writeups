@@ -36,6 +36,16 @@ io.interactive()
 
 Khi hàm `vuln()` thực hiện `ret`, RIP được thay bằng địa chỉ `win()`, chương trình đọc flag từ server.
 
+```mermaid
+flowchart LR
+  A["Gửi input vào gets()"]
+  B["Tràn 64 byte buffer"]
+  C["Bỏ qua 8 byte saved RBP"]
+  D["Ghi đè RIP bằng win()"]
+  E["Đọc flag.txt"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `CSSCTF{s1gn4l_r3c0v3r3d_fr0m_th3_v01d}`
 
 </div>
@@ -64,6 +74,16 @@ io.interactive()
 ```
 
 When `vuln()` executes `ret`, RIP is replaced with `win()`, which reads the flag from the server.
+
+```mermaid
+flowchart LR
+  A["Send input to gets()"]
+  B["Overflow the 64-byte buffer"]
+  C["Skip the 8-byte saved RBP"]
+  D["Overwrite RIP with win()"]
+  E["Read flag.txt"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `CSSCTF{s1gn4l_r3c0v3r3d_fr0m_th3_v01d}`
 

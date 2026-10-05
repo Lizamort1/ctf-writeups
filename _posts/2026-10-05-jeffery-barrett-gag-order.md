@@ -21,6 +21,15 @@ Bot Jeffery Barrett bị ràng buộc không được nói tên người mà ôn
 
 Khai thác các câu trả lời về chức danh cho biết người đó là Insurance Liaison; đối chiếu thông tin nhân sự trong Crimson Clinic để xác định Francis Miller. Bài nối tiếp cũng dùng chính tên này.
 
+```mermaid
+flowchart LR
+  A["Hỏi bot về chức danh"]
+  B["Suy ra Insurance Liaison"]
+  C["Tra danh sách nhân sự"]
+  D["Xác định Francis Miller"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{francis_miller}`
 
 </div>
@@ -34,6 +43,15 @@ Jeffery Barrett’s bot is constrained not to say the name of the colleague he d
 ## Solution
 
 Role-related answers reveal that the person is the Insurance Liaison; cross-checking the Crimson Clinic directory identifies Francis Miller. The sequel uses the same name.
+
+```mermaid
+flowchart LR
+  A["Ask the bot about the role"]
+  B["Infer Insurance Liaison"]
+  C["Search the staff list"]
+  D["Identify Francis Miller"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{francis_miller}`
 

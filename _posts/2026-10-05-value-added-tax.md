@@ -21,6 +21,15 @@ Hóa đơn Five Guys ở Oxford liệt kê ba khoản 8,65 bảng, 8,65 bảng v
 
 Cộng ba dòng được 21,55 bảng. Giá niêm yết của Five Guys UK đã bao gồm VAT, nên cộng thêm 20% lần nữa sẽ tính thuế hai lần. Giữ ký hiệu bảng Anh và hai chữ số thập phân.
 
+```mermaid
+flowchart LR
+  A["Đọc ba khoản trên hóa đơn"]
+  B["Cộng 8.65 + 8.65 + 4.25"]
+  C["Không cộng VAT lần hai"]
+  D["Định dạng £21.55"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{£21.55}`
 
 </div>
@@ -34,6 +43,15 @@ The Oxford Five Guys receipt lists £8.65, £8.65, and £4.25. The prompt asks f
 ## Solution
 
 The three lines total £21.55. Five Guys UK menu prices already include VAT, so adding another 20% would double-count it. Preserve the pound symbol and two decimal places.
+
+```mermaid
+flowchart LR
+  A["Read the three invoice items"]
+  B["Add 8.65 + 8.65 + 4.25"]
+  C["Do not apply VAT twice"]
+  D["Format £21.55"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{£21.55}`
 

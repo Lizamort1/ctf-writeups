@@ -21,6 +21,15 @@ description: "Bài giải Find the FIFA Fan 2/2 trong CDCTF 2026."
 
 Đối chiếu lịch các trận tại Lumen Field: trận Bosnia and Herzegovina gặp Qatar ngày 24/06 đã kết thúc 3–1; trận ngày 26/06 diễn ra sau giờ chụp và hòa. Vì vậy đội thắng trận người hâm mộ vừa xem là Bosnia and Herzegovina.
 
+```mermaid
+flowchart LR
+  A["Đọc EXIF và vị trí ảnh"]
+  B["Xác định Westfield Southcenter"]
+  C["Đối chiếu lịch Lumen Field"]
+  D["Chọn đội thắng trận"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Bosnia and Herzegovina}`
 
 </div>
@@ -34,6 +43,15 @@ The photos place the fan at Westfield Southcenter near Seattle. EXIF on two imag
 ## Solution
 
 Compare games at Lumen Field: Bosnia and Herzegovina defeated Qatar 3–1 on 24 June; the 26 June game began after the photo and ended level. The winner of the game the fan had seen is therefore Bosnia and Herzegovina.
+
+```mermaid
+flowchart LR
+  A["Read the image EXIF and location"]
+  B["Identify Westfield Southcenter"]
+  C["Check the Lumen Field schedule"]
+  D["Select the winning team"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Bosnia and Herzegovina}`
 

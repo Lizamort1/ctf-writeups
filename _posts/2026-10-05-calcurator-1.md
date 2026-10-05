@@ -21,6 +21,15 @@ Phân tích ELF calculator để tìm tên mà tiến trình con sử dụng sau
 
 Nhánh độc hại gọi fork rồi setsid, sau đó dùng strncpy ghi chuỗi wpad vào argv[0] và xóa các đối số còn lại. Tên tiến trình mới chính là nội dung flag.
 
+```mermaid
+flowchart LR
+  A["Phân tích ELF calculator"]
+  B["Theo dõi fork và setsid"]
+  C["Quan sát strncpy vào argv[0]"]
+  D["Khôi phục tên wpad"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{wpad}`
 
 </div>
@@ -34,6 +43,15 @@ Analyze the calculator ELF to find the process name adopted by its child after l
 ## Solution
 
 The malicious branch calls fork and setsid, then uses strncpy to write wpad into argv[0] and clears the remaining arguments. That new process name supplies the flag.
+
+```mermaid
+flowchart LR
+  A["Analyze the calculator ELF"]
+  B["Trace fork and setsid"]
+  C["Observe strncpy writing argv[0]"]
+  D["Recover the name wpad"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{wpad}`
 

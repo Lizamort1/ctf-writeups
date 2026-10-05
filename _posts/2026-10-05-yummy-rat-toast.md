@@ -21,6 +21,15 @@ description: "Bài giải Yummy Rat Toast trong CDCTF 2026."
 
 Xây từ điển theo nhân vật phim và biến thể có số. Chuỗi “Alfredo Linguini01” cho đúng MD5 đã cho. Đặt nguyên chuỗi này trong cặp ngoặc của flag, gồm cả dấu cách.
 
+```mermaid
+flowchart LR
+  A["Lập từ điển nhân vật Ratatouille"]
+  B["Sinh các biến thể có số"]
+  C["Tính MD5 từng ứng viên"]
+  D["Khớp Alfredo Linguini01"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Alfredo Linguini01}`
 
 </div>
@@ -34,6 +43,15 @@ The challenge supplies MD5 hash 3f1ebefc63dc39f3c9b934a30accb221 and a Ratatouil
 ## Solution
 
 Build a character-themed word list with numeric variants. “Alfredo Linguini01” hashes to the supplied MD5. Place the exact string inside the flag braces, including its space.
+
+```mermaid
+flowchart LR
+  A["Build a Ratatouille character dictionary"]
+  B["Generate numbered variants"]
+  C["Hash each candidate with MD5"]
+  D["Match Alfredo Linguini01"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Alfredo Linguini01}`
 

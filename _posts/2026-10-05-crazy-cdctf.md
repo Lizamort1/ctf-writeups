@@ -21,6 +21,16 @@ Tệp văn bản 496.800 byte lặp một khối chín dòng mười lần. So s
 
 Sai khác bắt đầu ở offset 297115. Thay đoạn khác biệt trở lại câu gốc làm cả mười khối giống hệt nhau; vì vậy lấy nguyên văn đoạn leetspeak, giữ cả khoảng trắng.
 
+```mermaid
+flowchart LR
+  A["Chia tệp thành các khối"]
+  B["So sánh mười bản sao"]
+  C["Tìm offset khác biệt"]
+  D["Đọc đoạn leetspeak"]
+  E["Đặt vào flag"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{1 w@5 cr@zy 0nc3}`
 
 </div>
@@ -34,6 +44,16 @@ The 496,800-byte text repeats one nine-line block ten times. Comparing the block
 ## Solution
 
 The difference begins at offset 297115. Restoring the original sentence makes all ten blocks identical, so the exceptional leetspeak text, including its spaces, is the answer.
+
+```mermaid
+flowchart LR
+  A["Split the file into blocks"]
+  B["Compare the ten copies"]
+  C["Locate the differing offset"]
+  D["Read the leetspeak segment"]
+  E["Format the flag"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{1 w@5 cr@zy 0nc3}`
 

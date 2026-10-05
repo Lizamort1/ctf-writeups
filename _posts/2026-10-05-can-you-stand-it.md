@@ -21,6 +21,15 @@ Bài thơ gợi tới Guy Standing và ảnh trên Wikipedia. Xem lịch sử tr
 
 Trong bản sửa ngày 17/10/2023, tài khoản Geneva2009 tự nhận là vợ của Guy Standing và đề nghị bỏ ảnh gây hiểu lầm. Tên tài khoản với chữ G viết hoa là đáp án.
 
+```mermaid
+flowchart LR
+  A["Nhận dạng Guy Standing"]
+  B["Mở lịch sử trang Wikipedia"]
+  C["Đọc thảo luận về ảnh"]
+  D["Xác định tài khoản yêu cầu đổi ảnh"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Geneva2009}`
 
 </div>
@@ -34,6 +43,15 @@ The poem points to Guy Standing and his Wikipedia photo. Inspect the page histor
 ## Solution
 
 In the 17 October 2023 edit, account Geneva2009 identifies herself as Guy Standing’s wife and asks to remove the misleading image. The username, with an uppercase G, is the answer.
+
+```mermaid
+flowchart LR
+  A["Identify Guy Standing"]
+  B["Open the Wikipedia revision history"]
+  C["Read the image discussion"]
+  D["Find the account requesting the change"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Geneva2009}`
 

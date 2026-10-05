@@ -21,6 +21,16 @@ Giai đoạn hai yêu cầu đăng nhập quản trị bằng mật khẩu yếu
 
 Đối chiếu trò chơi Madden NFL 2004, nhân vật trên bìa là Michael Vick, với năm sinh 1989 của con trai Brandon. Mật khẩu theo mẫu đó mở dashboard quản trị, nơi chứa flag của giai đoạn này.
 
+```mermaid
+flowchart LR
+  A["Đọc hồ sơ Jeffery Barrett"]
+  B["Suy ra Michael Vick và 1989"]
+  C["Dựng mật khẩu yếu"]
+  D["Đăng nhập dashboard"]
+  E["Đọc flag"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{Whats-a-password-policy-anyways?}`
 
 </div>
@@ -34,6 +44,16 @@ Stage two requires administrator access using an executive’s weak password. Cr
 ## Solution
 
 Correlate the cover athlete of Madden NFL 2004, Michael Vick, with Brandon’s birth year, 1989. The resulting pattern opens the admin dashboard, which contains this stage’s flag.
+
+```mermaid
+flowchart LR
+  A["Read Jeffery Barrett's profile"]
+  B["Infer Michael Vick and 1989"]
+  C["Build the weak password"]
+  D["Log in to the dashboard"]
+  E["Read the flag"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{Whats-a-password-policy-anyways?}`
 

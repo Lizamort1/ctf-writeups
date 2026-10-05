@@ -21,6 +21,16 @@ Gói tệp chứa key.txt và super_secret.txt. Dữ liệu mã hóa dùng AES-2
 
 Băm mật khẩu bằng SHA-256 để tạo khóa, lấy 16 byte đầu của SHA-256(khóa nối mật khẩu) làm IV, giải CBC và bỏ padding. XOR từng byte với 0x0A cho ra flag. Mã hóa lại kết quả và so sánh đúng ciphertext gốc để kiểm chứng.
 
+```mermaid
+flowchart LR
+  A["Lấy key.txt và super_secret.txt"]
+  B["Băm mật khẩu bằng SHA-256"]
+  C["Dẫn xuất IV và giải AES-CBC"]
+  D["XOR với 0x0A"]
+  E["Kiểm tra ciphertext"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{We're_@LL_Mad_h3rE!}`
 
 </div>
@@ -34,6 +44,16 @@ The supplied bundle contains key.txt and super_secret.txt. The ciphertext uses u
 ## Solution
 
 SHA-256 the password to derive the key, take the first 16 bytes of SHA-256(key concatenated with password) as the IV, then decrypt CBC and unpad. XOR each byte with 0x0A to obtain the flag. Re-encrypting the result reproduces the original ciphertext.
+
+```mermaid
+flowchart LR
+  A["Collect key.txt and super_secret.txt"]
+  B["Hash the password with SHA-256"]
+  C["Derive the IV and decrypt AES-CBC"]
+  D["XOR with 0x0A"]
+  E["Verify against the ciphertext"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{We're_@LL_Mad_h3rE!}`
 

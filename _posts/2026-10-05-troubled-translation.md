@@ -29,6 +29,16 @@ Các tin nhắn lúc 9:33–9:35 tiếp tục nhắc lại McDonald's, xác nh�
 điền vào cờ. Dấu nháy ASCII trong tên thương hiệu là một phần của đáp án; biến thể bỏ dấu nháy bị từ
 chối.
 
+```mermaid
+flowchart LR
+  A["Giải nén năm ảnh JPEG"]
+  B["Đọc ảnh theo thứ tự 5 đến 1"]
+  C["Theo dõi tin nhắn sửa địa điểm"]
+  D["Xác định McDonald's ở Chicago"]
+  E["Giữ dấu nháy trong flag"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{McDonald's_in_Chicago}`
 
 </div>
@@ -49,6 +59,16 @@ location as a McDonald's in Chicago, rather than a generic US restaurant or a Ge
 
 Messages at 09:33–09:35 repeat the McDonald's reference and confirm the business/city pair. The ASCII
 apostrophe in the brand name is part of the accepted answer; the spelling without it was rejected.
+
+```mermaid
+flowchart LR
+  A["Extract the five JPEGs"]
+  B["Read them from 5 to 1"]
+  C["Follow the location correction"]
+  D["Identify McDonald's in Chicago"]
+  E["Preserve the apostrophe in the flag"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{McDonald's_in_Chicago}`
 

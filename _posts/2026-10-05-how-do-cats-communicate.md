@@ -21,6 +21,16 @@ Tệp âm thanh communiCATions.wav có chuỗi xung ngắn ở một kênh. Quan
 
 Biến xung ngắn thành dấu chấm, xung dài thành dấu gạch, và phân tách chữ theo khoảng nghỉ để đọc mã Morse. Mã hóa ngược thông điệp đã đọc tái tạo đúng cả 137 mẫu tín hiệu trong vùng được chọn.
 
+```mermaid
+flowchart LR
+  A["Đo độ dài xung âm thanh"]
+  B["Đổi xung ngắn thành chấm"]
+  C["Đổi xung dài thành gạch"]
+  D["Tách chữ theo khoảng nghỉ"]
+  E["Giải mã Morse"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{I WANT TO EAT FISHIES}`
 
 </div>
@@ -34,6 +44,16 @@ The communiCATions.wav audio contains a short pulse sequence in one channel. The
 ## Solution
 
 Map short pulses to dots and long pulses to dashes, then split letters using the pauses to read Morse code. Re-encoding the decoded message reproduces all 137 samples in the selected signal region exactly.
+
+```mermaid
+flowchart LR
+  A["Measure the audio pulse widths"]
+  B["Map short pulses to dots"]
+  C["Map long pulses to dashes"]
+  D["Split letters by gaps"]
+  E["Decode Morse"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{I WANT TO EAT FISHIES}`
 

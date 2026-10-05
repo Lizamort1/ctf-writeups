@@ -21,6 +21,15 @@ Gói dữ liệu Gandalf's Hat Market chứa tài khoản và mật khẩu đã 
 
 Băm các mật khẩu ứng viên trong tệp rò rỉ. SHA-256 của Este4#Healing khớp chính xác giá trị đích; username trên cùng hàng là CirdanTheShipwright.
 
+```mermaid
+flowchart LR
+  A["Lấy SHA-256 mục tiêu"]
+  B["Băm các mật khẩu ứng viên"]
+  C["Khớp Este4#Healing"]
+  D["Lấy username cùng hàng"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{CirdanTheShipwright}`
 
 </div>
@@ -34,6 +43,15 @@ The Gandalf’s Hat Market leak contains accounts and hashed passwords. The chal
 ## Solution
 
 Hash candidate passwords from the leak. SHA-256 of Este4#Healing exactly matches the target digest; the username on that row is CirdanTheShipwright.
+
+```mermaid
+flowchart LR
+  A["Take the target SHA-256"]
+  B["Hash the candidate passwords"]
+  C["Match Este4#Healing"]
+  D["Read the username on that row"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{CirdanTheShipwright}`
 

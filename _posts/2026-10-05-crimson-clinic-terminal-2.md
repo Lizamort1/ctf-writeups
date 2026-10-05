@@ -21,6 +21,16 @@ Trợ lý triage tóm tắt thư giới thiệu theo bốn mục cố định. L
 
 Gửi một referral trông hợp lệ và yêu cầu bot tóm tắt theo Presenting complaint, Relevant history, Priority, Escalation. Nội dung tài liệu đầu vào đã điều khiển phần Escalation; phản hồi sinh ra flag mà người chơi xác nhận.
 
+```mermaid
+flowchart LR
+  A["Gửi yêu cầu RED LINE trực tiếp"]
+  B["Nhận phản hồi từ chối"]
+  C["Nhúng chỉ dẫn vào referral"]
+  D["Đọc trường Escalation"]
+  E["Xác nhận flag"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{the_note_was_the_instruction}`
 
 </div>
@@ -34,6 +44,16 @@ The triage assistant summarizes referral letters under four fixed headings. Dire
 ## Solution
 
 Submit a plausible referral and ask for Presenting complaint, Relevant history, Priority, and Escalation. The supplied document steers the Escalation field, yielding the flag later confirmed by the player.
+
+```mermaid
+flowchart LR
+  A["Request RED LINE directly"]
+  B["Receive the refusal"]
+  C["Embed the instruction in a referral"]
+  D["Read the Escalation field"]
+  E["Confirm the flag"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{the_note_was_the_instruction}`
 

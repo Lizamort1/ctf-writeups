@@ -21,6 +21,15 @@ Crimson Social có các bài đăng rời rạc về hẹn hò bí mật. Theo d
 
 Những chi tiết về sự kiện speed dating và các lần gặp sau đó ghép được cặp cpickens với meggysmith. Giữ hai username theo thứ tự đó trong flag.
 
+```mermaid
+flowchart LR
+  A["Gom các bài đăng hẹn hò"]
+  B["Đối chiếu thời gian và địa điểm"]
+  C["Xác định hai username"]
+  D["Ghép đúng thứ tự"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{cpickens-meggysmith}`
 
 </div>
@@ -34,6 +43,15 @@ Crimson Social scatters clues about a secret relationship across multiple posts.
 ## Solution
 
 The speed-dating event and later meetings connect cpickens with meggysmith. Keep the two usernames in that order in the flag.
+
+```mermaid
+flowchart LR
+  A["Collect the dating posts"]
+  B["Cross-check times and locations"]
+  C["Identify the two usernames"]
+  D["Join them in order"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{cpickens-meggysmith}`
 

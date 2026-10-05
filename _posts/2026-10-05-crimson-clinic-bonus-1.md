@@ -21,6 +21,15 @@ description: "Bài giải Welcome to Crimson Clinic BONUS 1 trong CDCTF 2026."
 
 Medical Director là Christopher Wilson, Chief Administration Officer là Diane Wang, còn Chief Financial Officer là Jeffery Barrett. Ghép tên đầy đủ theo cú pháp ba người mà đề cho phép.
 
+```mermaid
+flowchart LR
+  A["Mở trang Our Team"]
+  B["Đối chiếu ba chức danh"]
+  C["Lấy tên đầy đủ"]
+  D["Ghép theo thứ tự đề bài"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Christopher Wilson, Diane Wang, Jeffery Barrett}`
 
 </div>
@@ -34,6 +43,15 @@ Cross-check the clinic’s Our Team page with Crimson Social profiles to identif
 ## Solution
 
 The Medical Director is Christopher Wilson, the Chief Administration Officer is Diane Wang, and the Chief Financial Officer is Jeffery Barrett. Join the full names using the three-person format requested by the challenge.
+
+```mermaid
+flowchart LR
+  A["Open the Our Team page"]
+  B["Match the three job titles"]
+  C["Collect the full names"]
+  D["Join them in the requested order"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Christopher Wilson, Diane Wang, Jeffery Barrett}`
 

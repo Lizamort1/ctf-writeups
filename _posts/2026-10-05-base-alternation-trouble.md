@@ -21,6 +21,16 @@ Tệp bat.wav dài khoảng bốn giây chứa tiếng nói bị dịch lên vù
 
 Phân tích phổ rồi dịch tần xuống dải nghe được, lưu âm thanh phục hồi và đối chiếu kết quả nhận dạng. Ba lượt nhận dạng đều đọc cùng ba từ “lark pepsi shed”.
 
+```mermaid
+flowchart LR
+  A["Phân tích phổ bat.wav"]
+  B["Dịch tín hiệu xuống dải nghe"]
+  C["Khôi phục âm thanh"]
+  D["Nhận dạng giọng nói"]
+  E["Ghép từ thành flag"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{lark pepsi shed}`
 
 </div>
@@ -34,6 +44,16 @@ The roughly four-second bat.wav recording carries speech shifted near 20 kHz, ma
 ## Solution
 
 Inspect the spectrum, shift the signal back into the audible band, save the recovered audio, and compare independent transcriptions. Three recognition passes agree on “lark pepsi shed”.
+
+```mermaid
+flowchart LR
+  A["Inspect the bat.wav spectrum"]
+  B["Shift the signal into audible range"]
+  C["Restore the audio"]
+  D["Run speech recognition"]
+  E["Assemble the flag words"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{lark pepsi shed}`
 

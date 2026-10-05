@@ -23,6 +23,16 @@ Phóng SVG để truy vết từng dây theo tọa độ, phân biệt giao nhau
 
 Mẫu 32 bit tìm được là duy nhất và mô phỏng lại cho Override bằng 1. Chia thành bốn byte ASCII cho ra PASS; giữ nguyên 32 bit trong flag theo yêu cầu của đề.
 
+```mermaid
+flowchart LR
+  A["Truy vết dây trong SVG"]
+  B["Tách giao nhau thật và giả"]
+  C["Dựng ràng buộc Boolean"]
+  D["Giải ngược 32 đầu vào"]
+  E["Đổi bit sang ASCII"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `CSSCTF{01010000010000010101001101010011}`
 
 </div>
@@ -38,6 +48,16 @@ The SVG schematic describes a 32-input optical routing matrix. Some wires visual
 Zoom into the SVG and follow each wire by its coordinates, distinguishing connected junctions from simple crossings. Express the logic nodes as Boolean constraints and solve backward from Override to the 32 inputs.
 
 The resulting 32-bit pattern is unique and evaluates Override to 1. Its four ASCII bytes spell PASS; preserve the full bit string in the challenge’s required flag format.
+
+```mermaid
+flowchart LR
+  A["Trace the wires in the SVG"]
+  B["Separate real and false crossings"]
+  C["Build Boolean constraints"]
+  D["Solve the 32 inputs backwards"]
+  E["Convert the bits to ASCII"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `CSSCTF{01010000010000010101001101010011}`
 

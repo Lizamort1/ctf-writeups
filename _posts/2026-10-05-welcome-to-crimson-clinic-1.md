@@ -21,6 +21,15 @@ description: "Bài giải Welcome to Crimson Clinic (1/3) trong CDCTF 2026."
 
 Trong danh sách người dùng Crimson Social có tài khoản mang tên Flag. Trang hồ sơ của tài khoản này hiển thị trực tiếp chuỗi cần nộp ở mục About Me.
 
+```mermaid
+flowchart LR
+  A["Mở trang Crimson Clinic"]
+  B["Lần theo Crimson Social"]
+  C["Tìm tài khoản Flag"]
+  D["Đọc trường About Me"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{Be-Careful-What-You-Post-Online-Kids}`
 
 </div>
@@ -34,6 +43,15 @@ The challenge asks for an OSINT profile of Crimson Clinic. Follow the clinic sta
 ## Solution
 
 Among the Crimson Social users is an account named Flag. Its profile directly exposes the required value in the About Me section.
+
+```mermaid
+flowchart LR
+  A["Open the Crimson Clinic page"]
+  B["Follow Crimson Social"]
+  C["Find the Flag account"]
+  D["Read the About Me field"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{Be-Careful-What-You-Post-Online-Kids}`
 

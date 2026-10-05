@@ -21,6 +21,16 @@ Giai đoạn cuối yêu cầu truy cập dashboard của bác sĩ. Trong vai Dr
 
 Đăng nhập tài khoản bác sĩ rồi kiểm tra trang prescriptions.html của medical dashboard. Flag nằm trong một ô bảng của trang này.
 
+```mermaid
+flowchart LR
+  A["Hoàn tất xác minh lễ tân"]
+  B["Nhận mật khẩu tạm thời"]
+  C["Đăng nhập dashboard bác sĩ"]
+  D["Mở prescriptions.html"]
+  E["Đọc flag"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{Its_always_lupus}`
 
 </div>
@@ -34,6 +44,16 @@ The final stage requires a physician dashboard session. Acting as Dr. Chris Wils
 ## Solution
 
 Sign in as the physician and inspect prescriptions.html in the medical dashboard. The flag appears in a table cell on that page.
+
+```mermaid
+flowchart LR
+  A["Complete the receptionist verification"]
+  B["Receive the temporary password"]
+  C["Log in to the doctor dashboard"]
+  D["Open prescriptions.html"]
+  E["Read the flag"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{Its_always_lupus}`
 

@@ -21,6 +21,15 @@ Tra Adam4EVE xác định IChooseYou Market and Industry ở Orvolle có structu
 
 Lọc từ ngày 16/05/2026 rồi chọn giá trị Buy Order lớn nhất. Ngày 29/08/2026 đạt 11.680.000 ISK; dữ liệu biểu đồ theo ngày xác nhận cùng kết quả.
 
+```mermaid
+flowchart LR
+  A["Tra structure ID trên Adam4EVE"]
+  B["Lọc dữ liệu từ 16/05/2026"]
+  C["Tìm Buy Order lớn nhất"]
+  D["Định dạng ngày và giá"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{2026-08-29_11680000}`
 
 </div>
@@ -34,6 +43,15 @@ Adam4EVE identifies IChooseYou Market and Industry in Orvolle as structure ID 10
 ## Solution
 
 Filter dates from 16 May 2026 and select the maximum Buy Order income. The peak is 11,680,000 ISK on 29 August 2026; the daily chart data independently confirms it.
+
+```mermaid
+flowchart LR
+  A["Find the structure ID on Adam4EVE"]
+  B["Filter data from 16/05/2026"]
+  C["Select the maximum Buy Order"]
+  D["Format the date and value"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{2026-08-29_11680000}`
 

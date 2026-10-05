@@ -21,6 +21,15 @@ Từ bài đăng của Dr. Chris Wilson về cuộc ly hôn, lần theo hồ sơ
 
 Đối chiếu chuỗi bài đăng gia đình và ngày sinh của Amy, kết quả là 11/07/1981 theo cách viết ngày/tháng. Đề dùng mẫu MM/DD/YYYY, nên đưa tháng trước ngày.
 
+```mermaid
+flowchart LR
+  A["Mở bài đăng của Chris Wilson"]
+  B["Lần theo hồ sơ Amy Lombardi"]
+  C["Đối chiếu ngày sinh"]
+  D["Đổi sang MM/DD/YYYY"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{07/11/1981}`
 
 </div>
@@ -34,6 +43,15 @@ Follow Dr. Chris Wilson’s divorce posts to his former wife Amy Lombardi. Disti
 ## Solution
 
 Cross-check the family timeline and Amy’s birthday, 11 July 1981. The challenge requires MM/DD/YYYY, so write the month before the day.
+
+```mermaid
+flowchart LR
+  A["Open Chris Wilson's post"]
+  B["Follow Amy Lombardi's profile"]
+  C["Verify the date of birth"]
+  D["Convert it to MM/DD/YYYY"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{07/11/1981}`
 

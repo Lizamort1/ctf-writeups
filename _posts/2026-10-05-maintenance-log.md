@@ -23,6 +23,16 @@ Hàm báo cáo rò địa chỉ buffer 80 byte. Hàm gắn nhãn tiếp theo đ�
 
 Đặt fake RBP và địa chỉ nhánh Access Granted tại vị trí đó. Khi hàm báo cáo chạy `leave; ret`, nó lấy cặp RBP/RIP do mình kiểm soát và bỏ qua phép so token. Bộ khai thác cục bộ kiểm tra căn chỉnh stack, chạy ổn định ba lần trên dịch vụ thật và thu flag.
 
+```mermaid
+flowchart LR
+  A["Rò địa chỉ summary buffer"]
+  B["Ghi đè thấp saved RBP"]
+  C["Đặt fake RBP và RIP"]
+  D["Thực hiện leave; ret"]
+  E["Vào nhánh Access Granted"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `CSSCTF{Duh_m4t3_1_4m_sl33py}`
 
 </div>
@@ -38,6 +48,16 @@ The maintenance report service prints the address of its summary buffer and acce
 The report function leaks its 80-byte buffer address. The tag function then reads 33 bytes into a 32-byte buffer, letting the final byte overwrite the low byte of the saved RBP. Use the leak to select a reachable pivot slot inside the controlled summary.
 
 Place a fake RBP and the Access Granted branch address there. When the report function executes `leave; ret`, it pops the controlled RBP/RIP pair and skips the token check. The local exploit checks stack alignment, worked three times against the service, and captured the flag.
+
+```mermaid
+flowchart LR
+  A["Leak the summary buffer"]
+  B["Overwrite the saved RBP low byte"]
+  C["Place fake RBP and RIP"]
+  D["Trigger leave; ret"]
+  E["Reach Access Granted"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `CSSCTF{Duh_m4t3_1_4m_sl33py}`
 

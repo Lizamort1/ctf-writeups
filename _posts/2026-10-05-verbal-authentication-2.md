@@ -21,6 +21,16 @@ Bản ghi cuộc gọi nhập vai lính AEF dùng từ mã thời Thế chiến 
 
 Đối chiếu bảng mã: CHECK chỉ xe máy và LOWER chỉ cấp bậc Captain. Cụm “lower by check” trong cuộc gọi chỉ vị Captain, tức Martin Morison trong danh sách bí danh. Dùng tên và họ viết thường, ngăn bằng dấu gạch dưới.
 
+```mermaid
+flowchart LR
+  A["Đọc bảng leaked_aliases"]
+  B["Giải mã CHECK và LOWER"]
+  C["Suy ra cấp Captain"]
+  D["Tra Martin Morison"]
+  E["Chuẩn hóa tên"]
+  A --> B --> C --> D --> E
+```
+
 ⇒ **Flag:** `cdctf{martin_morison}`
 
 </div>
@@ -34,6 +44,16 @@ The intercepted call roleplays AEF soldiers using First World War code words; th
 ## Solution
 
 The codebook maps CHECK to motorcycle and LOWER to Captain. “Lower by check” therefore identifies the Captain, Martin Morison in the alias list. Lowercase his first and last name and join them with an underscore.
+
+```mermaid
+flowchart LR
+  A["Read leaked_aliases"]
+  B["Decode CHECK and LOWER"]
+  C["Infer the Captain rank"]
+  D["Look up Martin Morison"]
+  E["Normalize the name"]
+  A --> B --> C --> D --> E
+```
 
 ⇒ **Flag:** `cdctf{martin_morison}`
 

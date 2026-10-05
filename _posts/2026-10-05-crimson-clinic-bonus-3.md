@@ -21,6 +21,15 @@ Kiểm tra các trang hồ sơ phụ của Crimson Social dẫn đến trang emi
 
 Giải mã Base64 cho ra flag hoàn chỉnh. Đường dẫn và trường About Me là hai dấu hiệu để phân biệt trang này với các hồ sơ mồi thông thường.
 
+```mermaid
+flowchart LR
+  A["Theo liên kết hồ sơ phụ"]
+  B["Mở emilys_cat_paradise.html"]
+  C["Lấy chuỗi About Me"]
+  D["Giải mã Base64"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{cats_r_better_than_dogs}`
 
 </div>
@@ -34,6 +43,15 @@ Inspecting auxiliary Crimson Social profiles leads to emilys_cat_paradise.html. 
 ## Solution
 
 Decoding that string yields the complete flag. The page path and About Me field distinguish this hidden profile from ordinary decoys.
+
+```mermaid
+flowchart LR
+  A["Follow the linked profile"]
+  B["Open emilys_cat_paradise.html"]
+  C["Copy the About Me string"]
+  D["Decode the Base64"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{cats_r_better_than_dogs}`
 

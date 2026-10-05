@@ -21,6 +21,15 @@ Cơ sở dữ liệu probe request thu từ rogue access point chứa nhiều th
 
 MAC 3C:07:54:1D:9B:E2 có bit U/L bằng 0. Sắp probe theo thời gian, các SSID sân bay lần lượt là YVR-Public, NRT-FREE-WiFi, HND-FreeWiFi và SEA-WiFi-Free. Lấy mã sân bay theo đúng thứ tự.
 
+```mermaid
+flowchart LR
+  A["Lọc MAC toàn cục"]
+  B["Sắp probe theo thời gian"]
+  C["Theo dõi các SSID sân bay"]
+  D["Đổi sang mã IATA"]
+  A --> B --> C --> D
+```
+
 ⇒ **Flag:** `cdctf{YVR_NRT_HND_SEA}`
 
 </div>
@@ -34,6 +43,15 @@ The rogue access point’s probe-request database contains many devices and SSID
 ## Solution
 
 MAC 3C:07:54:1D:9B:E2 has its U/L bit clear. In time order, its airport SSIDs are YVR-Public, NRT-FREE-WiFi, HND-FreeWiFi, and SEA-WiFi-Free. Use the airport codes in that order.
+
+```mermaid
+flowchart LR
+  A["Filter for a globally unique MAC"]
+  B["Sort the probes by time"]
+  C["Track the airport SSIDs"]
+  D["Convert them to IATA codes"]
+  A --> B --> C --> D
+```
 
 ⇒ **Flag:** `cdctf{YVR_NRT_HND_SEA}`
 
