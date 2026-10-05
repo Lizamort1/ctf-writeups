@@ -418,6 +418,50 @@
       overflow-wrap: anywhere;
     }
 
+    .flow-fallback {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .7rem;
+      margin: 1.25rem 0;
+      padding: 1rem;
+      border: 1px solid var(--main-border-color, #d7dce2);
+      border-radius: .75rem;
+      background: var(--card-bg, rgba(127, 127, 127, .06));
+    }
+
+    .flow-fallback .flow-step {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.5rem;
+      padding: .55rem .8rem;
+      border: 1px solid var(--main-border-color, #d7dce2);
+      border-radius: .55rem;
+      color: var(--text-color, inherit);
+      background: var(--main-bg, #fff);
+      font-size: .92rem;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .flow-fallback .flow-arrow {
+      color: var(--text-muted-color, #7b8088);
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      .flow-fallback {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .flow-fallback .flow-arrow {
+        transform: rotate(90deg);
+        align-self: center;
+      }
+    }
+
 
     html:not([data-lang="vn"]) .lang-vn,
     html[data-lang="en"] .lang-vn {
@@ -1241,6 +1285,57 @@
         applyInitialLanguage();
       }
       window.addEventListener('pageshow', applyInitialLanguage);
+    })();
+  </script>
+
+  <script>
+    (function() {
+      function renderFlowFallback() {
+        document.querySelectorAll('pre > code.language-mermaid').forEach(function(code) {
+          var labels = [];
+          var seen = {};
+          code.textContent.split(/\r?\n/).forEach(function(line) {
+            var match = line.match(/^\s*([A-Z])\["([^"]*)"\]/);
+            if (match && !seen[match[1]]) {
+              seen[match[1]] = true;
+              labels.push(match[2]);
+            }
+          });
+
+          if (!labels.length) {
+            return;
+          }
+
+          var flow = document.createElement('div');
+          flow.className = 'flow-fallback';
+          flow.setAttribute('role', 'img');
+          flow.setAttribute('aria-label', 'Exploitation flow');
+
+          labels.forEach(function(label, index) {
+            var step = document.createElement('span');
+            step.className = 'flow-step';
+            step.textContent = label;
+            flow.appendChild(step);
+
+            if (index < labels.length - 1) {
+              var arrow = document.createElement('span');
+              arrow.className = 'flow-arrow';
+              arrow.setAttribute('aria-hidden', 'true');
+              arrow.textContent = '→';
+              flow.appendChild(arrow);
+            }
+          });
+
+          code.parentElement.replaceWith(flow);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderFlowFallback);
+      } else {
+        renderFlowFallback();
+      }
+      window.addEventListener('pageshow', renderFlowFallback);
     })();
   </script>
 </head>
