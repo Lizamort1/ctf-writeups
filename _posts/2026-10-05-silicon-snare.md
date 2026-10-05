@@ -4,6 +4,7 @@ date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Hardware"]
 tags: ["hardware", "logic", "svg"]
 description: "Bài giải Silicon Snare: truy vết ma trận cổng logic 32 bit."
+mermaid: true
 ---
 
 <div class="lang-switch" role="tablist" aria-label="Language switch">

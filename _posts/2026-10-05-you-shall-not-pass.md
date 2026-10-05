@@ -4,6 +4,7 @@ date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "Password Cracking"]
 tags: ["cdctf", "password-cracking"]
 description: "Bài giải You Shall not Pass! trong CDCTF 2026."
+mermaid: true
 ---
 
 <div class="lang-switch" role="tablist" aria-label="Language switch">

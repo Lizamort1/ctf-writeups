@@ -4,6 +4,7 @@ date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "OSINT"]
 tags: ["osint", "git", "base64"]
 description: "Bài giải Dead Faction Servers: ghép hai phần flag từ lịch sử Git."
+mermaid: true
 ---
 
 <div class="lang-switch" role="tablist" aria-label="Language switch">

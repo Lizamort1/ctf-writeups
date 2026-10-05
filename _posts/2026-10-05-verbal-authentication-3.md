@@ -4,6 +4,7 @@ date: 2026-10-05 00:00:00 +0700
 categories: ["CDCTF 2026", "Cryptography"]
 tags: ["cdctf", "cryptography"]
 description: "Bài giải Verbal Authentication Transmissions 3/5: Pretty Good Passphrase trong CDCTF 2026."
+mermaid: true
 ---
 
 <div class="lang-switch" role="tablist" aria-label="Language switch">

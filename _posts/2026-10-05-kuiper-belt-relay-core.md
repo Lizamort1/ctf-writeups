@@ -4,6 +4,7 @@ date: 2026-10-05 00:00:00 +0700
 categories: ["CSS CTF 2026", "Pwn"]
 tags: ["pwn", "buffer-overflow", "ret2win"]
 description: "Bài giải Kuiper Belt Relay Core: khai thác tràn bộ đệm để chuyển luồng thực thi vào hàm win()."
+mermaid: true
 ---
 
 <div class="lang-switch" role="tablist" aria-label="Language switch">
