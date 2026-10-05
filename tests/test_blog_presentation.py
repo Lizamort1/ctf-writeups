@@ -157,7 +157,7 @@ class BlogPresentationTests(unittest.TestCase):
 
         self.assertFalse(public_posts)
         self.assertFalse((ROOT / "competitions" / "poctf-2026.md").exists())
-        self.assertGreaterEqual(len(private_posts), 16)
+        self.assertGreaterEqual(len(private_posts), 17)
         self.assertIn("https://pointeroverflowctf.com/img/logo-mini.png", catalog)
         for item in private_posts:
             content = item.read_text(encoding="utf-8")
@@ -165,6 +165,10 @@ class BlogPresentationTests(unittest.TestCase):
                 continue
             vn = content.split('<div class="lang-vn" markdown="1">', 1)[1].split("</div>", 1)[0]
             en = content.split('<div class="lang-en" markdown="1">', 1)[1].split("</div>", 1)[0]
+            if item.name == "2026-10-05-frequency-and-consequence.md":
+                self.assertIn("U7UTQYJ27QKBOHPQ", vn)
+                self.assertIn("U7UTQYJ27QKBOHPQ", en)
+                continue
             for body in (vn, en):
                 self.assertRegex(body.strip().splitlines()[-1], r"^⇒ \*\*Flag:\*\* `POCTF\{[^`]+\}`$")
                 self.assertEqual(1, body.count("⇒ **Flag:**"))
