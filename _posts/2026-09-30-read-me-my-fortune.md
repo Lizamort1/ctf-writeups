@@ -1,4 +1,5 @@
 ---
+published: false
 title: "Read Me My Fortune"
 date: 2026-09-30 01:41:00 +0700
 categories: ["Pointer Overflow CTF 2026", "Exploitation"]

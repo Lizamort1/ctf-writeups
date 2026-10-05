@@ -1,4 +1,5 @@
 ---
+published: false
 title: "Excavation"
 date: 2026-09-30 01:36:00 +0700
 categories: ["Pointer Overflow CTF 2026", "Reverse Engineering"]

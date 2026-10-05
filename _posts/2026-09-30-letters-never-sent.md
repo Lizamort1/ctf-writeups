@@ -1,4 +1,5 @@
 ---
+published: false
 title: "Letters Never Sent"
 date: 2026-09-30 01:40:00 +0700
 categories: ["Pointer Overflow CTF 2026", "Crypto"]

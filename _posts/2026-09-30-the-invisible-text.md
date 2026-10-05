@@ -1,4 +1,5 @@
 ---
+published: false
 title: "The Invisible Text"
 date: 2026-09-30 01:38:00 +0700
 categories: ["Pointer Overflow CTF 2026", "Steganography"]
