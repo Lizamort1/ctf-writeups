@@ -146,21 +146,23 @@ class BlogPresentationTests(unittest.TestCase):
             self.assertIn(f'categories: ["SunshineCTF 2026", "{subject}"]', content)
         self.assertFalse((ROOT / "_posts" / "2026-09-26-helpdesk-freebie.md").exists())
 
-    def test_pointer_overflow_writeup_has_its_own_osint_competition(self):
-        post = (ROOT / "_posts" / "2026-09-30-where-the-light-fails-to-fall.md").read_text(encoding="utf-8")
-        competition = (ROOT / "competitions" / "poctf-2026.md").read_text(encoding="utf-8")
+    def test_pointer_overflow_writeups_are_embargoed_until_contest_end(self):
         catalog = (ROOT / "_data" / "competitions.yml").read_text(encoding="utf-8")
-        poctf_posts = [
+        private_dir = ROOT.parent / "POCTF" / "private-writeups"
+        private_posts = list(private_dir.glob("*.md")) if private_dir.is_dir() else []
+        public_posts = [
             item for item in (ROOT / "_posts").glob("*.md")
             if 'categories: ["Pointer Overflow CTF 2026", ' in item.read_text(encoding="utf-8")
         ]
 
-        self.assertIn('categories: ["Pointer Overflow CTF 2026", "OSINT"]', post)
-        self.assertEqual(8, len(poctf_posts))
-        self.assertIn("permalink: /competitions/poctf-2026/", competition)
+        self.assertFalse(public_posts)
+        self.assertFalse((ROOT / "competitions" / "poctf-2026.md").exists())
+        self.assertGreaterEqual(len(private_posts), 16)
         self.assertIn("https://pointeroverflowctf.com/img/logo-mini.png", catalog)
-        for item in poctf_posts:
+        for item in private_posts:
             content = item.read_text(encoding="utf-8")
+            if 'categories: ["Pointer Overflow CTF 2026", ' not in content:
+                continue
             vn = content.split('<div class="lang-vn" markdown="1">', 1)[1].split("</div>", 1)[0]
             en = content.split('<div class="lang-en" markdown="1">', 1)[1].split("</div>", 1)[0]
             for body in (vn, en):
@@ -186,7 +188,10 @@ class BlogPresentationTests(unittest.TestCase):
             ("sunshinectf-2026", "png"),
             ("ptitctf-2026", "jpg"),
         ):
-            self.assertTrue((ROOT / "competitions" / f"{slug}.md").is_file())
+            if slug == "poctf-2026":
+                self.assertFalse((ROOT / "competitions" / f"{slug}.md").exists())
+            else:
+                self.assertTrue((ROOT / "competitions" / f"{slug}.md").is_file())
             self.assertTrue((ROOT / "assets" / "img" / "competitions" / f"{slug}.{extension}").is_file())
 
     def test_new_competition_writeups_have_matching_final_flags(self):
